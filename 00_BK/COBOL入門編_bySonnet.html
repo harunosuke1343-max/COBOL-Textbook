@@ -1,0 +1,2880 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>COBOL 入門編</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;600;700&family=Source+Code+Pro:ital,wght@0,300;0,400;0,600;1,400&family=Shippori+Mincho:wght@400;500;700&display=swap');
+
+:root {
+  --bg:        #f5f0e8;
+  --bg-alt:    #ede7d9;
+  --paper:     #faf7f2;
+  --ink:       #1a1208;
+  --ink-light: #3d3020;
+  --accent:    #2a4a7f;
+  --accent2:   #6b3a1f;
+  --rule:      #b8a890;
+  --code-bg:   #1a1810;
+  --code-fg:   #c8e6a0;
+  --code-dim:  #7a9a5a;
+  --highlight: #fff8d0;
+  --note-bg:   #f0e8d0;
+  --warn-bg:   #fdf0e0;
+  --sidebar-w: 240px;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;font-size:15px}
+
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:'Noto Serif JP','Shippori Mincho',serif;
+  line-height:1.95;
+  display:flex;
+  min-height:100vh;
+}
+
+/* ─── ライン背景 ─── */
+body::before{
+  content:'';position:fixed;inset:0;
+  background-image:repeating-linear-gradient(
+    0deg,transparent,transparent 29px,rgba(120,100,60,.035) 29px,rgba(120,100,60,.035) 30px);
+  pointer-events:none;z-index:0;
+}
+
+/* ─── サイドバー ─── */
+#sidebar{
+  position:fixed;top:0;left:0;bottom:0;
+  width:var(--sidebar-w);
+  background:var(--ink);
+  color:#c8b890;
+  overflow-y:auto;
+  z-index:50;
+  padding:24px 0 40px;
+  transition:transform .3s;
+  font-family:'Source Code Pro',monospace;
+  font-size:.72rem;
+}
+#sidebar::-webkit-scrollbar{width:4px}
+#sidebar::-webkit-scrollbar-thumb{background:#444;border-radius:2px}
+
+.sb-logo{
+  padding:0 18px 20px;
+  border-bottom:1px solid #333;
+  margin-bottom:16px;
+}
+.sb-logo h2{
+  font-size:.95rem;letter-spacing:.25em;
+  color:#e8d8b0;font-weight:600;
+  font-family:'Source Code Pro',monospace;
+}
+.sb-logo small{display:block;color:#7a6a50;margin-top:4px;font-size:.65rem;letter-spacing:.1em}
+
+.sb-search{
+  padding:0 14px 14px;
+}
+.sb-search input{
+  width:100%;background:#111;border:1px solid #333;color:#c8e6a0;
+  font-family:'Source Code Pro',monospace;font-size:.72rem;
+  padding:6px 10px;outline:none;
+}
+.sb-search input:focus{border-color:#6a8a40}
+
+.sb-group{margin-bottom:4px}
+.sb-chap{
+  display:block;padding:7px 18px;color:#e8d0a0;
+  font-weight:600;font-size:.73rem;letter-spacing:.05em;
+  text-decoration:none;cursor:pointer;
+  border-left:2px solid transparent;
+  transition:all .15s;
+}
+.sb-chap:hover,.sb-chap.active{
+  background:rgba(200,180,120,.12);
+  border-left-color:#c8b030;color:#f0d870;
+}
+.sb-items{display:none;padding-bottom:4px}
+.sb-group.open .sb-items{display:block}
+.sb-items a{
+  display:block;padding:4px 18px 4px 28px;
+  color:#9a8a70;text-decoration:none;font-size:.68rem;
+  transition:color .15s;
+}
+.sb-items a:hover{color:#c8e6a0}
+
+/* ─── メインコンテンツ ─── */
+#main{
+  margin-left:var(--sidebar-w);
+  flex:1;padding:0 40px 100px;
+  max-width:900px;
+  position:relative;z-index:1;
+}
+
+/* ─── カバー ─── */
+.cover{
+  text-align:center;padding:72px 0 56px;
+  border-bottom:3px double var(--rule);margin-bottom:56px;
+}
+.cover-dance{font-size:80px;line-height:1;margin-bottom:20px;
+  filter:grayscale(.2);animation:fIn 1.2s ease both}
+.cover h1{
+  font-family:'Source Code Pro',monospace;
+  font-size:clamp(2.8rem,6vw,4.8rem);font-weight:600;
+  letter-spacing:.25em;color:var(--accent);
+  text-shadow:2px 3px 0 rgba(42,74,127,.14);
+  animation:fIn 1s .2s ease both;
+}
+.cover-sub{
+  font-size:1.5rem;color:var(--ink-light);
+  letter-spacing:.35em;margin-top:6px;
+  animation:fIn 1s .35s ease both;
+}
+.cover-rule{
+  width:180px;height:2px;margin:28px auto;
+  background:linear-gradient(90deg,transparent,var(--rule),transparent);
+  animation:fIn 1s .45s ease both;
+}
+.cover-meta{
+  font-size:.88rem;color:var(--ink-light);
+  line-height:2.2;letter-spacing:.05em;
+  animation:fIn 1s .55s ease both;
+}
+.cover-meta strong{
+  display:block;font-size:.72rem;color:var(--rule);
+  letter-spacing:.2em;margin-bottom:4px;text-transform:uppercase;
+}
+@keyframes fIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+
+/* ─── 章ヘッダ ─── */
+.chapter{margin-bottom:68px;scroll-margin-top:20px}
+.ch-header{
+  display:flex;align-items:baseline;gap:14px;
+  margin-bottom:28px;padding-bottom:10px;
+  border-bottom:2px solid var(--accent);
+}
+.ch-num{
+  background:var(--accent);color:#fff;
+  font-family:'Source Code Pro',monospace;
+  font-size:.72rem;letter-spacing:.2em;
+  padding:3px 10px;flex-shrink:0;
+}
+.ch-title{
+  font-size:clamp(1.15rem,2.5vw,1.55rem);
+  font-weight:700;color:var(--ink);letter-spacing:.07em;
+}
+
+/* ─── セクション ─── */
+.section{margin-bottom:36px;scroll-margin-top:20px}
+.sec-title{
+  font-size:1rem;font-weight:700;color:var(--accent2);
+  margin-bottom:12px;padding-left:10px;
+  border-left:3px solid var(--accent2);letter-spacing:.05em;
+}
+.sub-title{
+  font-family:'Source Code Pro',monospace;
+  font-size:.9rem;font-weight:600;color:var(--accent);
+  margin:18px 0 8px;letter-spacing:.04em;
+}
+.sub-sub{
+  font-size:.88rem;font-weight:600;color:var(--ink-light);
+  margin:14px 0 6px;
+}
+p{margin-bottom:10px;text-align:justify}
+
+/* ─── コードブロック ─── */
+pre,.code-block{
+  background:var(--code-bg);color:var(--code-fg);
+  font-family:'Source Code Pro',monospace;
+  font-size:.78rem;line-height:1.75;
+  padding:18px 22px;margin:14px 0;
+  overflow-x:auto;white-space:pre;tab-size:4;
+  border-left:3px solid var(--accent);
+}
+code{
+  font-family:'Source Code Pro',monospace;font-size:.8em;
+  background:rgba(42,74,127,.1);color:var(--accent);
+  padding:1px 5px;border-radius:2px;
+}
+pre code{background:none;color:inherit;padding:0}
+
+/* コード色 */
+.kw{color:#79b8ff;font-weight:600}
+.cm{color:var(--code-dim);font-style:italic}
+.lit{color:#f0e060}
+.num{color:#ffa07a}
+.op{color:#f0c070}
+
+/* ─── フロー図 ─── */
+.flow{
+  background:#141210;color:#c8d8e8;
+  font-family:'Source Code Pro',monospace;
+  font-size:.76rem;line-height:1.85;
+  padding:22px;margin:14px 0;
+  overflow-x:auto;white-space:pre;
+  border:1px solid #2a2820;
+}
+.flow .fn{color:#7ad0ff;font-weight:600}
+.flow .fc{color:#ffd880}
+.flow .fa{color:#80d880}
+
+/* ─── テーブル ─── */
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:.85rem}
+th{background:var(--accent);color:#fff;padding:7px 13px;text-align:left;font-size:.78rem;letter-spacing:.06em}
+td{padding:6px 13px;border-bottom:1px solid var(--rule);vertical-align:top}
+tr:nth-child(even) td{background:var(--bg-alt)}
+tr:hover td{background:var(--highlight)}
+
+/* ─── DIVISION表 ─── */
+.div-table{
+  background:var(--code-bg);font-family:'Source Code Pro',monospace;
+  font-size:.8rem;padding:18px 22px;margin:14px 0;
+  border-left:4px solid var(--accent);
+}
+.div-row{
+  display:grid;grid-template-columns:220px 150px 1fr;
+  gap:8px;padding:5px 0;border-bottom:1px solid #2a2820;
+}
+.div-row:last-child{border-bottom:none}
+.dv-n{color:#79b8ff;font-weight:600}
+.dv-k{color:#c8e6a0}
+.dv-d{color:#c8a020}
+
+/* ─── 構文ボックス ─── */
+.syntax{
+  background:var(--code-bg);color:var(--code-fg);
+  font-family:'Source Code Pro',monospace;
+  font-size:.78rem;line-height:2;
+  padding:18px 22px;margin:14px 0;
+  border-left:3px solid #c8a020;
+}
+.s-req{color:#79b8ff;font-weight:600}
+.s-opt{color:#c8a020}
+.s-alt{color:#ffa07a}
+
+/* ─── 記入例 ─── */
+.example-box{
+  background:var(--paper);border:1px solid var(--rule);
+  padding:18px 22px;margin:14px 0;
+}
+.ex-label{
+  font-size:.72rem;letter-spacing:.18em;color:var(--accent2);
+  font-weight:700;margin-bottom:10px;
+  display:flex;align-items:center;gap:8px;
+}
+.ex-label::after{content:'';flex:1;height:1px;background:var(--rule)}
+
+/* ─── ノート ─── */
+.note{
+  background:var(--note-bg);
+  border-left:4px solid var(--accent2);
+  padding:12px 16px;margin:12px 0;font-size:.875rem;
+}
+.note-lbl{
+  font-size:.7rem;font-weight:700;color:var(--accent2);
+  letter-spacing:.15em;margin-bottom:5px;text-transform:uppercase;
+}
+.warn{
+  background:var(--warn-bg);border-left:4px solid #c87020;
+  padding:12px 16px;margin:12px 0;font-size:.875rem;
+}
+.warn-lbl{font-size:.7rem;font-weight:700;color:#a05010;letter-spacing:.15em;margin-bottom:5px}
+
+/* ─── 条項 ─── */
+.clause{margin-bottom:26px;padding-left:14px;border-left:2px solid var(--bg-alt)}
+.clause-title{
+  font-family:'Source Code Pro',monospace;
+  font-weight:600;color:var(--accent);
+  font-size:.9rem;margin-bottom:8px;
+  display:flex;align-items:center;gap:8px;
+}
+.cl-num{
+  background:var(--accent);color:#fff;
+  font-size:.68rem;padding:2px 7px;flex-shrink:0;
+}
+
+/* ─── 息抜き ─── */
+.break-box{
+  background:var(--highlight);border:2px dashed var(--rule);
+  padding:22px 30px;margin:28px 0;
+}
+.break-title{
+  font-size:1.05rem;font-weight:700;color:var(--accent2);
+  margin-bottom:10px;letter-spacing:.2em;text-align:center;
+}
+
+/* ─── コマンドグリッド ─── */
+.cmd-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));
+  gap:5px;margin:12px 0;
+}
+.cmd-item{
+  background:var(--code-bg);color:var(--code-fg);
+  font-family:'Source Code Pro',monospace;font-size:.75rem;
+  padding:5px 10px;border-left:2px solid var(--accent);
+}
+
+/* ─── リスト ─── */
+ul,ol{padding-left:22px;margin-bottom:10px}
+li{margin-bottom:5px}
+
+/* ─── 区切り ─── */
+.page-rule{border:none;border-top:1px dashed var(--rule);margin:40px 0}
+
+/* ─── フッター ─── */
+.doc-footer{
+  text-align:center;padding:36px 0;
+  border-top:2px double var(--rule);margin-top:60px;
+  color:var(--rule);font-size:.75rem;
+  font-family:'Source Code Pro',monospace;letter-spacing:.1em;
+}
+
+/* ─── ハンバーガー（モバイル）─── */
+#menu-btn{
+  display:none;position:fixed;top:12px;left:12px;
+  background:var(--accent);color:#fff;border:none;
+  padding:8px 12px;font-size:1rem;cursor:pointer;z-index:200;
+}
+
+/* ─── 読書進捗バー ─── */
+#progress-bar{
+  position:fixed;top:0;left:0;height:3px;width:0%;
+  background:linear-gradient(90deg,#c8b030,#4a90d0);
+  z-index:200;transition:width .1s linear;
+}
+
+/* ─── コードコピーボタン ─── */
+.code-wrap{position:relative}
+.copy-btn{
+  position:absolute;top:6px;right:8px;
+  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);
+  color:#7aaa50;font-family:'Source Code Pro',monospace;
+  font-size:.65rem;letter-spacing:.08em;
+  padding:3px 8px;cursor:pointer;
+  transition:all .2s;opacity:0;
+}
+.code-wrap:hover .copy-btn{opacity:1}
+.copy-btn:hover{background:rgba(255,255,255,.15);color:#c8e6a0}
+.copy-btn.copied{color:#ffd870;border-color:#ffd870}
+
+/* ─── フローティングボタン群 ─── */
+.fab-group{
+  position:fixed;bottom:28px;right:24px;
+  display:flex;flex-direction:column;gap:8px;
+  z-index:100;
+}
+.fab{
+  width:42px;height:42px;border-radius:50%;
+  border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1rem;box-shadow:0 2px 8px rgba(0,0,0,.3);
+  transition:all .2s;
+}
+.fab:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.4)}
+#btn-top{background:var(--accent);color:#fff}
+#btn-print{background:var(--accent2);color:#fff;font-size:.8rem}
+
+/* ─── 目次ページ ─── */
+#toc-page{
+  background:var(--paper);border:1px solid var(--rule);
+  border-top:4px solid var(--accent);
+  padding:40px 48px;margin-bottom:64px;
+  box-shadow:3px 3px 0 rgba(0,0,0,.05);
+}
+#toc-page h2{
+  font-family:'Source Code Pro',monospace;
+  font-size:1rem;letter-spacing:.5em;color:var(--accent);
+  border-bottom:1px solid var(--rule);padding-bottom:14px;
+  margin-bottom:24px;text-align:center;
+}
+.toc-ch{margin-bottom:16px}
+.toc-ch-link{
+  display:flex;align-items:baseline;justify-content:space-between;
+  font-weight:700;font-size:.92rem;color:var(--accent);
+  text-decoration:none;padding:4px 0;
+  border-bottom:1px dotted var(--rule);
+  transition:color .15s;
+}
+.toc-ch-link:hover{color:var(--accent2)}
+.toc-ch-link span{font-size:.72rem;color:var(--rule);font-family:'Source Code Pro',monospace}
+.toc-sub-items{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:2px 16px;padding:6px 0 0 16px;
+}
+.toc-sub-items a{
+  font-size:.8rem;color:var(--ink-light);text-decoration:none;
+  padding:2px 0;transition:color .15s;
+}
+.toc-sub-items a:hover{color:var(--accent2)}
+
+/* ─── SVGフロー図 ─── */
+.svg-flow{
+  background:#141210;padding:16px;margin:14px 0;
+  overflow-x:auto;border:1px solid #2a2820;
+}
+.svg-flow svg{display:block;margin:0 auto}
+
+/* ─── キーボードショートカットヒント ─── */
+.kbd-hint{
+  font-family:'Source Code Pro',monospace;font-size:.68rem;
+  color:var(--ink-light);margin-top:6px;text-align:right;
+}
+kbd{
+  background:var(--bg-alt);border:1px solid var(--rule);
+  border-radius:2px;padding:1px 5px;font-size:.72em;
+}
+
+/* ─── レスポンシブ ─── */
+@media(max-width:720px){
+  #sidebar{transform:translateX(-100%)}
+  #sidebar.open{transform:none}
+  #main{margin-left:0;padding:0 18px 80px}
+  #menu-btn{display:block}
+  .div-row{grid-template-columns:1fr}
+  pre,.syntax,.flow{font-size:.7rem;padding:14px}
+  .toc-sub-items{grid-template-columns:1fr}
+  #toc-page{padding:24px 20px}
+  .fab-group{bottom:16px;right:14px}
+}
+
+/* ─── スクロールバー ─── */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--bg-alt)}
+::-webkit-scrollbar-thumb{background:var(--rule);border-radius:3px}
+
+/* ─── 印刷 ─── */
+@media print{
+  #sidebar,#menu-btn,.fab-group,#progress-bar,#toc-page{display:none}
+  #main{margin-left:0}
+  body::before{display:none}
+  .chapter{break-before:page}
+  pre,.flow,.svg-flow{break-inside:avoid}
+  .copy-btn{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- 読書進捗バー -->
+<div id="progress-bar"></div>
+
+<!-- ハンバーガーメニュー -->
+<button id="menu-btn" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+
+<!-- フローティングボタン群 -->
+<div class="fab-group">
+  <button class="fab" id="btn-print" title="印刷" onclick="window.print()">🖨</button>
+  <button class="fab" id="btn-top" title="ページトップへ" onclick="window.scrollTo({top:0,behavior:'smooth'})">▲</button>
+</div>
+
+<!-- ════ サイドバー ════ -->
+<nav id="sidebar">
+  <div class="sb-logo">
+    <h2>COBOL</h2>
+    <small>入門編 ／ 1999.11.18</small>
+  </div>
+  <div class="sb-search">
+    <input type="text" id="srch" placeholder="検索…" oninput="doSearch(this.value)">
+  </div>
+
+  <div class="sb-group" onclick="tog(this)">
+    <span class="sb-chap">第一章　概説</span>
+    <div class="sb-items">
+      <a href="#ch1-1">COBOLの単位</a>
+      <a href="#ch1-2">4つのDIVISION</a>
+      <a href="#ch1-3">文字セット</a>
+    </div>
+  </div>
+  <div class="sb-group" onclick="tog(this)">
+    <span class="sb-chap">第二章　IDENTIFICATION</span>
+    <div class="sb-items">
+      <a href="#ch2-1">形式・記入例</a>
+    </div>
+  </div>
+  <div class="sb-group" onclick="tog(this)">
+    <span class="sb-chap">第三章　ENVIRONMENT</span>
+    <div class="sb-items">
+      <a href="#ch3-sp">SPECIAL-NAMES</a>
+      <a href="#ch3-sc">SOURCE-COMPUTER</a>
+      <a href="#ch3-oc">OBJECT-COMPUTER</a>
+      <a href="#ch3-io">INPUT-OUTPUT SECTION</a>
+      <a href="#ch3-fc">FILE-CONTROL</a>
+      <a href="#ch3-ioc">I-O-CONTROL</a>
+    </div>
+  </div>
+  <div class="sb-group" onclick="tog(this)">
+    <span class="sb-chap">第四章　DATA</span>
+    <div class="sb-items">
+      <a href="#ch4-fs">FILE SECTION</a>
+      <a href="#ch4-ws">WORKING-STORAGE</a>
+      <a href="#ch4-pic">PICTURE句</a>
+      <a href="#ch4-val">VALUE文節</a>
+      <a href="#ch4-jr">JUST RIGHT句</a>
+      <a href="#ch4-rd">REDEFINE文節</a>
+      <a href="#ch4-oc">OCCURS文節</a>
+      <a href="#ch4-ls">LINKAGE SECTION</a>
+    </div>
+  </div>
+  <div class="sb-group" onclick="tog(this)">
+    <span class="sb-chap">第五章　PROCEDURE</span>
+    <div class="sb-items">
+      <a href="#c-accept">ACCEPT</a>
+      <a href="#c-add">ADD</a>
+      <a href="#c-sub">SUBTRACT</a>
+      <a href="#c-mul">MULTIPLY</a>
+      <a href="#c-div">DIVIDE</a>
+      <a href="#c-cmp">COMPUTE</a>
+      <a href="#c-if">IF文</a>
+      <a href="#c-read">READ</a>
+      <a href="#c-move">MOVE</a>
+      <a href="#c-set">SET</a>
+      <a href="#c-perf">PERFORM</a>
+      <a href="#c-goto">GO TO</a>
+      <a href="#c-open">OPEN</a>
+      <a href="#c-close">CLOSE</a>
+      <a href="#c-write">WRITE</a>
+      <a href="#c-disp">DISPLAY</a>
+      <a href="#c-srch">SEARCH</a>
+      <a href="#c-stop">STOP RUN / GOBACK</a>
+    </div>
+  </div>
+  <div class="sb-group" onclick="tog(this)">
+    <span class="sb-chap">第六章　フロー例</span>
+    <div class="sb-items">
+      <a href="#ch6-m11">マッチング 1:1</a>
+      <a href="#ch6-m1n">マッチング 1:N</a>
+      <a href="#ch6-mnn">マッチング N:N</a>
+      <a href="#ch6-desc">マッチングの説明</a>
+      <a href="#ch6-cb">コントロールブレイク</a>
+    </div>
+  </div>
+  <div class="sb-group" onclick="tog(this)">
+    <span class="sb-chap">第七章　TSO</span>
+    <div class="sb-items">
+      <a href="#ch7-fi">ファイル説明</a>
+      <a href="#ch7-fl">ソース→ロードモジュール</a>
+      <a href="#ch7-jt">JCL vs TSO</a>
+      <a href="#ch7-md">モード関係図</a>
+      <a href="#ch7-cl">CLISTの作り方</a>
+      <a href="#ch7-cm">主なコマンド</a>
+    </div>
+  </div>
+  <div class="sb-group" onclick="tog(this)">
+    <span class="sb-chap">第八章　PAD図</span>
+    <div class="sb-items">
+      <a href="#pad1">1:1（スイッチ使用）</a>
+      <a href="#pad2">1:1（スイッチ不使用）</a>
+      <a href="#pad3">1:N</a>
+      <a href="#pad4">N:N</a>
+      <a href="#pad5">コントロールブレイク</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ════ メイン ════ -->
+<div id="main">
+
+<!-- カバー -->
+<div class="cover">
+  <div class="cover-dance">🕺💃</div>
+  <h1>COBOL</h1>
+  <div class="cover-sub">入門編</div>
+  <div class="cover-rule"></div>
+  <div class="cover-meta">
+    <strong>編集</strong>
+    東京システム営業５部１課<br>
+    大井駐在オペレーター<br>
+    1999年11月18日　再編成
+  </div>
+</div>
+
+<!-- ════ 目次ページ ════ -->
+<div id="toc-page">
+  <h2>目　　次</h2>
+
+  <div class="toc-ch">
+    <a class="toc-ch-link" href="#ch1">第一章　COBOLの概説<span>p.1</span></a>
+    <div class="toc-sub-items">
+      <a href="#ch1-1">1、COBOLの単位</a>
+      <a href="#ch1-2">2、4つのDIVISION</a>
+      <a href="#ch1-3">3、文字セット</a>
+    </div>
+  </div>
+
+  <div class="toc-ch">
+    <a class="toc-ch-link" href="#ch2">第二章　IDENTIFICATION DIVISION（見出し部）<span>p.3</span></a>
+    <div class="toc-sub-items">
+      <a href="#ch2-1">1、形式（記入例）</a>
+    </div>
+  </div>
+
+  <div class="toc-ch">
+    <a class="toc-ch-link" href="#ch3">第三章　ENVIRONMENT DIVISION（環境部）<span>p.4</span></a>
+    <div class="toc-sub-items">
+      <a href="#ch3-sp">SPECIAL-NAMES</a>
+      <a href="#ch3-sc">SOURCE-COMPUTER</a>
+      <a href="#ch3-oc">OBJECT-COMPUTER</a>
+      <a href="#ch3-io">INPUT-OUTPUT SECTION</a>
+      <a href="#ch3-fc">FILE-CONTROL（①〜⑪文節）</a>
+      <a href="#ch3-ioc">I-O-CONTROL（①〜④文節）</a>
+    </div>
+  </div>
+
+  <div class="toc-ch">
+    <a class="toc-ch-link" href="#ch4">第四章　DATA DIVISION（データ部）<span>p.9</span></a>
+    <div class="toc-sub-items">
+      <a href="#ch4-fs">FILE SECTION</a>
+      <a href="#ch4-ws">WORKING-STORAGE SECTION</a>
+      <a href="#ch4-pic">PICTURE句（9/A/X/編集TYPE）</a>
+      <a href="#ch4-val">VALUE文節</a>
+      <a href="#ch4-jr">JUST RIGHT句</a>
+      <a href="#ch4-rd">REDEFINE文節</a>
+      <a href="#ch4-oc">OCCURS文節（テーブル）</a>
+      <a href="#ch4-ls">LINKAGE SECTION</a>
+    </div>
+  </div>
+
+  <div class="toc-ch">
+    <a class="toc-ch-link" href="#ch5">第五章　PROCEDURE DIVISION（手続き部）<span>p.23</span></a>
+    <div class="toc-sub-items">
+      <a href="#c-accept">1、ACCEPT</a>
+      <a href="#c-add">2、ADD</a>
+      <a href="#c-sub">3、SUBTRACT</a>
+      <a href="#c-mul">4、MULTIPLY</a>
+      <a href="#c-div">5、DIVIDE</a>
+      <a href="#c-cmp">6、COMPUTE</a>
+      <a href="#c-if">7、IF文</a>
+      <a href="#c-read">8、READ</a>
+      <a href="#c-move">9、MOVE</a>
+      <a href="#c-set">10、SET</a>
+      <a href="#c-perf">11、PERFORM</a>
+      <a href="#c-goto">12、GO TO</a>
+      <a href="#c-open">13、OPEN</a>
+      <a href="#c-close">14、CLOSE</a>
+      <a href="#c-write">15、WRITE</a>
+      <a href="#c-disp">16、DISPLAY</a>
+      <a href="#c-srch">17、SEARCH</a>
+      <a href="#c-stop">18、STOP RUN / GOBACK</a>
+    </div>
+  </div>
+
+  <div class="toc-ch">
+    <a class="toc-ch-link" href="#ch6">第六章　フロー例とコーディング例<span>p.38</span></a>
+    <div class="toc-sub-items">
+      <a href="#ch6-m11">1、マッチング（1:1）</a>
+      <a href="#ch6-m1n">2、マッチング（1:N）</a>
+      <a href="#ch6-mnn">3、マッチング（N:N）</a>
+      <a href="#ch6-desc">4、マッチングの説明</a>
+      <a href="#ch6-cb">5、コントロールブレイク</a>
+    </div>
+  </div>
+
+  <div class="toc-ch">
+    <a class="toc-ch-link" href="#ch7">第七章　TSO<span>p.50</span></a>
+    <div class="toc-sub-items">
+      <a href="#ch7-fi">ファイル説明</a>
+      <a href="#ch7-fl">ソース→ロードモジュール</a>
+      <a href="#ch7-jt">JCL vs TSO</a>
+      <a href="#ch7-md">TSOモード関係図</a>
+      <a href="#ch7-cl">CLISTの作り方</a>
+      <a href="#ch7-cm">TSOの主なコマンド</a>
+    </div>
+  </div>
+
+  <div class="toc-ch">
+    <a class="toc-ch-link" href="#ch8">第八章　PAD図<span>p.58</span></a>
+    <div class="toc-sub-items">
+      <a href="#pad1">1:1マッチング（スウィッチ使用）</a>
+      <a href="#pad2">1:1マッチング（スウィッチ不使用）</a>
+      <a href="#pad3">1:Nマッチング</a>
+      <a href="#pad4">N:Nマッチング</a>
+      <a href="#pad5">コントロールブレイク（3キー）</a>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════
+     第一章
+════════════════════════════════ -->
+<div class="chapter" id="ch1">
+  <div class="ch-header">
+    <div class="ch-num">第一章</div>
+    <div class="ch-title">COBOLの概説</div>
+  </div>
+
+  <div class="section" id="ch1-1">
+    <div class="sec-title">1、COBOLの単位</div>
+    <p>語はCOBOL予約語、あるいはプログラマーによって定義される語のいずれかである。</p>
+    <p>予約語はCOBOLコンパイラーに対し、特定の統語上意味を持っている。</p>
+    <p>プログラマーによって定義される語は、データ名やプログラム名などの項目で名前を付ける際はCOBOLの規則に従わなければならない。</p>
+  </div>
+
+  <div class="section" id="ch1-2">
+    <div class="sec-title">2、4つのDIVISION</div>
+    <p>各DIVISIONは、論理的な順序に配置される。DIVISIONのコーディングの順序は下記のとおりである。</p>
+    <div class="div-table">
+      <div class="div-row"><span class="dv-n">IDENTIFICATION</span><span class="dv-k">DIVISION.</span><span class="dv-d">（見出し部）</span></div>
+      <div class="div-row"><span class="dv-n">ENVIRONMENT</span><span class="dv-k">DIVISION.</span><span class="dv-d">（環境部）</span></div>
+      <div class="div-row"><span class="dv-n">DATA</span><span class="dv-k">DIVISION.</span><span class="dv-d">（データ部）</span></div>
+      <div class="div-row"><span class="dv-n">PROCEDURE</span><span class="dv-k">DIVISION.</span><span class="dv-d">（手続き部）</span></div>
+    </div>
+    <ul>
+      <li><strong>IDENTIFICATION DIVISION</strong> では、プログラム名、プログラム作成者、作成日などを記入する。</li>
+      <li><strong>ENVIRONMENT DIVISION</strong> では、プログラムを処理する具体的な計算機の構成に関する情報、JCLのDD名とDCB名の対応づけなどを記入する。</li>
+      <li><strong>DATA DIVISION</strong> では、プログラムで扱う全てのデータの形式、性質、及び作業用エリアとして使用するエリアの定義などを記入する。</li>
+      <li><strong>PROCEDURE DIVISION</strong> では、計算機に実行させたい処理をCOBOLの命令により記入する。</li>
+    </ul>
+  </div>
+
+  <div class="section" id="ch1-3">
+    <div class="sec-title">3、文字セット</div>
+    <p>51種類の文字から構成される。</p>
+    <table>
+      <tr><th>文字</th><th>意味</th><th>文字</th><th>意味</th></tr>
+      <tr><td><code>0, 1〜9</code></td><td>数字</td><td><code>：</code></td><td>コロン</td></tr>
+      <tr><td><code>A, B〜Z</code></td><td>英字</td><td><code>；</code></td><td>セミコロン</td></tr>
+      <tr><td><code>△</code></td><td>スペース（空白）</td><td><code>．</code></td><td>ピリオド（小数点）</td></tr>
+      <tr><td><code>＋</code></td><td>正の符号</td><td><code>" 又は '</code></td><td>引用符（IBMでは'）</td></tr>
+      <tr><td><code>－</code></td><td>負の符号（ハイフン）</td><td><code>（</code></td><td>左括弧</td></tr>
+      <tr><td><code>＊</code></td><td>星印（アスタリスク）</td><td><code>）</code></td><td>右括弧</td></tr>
+      <tr><td><code>／</code></td><td>斜線（スラッシュ）</td><td><code>＞</code></td><td>不等号（より大きい）</td></tr>
+      <tr><td><code>＝</code></td><td>等号</td><td><code>＜</code></td><td>不等号（より小さい）</td></tr>
+      <tr><td><code>¥</code></td><td>通貨記号</td><td></td><td></td></tr>
+    </table>
+    <div class="note">
+      <div class="note-lbl">語の中に使用できる文字</div>
+      <p><code>0〜9</code>、<code>A〜Z</code>、<code>－（ハイフン）</code> は語の始めと終わりには使用出来ない。尚、桁数は30桁以内である。</p>
+<pre>例   S02-INITIAL
+     WK-FROM.
+     COUNTER-AREA   etc</pre>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════
+     第二章
+════════════════════════════════ -->
+<div class="chapter" id="ch2">
+  <div class="ch-header">
+    <div class="ch-num">第二章</div>
+    <div class="ch-title">IDENTIFICATION DIVISION（見出し部）</div>
+  </div>
+  <div class="section" id="ch2-1">
+    <div class="sec-title">1、形式</div>
+    <div class="syntax">
+<span class="s-req">*IDENTIFICATION DIVISION.</span>
+<span class="s-req">*PROGRAM-ID.         </span><span class="s-alt">プログラム名．</span>
+<span class="s-opt"> AUTHOR.              </span><span class="s-alt">プログラム作成者</span>
+<span class="s-opt"> DATE-COMPILED.       </span><span class="s-alt">コンパイル日付</span>
+<span class="s-opt"> DATE-WRITTEN.        </span><span class="s-alt">プログラム作成日</span>
+<span class="s-opt"> INSTALLATION.        </span><span class="s-alt">会社名、課名、etc</span>
+<span class="s-opt"> SECURITY.            </span><span class="s-alt">情報の極秘等</span>
+<span class="s-opt"> REMARKS.             </span><span class="s-alt">プログラムの概要処理</span></div>
+    <p><code>＊</code> は省略不可、他は省略可能。コンパイル日付は機械の方でコンパイル時に入れてくれるので、プログラマーが記入する必要はない。記入した時には、機械の方の日付は無視される。</p>
+    <div class="example-box">
+      <div class="ex-label">記入例</div>
+<pre>IDENTIFICATION    DIVISION.
+PROGRAM-ID.       SS001601.
+DATE-COMPILED.
+REMARKS.          MIX DUMP.</pre>
+    </div>
+    <p>尚、REMARKSは、項目中にスペースがあっても、2行になっても、全くプログラムにさしつかえはない。</p>
+  </div>
+</div>
+
+<!-- ════════════════════════════════
+     第三章
+════════════════════════════════ -->
+<div class="chapter" id="ch3">
+  <div class="ch-header">
+    <div class="ch-num">第三章</div>
+    <div class="ch-title">ENVIRONMENT DIVISION（環境部）</div>
+  </div>
+
+  <div class="section">
+    <div class="sec-title">1、形式</div>
+    <div class="syntax">
+<span class="s-req">*ENVIRONMENT DIVISION.</span>
+<span class="s-req">*CONFIGURATION SECTION.</span>
+<span class="s-req">*SOURCE-COMPUTER.</span>
+<span class="s-req">*OBJECT-COMPUTER.</span>
+<span class="s-opt"> SPECIAL-NAMES.</span>
+<span class="s-opt"> INPUT-OUTPUT SECTION.</span>
+<span class="s-opt"> FILE-CONTROL.</span>
+<span class="s-opt"> I-O-CONTROL.</span></div>
+    <p><code>＊</code> の4つは指定しなければならない。<code>＊</code>のない4つは、プログラム上あるいはファイルの都合上、指定せねばならないものもある。</p>
+    <div class="example-box">
+      <div class="ex-label">記入例</div>
+<pre>ENVIRONMENT       DIVISION.
+CONFIGURATION     SECTION.
+SOURCE-COMPUTER.  IBM-370.
+OBJECT-COMPUTER.  IBM-370.
+SPECIAL-NAMES.    C01 IS F-FILE
+INPUT-OUTPUT      SECTION.
+FILE-CONTROL.
+    SELECT INFL ASSIGN TO UT-S-INFL.
+    SELECT OTFL ASSIGN TO UT-S-OTFL.
+I-O-CONTROL.
+    APPLY WRITE-ONLY ON OTFL.</pre>
+    </div>
+  </div>
+
+  <div class="section" id="ch3-sp">
+    <div class="sec-title">(1) SPECIAL-NAMES</div>
+    <p>これは、プリントなどでファーストラインに名前を付けるものである。（C01のみ使用）</p>
+    <p>例えば、<code>"C01 IS FIRST-LINE"</code> と記入すると、チャネル01（C01）の名前をFIRST-LINEとすると定義する事である。これは、プロシジャーディビジョンでプリントファイルにWRITEする時使用される。BEFOREもしくはAFTERでFIRST-LINEと書くと命令が実行された後、もしくは前にプリンタのポインタは、TOPを指す。詳細はWRITE命令を参照。</p>
+  </div>
+
+  <div class="section" id="ch3-sc">
+    <div class="sec-title">(2) SOURCE-COMPUTER</div>
+    <p>この段落は文書化の働きしかしない。コンパイルする電子計算機について記述する。通常、<code>IBM-9790.</code> などの様に記述する。</p>
+  </div>
+
+  <div class="section" id="ch3-oc">
+    <div class="sec-title">(3) OBJECT-COMPUTER</div>
+    <p>SOURCE-COMPUTERと同じで実行する計算機について記述する。MEMORY SIZEやSEGMENT-LIMITなどのOPTIONがあるが、ここでは省略する。</p>
+  </div>
+
+  <div class="section" id="ch3-io">
+    <div class="sec-title">(4) INPUT-OUTPUT SECTION</div>
+    <p>個々のファイルの定義。ファイルを入れる外部記憶媒体の識別（JCLのDDとの関連付け）、1つ又は2つ以上の入出力装置へのファイルの割り当てなどを定義するセクションで、FILE-CONTROL段落と、I-O-CONTROL段落がある。</p>
+  </div>
+
+  <div class="section" id="ch3-fc">
+    <div class="sec-title">(5) FILE-CONTROL</div>
+    <p>ファイルを入出力装置に割り当てる。</p>
+    <div class="syntax">
+<span class="s-req">SELECT</span>          文節
+<span class="s-req">ASSIGN</span>          文節
+<span class="s-opt">RESERVE</span>         文節
+<span class="s-opt">FILE-LIMIT</span>      文節
+<span class="s-opt">ACCESS MODE</span>     文節
+<span class="s-opt">PROCESSING MODE</span> 文節
+<span class="s-opt">ACTUAL KEY</span>      文節
+<span class="s-opt">NOMINAL KEY</span>     文節
+<span class="s-opt">RECORD KEY</span>      文節
+<span class="s-opt">TRACK-AREA</span>      文節
+<span class="s-opt">TRACK-LIMIT</span>     文節</div>
+
+    <div class="clause">
+      <div class="clause-title"><span class="cl-num">①</span> SELECT 文節</div>
+      <p>SELECT文節は、プログラム中の個々のファイルに名前を与える為に使用される。</p>
+      <pre>SELECT ファイル名</pre>
+      <p>このファイル名で書いた名前は、DATA DIVISION中のFD又はSD項目を持っていなければならない。</p>
+    </div>
+
+    <div class="clause">
+      <div class="clause-title"><span class="cl-num">②</span> ASSIGN 文節</div>
+      <p>ASSIGN文節は、ファイルを外部媒体（JCL上のDD名）に割り当てるものである。</p>
+      <pre>ASSIGN TO システム名</pre>
+      <p>システム名の構成：<code>クラス（－装置）－編成－名前</code></p>
+      <table>
+        <tr><th>クラス</th><th>説明</th><th>装置番号例</th></tr>
+        <tr><td><code>DA</code></td><td>大容量記憶装置</td><td>—</td></tr>
+        <tr><td><code>UT</code></td><td>ユーティリティ（IBMでは主にこれ）</td><td>2301, 2302, 2303, 2311, 2321, 2314 / 2400など</td></tr>
+        <tr><td><code>UR</code></td><td>ユニットレコード</td><td>1403, 1404, 1443など</td></tr>
+      </table>
+      <p>UTスはURに割り当てられるファイルは標準順次編成でなければならない。DAは順次編成又は直接編成のいずれでもよい。</p>
+      <table>
+        <tr><th>編成コード</th><th>意味</th></tr>
+        <tr><td><code>S</code></td><td>標準順次編成</td></tr>
+        <tr><td><code>D</code></td><td>直接編成</td></tr>
+        <tr><td><code>W</code></td><td>REWRITEを使用時の直接編成</td></tr>
+        <tr><td><code>R</code></td><td>相対編成</td></tr>
+        <tr><td><code>I</code></td><td>索引編成</td></tr>
+      </table>
+      <p>名前は、1〜8文字までで示すDD名である。</p>
+    </div>
+
+    <div class="clause">
+      <div class="clause-title"><span class="cl-num">③</span> RESERVE 文節</div>
+      <p>コンパイラーが割り当てられる入出力域（BUFF）の数をユーザーが修正できる様にするものである。</p>
+<pre>RESERVE { NO    } ALTERNATE [ AREA  ]
+        { 整数  }            [ AREAS ]</pre>
+      <p>整数で示される偶数だけBUFFが確保される。但し、順次アクセスにのみ有効。</p>
+    </div>
+
+    <div class="clause">
+      <div class="clause-title"><span class="cl-num">④</span> FILE-LIMIT 文節</div>
+      <p>この文節は、コメントとしてあつかわれるので省略する。</p>
+      <pre>FILE-LIMIT IS リテラル-1 THRU リテラル-2</pre>
+    </div>
+
+    <div class="clause">
+      <div class="clause-title"><span class="cl-num">⑤</span> ACCESS MODE 文節</div>
+      <p>ファイルのレコードをアクセスする方法を規定する。省略時は SEQUENTIALとみなされる。</p>
+<pre>ACCESS MODE IS { SEQUENTIAL }
+               { RANDOM     }</pre>
+    </div>
+
+    <div class="clause">
+      <div class="clause-title"><span class="cl-num">⑥</span> PROCESSING MODE 文節</div>
+      <p>この文節は、指定してもコメントとして扱われる。</p>
+      <pre>PROCESSING MODE IS SEQUENTIAL</pre>
+    </div>
+
+    <div class="clause">
+      <div class="clause-title"><span class="cl-num">⑦</span> ACTUAL KEY 文節</div>
+      <p>ランダム・アクセスの時には、指定しなければならない。データ名は、5〜259バイトの長さの固定長項目であり、DATA DIVISIONで指定しなければならない。</p>
+      <pre>ACTUAL KEY IS データ名</pre>
+    </div>
+
+    <div class="clause">
+      <div class="clause-title"><span class="cl-num">⑧</span> NOMINAL KEY 文節</div>
+      <p>索引付ファイル及び相対ファイルをランダム・アクセスする時、指定しなければならない。データ名は、1〜255バイトの長さの固定長のWORKING-STORAGE SECTIONで項目を指定する事ができる。</p>
+      <pre>NOMINAL KEY IS データ名</pre>
+    </div>
+
+    <div class="clause">
+      <div class="clause-title"><span class="cl-num">⑨</span> RECORD KEY 文節</div>
+      <p>索引ファイルをアクセスする為に使用する。データ名は、255バイト以下の固定長項目でなければならない。</p>
+      <pre>RECORD KEY IS データ名</pre>
+    </div>
+
+    <div class="clause">
+      <div class="clause-title"><span class="cl-num">⑩</span> TRACK-AREA 文節</div>
+      <p>索引ファイルに対し、ランダム・アクセス方式でレコードを追加する場合、使用される。この文節を使用するとレコード追加の効率がよくなる。定義される区域は、8の倍数で、32760バイト以内。</p>
+<pre>TRACK-AREA IS { データ名 }
+              { 整数    }</pre>
+    </div>
+
+    <div class="clause">
+      <div class="clause-title"><span class="cl-num">⑪</span> TRACK-LIMIT 文節</div>
+      <p>直接編成ファイルの作成時、初期値化すべき最後のトラックの相対番号を示すものである。</p>
+      <pre>TRACK-LIMIT IS 整数 TRACK(S)</pre>
+    </div>
+  </div>
+
+  <div class="section" id="ch3-ioc">
+    <div class="sec-title">(6) I-O-CONTROL</div>
+<pre>I-O-CONTROL.
+    RERUN 文節
+    SAME AREA 文節
+    MULTIPLE FILE TAPE 文節
+    APPLY 文節</pre>
+    <div class="clause">
+      <div class="clause-title"><span class="cl-num">①</span> RERUN 文節</div>
+      <p>RERUN文節は、チェックポイント・レコードをとる事を指定するものである。</p>
+<pre>RERUN ON システム名
+EVERY { 整数          RECORD }
+      { [END OF] { REEL }    }
+                 { UNIT }    }</pre>
+      <ul>
+        <li>システム名は、チェックポイント・レコードが書かれるファイル。</li>
+        <li>ファイル名は、チェックポイント・レコードをどのファイルの為に取るのか、その目的のファイルを表わす。これは、DATA部で定義されていなければならない。</li>
+      </ul>
+    </div>
+    <div class="clause">
+      <div class="clause-title"><span class="cl-num">②</span> SAME 文節</div>
+      <p>処理中に2つ以上のファイルが同じコア記憶域を使用することを指定する。</p>
+<pre>SAME [ SORT   ] AREA FOR ファイル名-1…n
+     [ RECORD ]</pre>
+    </div>
+    <div class="clause">
+      <div class="clause-title"><span class="cl-num">③</span> MULTIPLE FILE TAPE 文節</div>
+      <p>これは文書化の為に使用。</p>
+<pre>MULTIPLE FILE TAPE CONTAINS ファイル名-1
+POSITION 整数-1…n</pre>
+    </div>
+    <div class="clause">
+      <div class="clause-title"><span class="cl-num">④</span> APPLY 文節</div>
+<pre>(I)  APPLY WRITE-ONLY ON ファイル名-1…n
+     Vモードのレコードをもつファイルをアウトファイルに対し使用する。
+     この指定をした時のWRITE文は、
+     "WRITE レコード名 FROM エリア名" の形をとらなければならない。
+     指定しないと、ブロッキングの使用効率が非常に悪くなる。
+
+(II) APPLY CORE-INDEX ON ファイル名-1…n
+     ランダム・アクセスの索引付ファイルに対してのみ指定できる。</pre>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════
+     第四章
+════════════════════════════════ -->
+<div class="chapter" id="ch4">
+  <div class="ch-header">
+    <div class="ch-num">第四章</div>
+    <div class="ch-title">DATA DIVISION（データ部）</div>
+  </div>
+
+  <div class="section">
+    <div class="sec-title">1、形式</div>
+    <div class="syntax">
+<span class="s-req">*DATA DIVISION.</span>
+<span class="s-opt"> FILE SECTION.</span>
+<span class="s-opt"> WORKING-STORAGE SECTION.</span>
+<span class="s-opt"> LINKAGE SECTION.</span>
+<span class="s-opt"> REPORT SECTION.</span></div>
+    <div class="example-box">
+      <div class="ex-label">記入例</div>
+<pre>DATA              DIVISION.
+FILE              SECTION.
+FD  INFL          RECORDING MODE IS F
+    RECORD        CONTAINS 20 CHARACTERS
+    LABEL         RECORD IS STANDARD
+    DATA          RECORD IS IN-REC.
+01  IN-REC                          PIC X(20).
+WORKING-STORAGE   SECTION.
+77  COUNTER                         PIC 99.
+01  IN-DATA.
+  05 IN-KBN                         PIC X(5).
+  05 IN-NAIYO                       PIC X(15).
+LINKAGE           SECTION.
+01  PARM.
+  05 PARM-LL                        PIC 9(3) COMP.
+  05 PARM-YMD                       PIC X(6).</pre>
+    </div>
+  </div>
+
+  <div class="section" id="ch4-fs">
+    <div class="sec-title">(1) FILE SECTION</div>
+    <p>ここでは、プログラム中で使用される外部データのDCBなどを記述する。1つのプログラム中で25個以内のファイル記述項目を書く事ができる。</p>
+    <p><strong>A. ファイル記述項目（FD）</strong></p>
+    <pre>FD  ファイル名
+    BLOCK CONTAINS 文節
+    RECORD CONTAINS 文節
+    RECORDING MODE 文節
+    LABEL RECORD 文節
+    VALUE OF 文節
+    DATA RECORD 文節
+    REPORT 文節</pre>
+
+    <div class="clause">
+      <div class="clause-title"><span class="cl-num">①</span> BLOCK CONTAINS 文節</div>
+      <p>ここでは、物理レコードのブロック長を指定する。</p>
+<pre>BLOCK CONTAINS [整数-1 TO] { CHARACTERS }
+                           { RECORDS    }</pre>
+      <p>1レコード1ブロックのデータには、この文節を指定する必要はない。データがFIXの時は、整数-2だけを指定する。データがVARIABLEの時は、整数-2はMAXのレコード長を指定し、整数-1を指定する時はMINのレコード長を記入する。例えば、<code>BLOCK CONTAINS 1 TO 3 RECORDS</code> と指定すると、最小1レコード最大3レコードであるということを意味している。</p>
+    </div>
+
+    <div class="clause">
+      <div class="clause-title"><span class="cl-num">②</span> RECORD CONTAINS 文節</div>
+      <p>ここでは、データ・レコードの大きさを指定する。</p>
+      <pre>RECORD CONTAINS [整数-1 TO] 整数-2 CHARACTERS</pre>
+      <p>通常、整数-2を指定する。整数-2はMAXのレコードの大きさである。整数-1を指定する時は、データがVARIABLEの時で、レコードの最小値を指定する。</p>
+    </div>
+
+    <div class="clause">
+      <div class="clause-title"><span class="cl-num">③</span> RECORDING MODE 文節</div>
+      <p>ここでは、F、U、V、Sを指定する事ができる。</p>
+      <pre>RECORDING MODE IS モード</pre>
+      <table>
+        <tr><th>モード</th><th>説明</th></tr>
+        <tr><td><code>F</code></td><td>ファイル内、全てのレコードが同じ長さである。通常、各ブロックに入るレコード数は固定している。</td></tr>
+        <tr><td><code>U</code></td><td>レコードの長さは、固定長でも可変長でもよい。しかし、各ブロックには1レコードしか入らない。</td></tr>
+        <tr><td><code>V</code></td><td>レコードの長さは、固定長でも可変長でもよいが、それぞれ1つのブロックの中に1〜n個のレコードは収まっていなければならない。</td></tr>
+        <tr><td><code>S</code></td><td>レコードの長さは、固定長でも可変長でもよく、1レコードが1ブロックより大きくてもよい。</td></tr>
+      </table>
+      <p>U、VモードはK索引付編成、および相対編成のファイルには指定できない。Sモードは、標準順次ファイル、又は直接ファイルに対して指定できる。</p>
+    </div>
+
+    <div class="clause">
+      <div class="clause-title"><span class="cl-num">④</span> LABEL RECORD 文節</div>
+      <p>ここでは、ラベルの有無を指定するものである。</p>
+<pre>LABEL { RECORD IS  } { OMITTED      }
+      { RECORD ARE } { STANDARD     }
+                     { データ名-1…n }</pre>
+      <ul>
+        <li><code>OMITTED</code>：ユニット・レコード装置に割り当てられているファイルに対して必ず指定しなければならない。（ただし、IBMではこれもSTANDARDで処理できる）</li>
+        <li><code>STANDARD</code>：ファイルに数個のラベルがついており、システム仕様に従っていることを指定する。索引付編成はSTANDARDを指定しなければならない。</li>
+        <li>データ名-1…n：ユーザーラベルで標準外ラベルである。</li>
+      </ul>
+    </div>
+
+    <div class="clause">
+      <div class="clause-title"><span class="cl-num">⑤</span> VALUE OF 文節</div>
+      <p>この文節は、コメントとして扱われるので指定する必要はない。</p>
+<pre>VALUE OF データ名-1 IS { データ名-2  }
+                      { リテラル-1  }</pre>
+    </div>
+
+    <div class="clause">
+      <div class="clause-title"><span class="cl-num">⑥</span> DATA RECORD 文節</div>
+      <p>FD文の後で書くデータレコードの名前を指定する。データ名を複数指定する時は、01レベルでその分をとらなければならない。</p>
+<pre>DATA { RECORD IS  } データ名-1…n
+     { RECORD ARE }</pre>
+    </div>
+  </div>
+
+  <div class="section" id="ch4-ws">
+    <div class="sec-title">(2) データ記述項目 / WORKING-STORAGE SECTION</div>
+    <p>データ記述項目は、後で述べる WORKING-STORAGE SECTIONで説明することと重なる部分が多いので、簡単に述べる事にする。</p>
+<pre>レベル番号 { データ名 } PICTURE句
+          { FILLER  }</pre>
+    <p>レベル番号は、データの内容にレベル付けをするもので01〜49まで指定できる。通常、01、05、10…の順で付けていく事が多い。ファイルの項目のDATA RECORD文節で指定したDATA名をここで01レベルで定義しなければならない。</p>
+    <div class="note">
+      <div class="note-lbl">レベル番号の特殊値</div>
+      <table>
+        <tr><th>レベル番号</th><th>名称</th><th>特徴</th></tr>
+        <tr><td><code>66</code></td><td>再編成項目</td><td>データ項目のグループを再編成する</td></tr>
+        <tr><td><code>77</code></td><td>独立項目</td><td>下位レベルを持たない。セクション先頭で定義。</td></tr>
+        <tr><td><code>88</code></td><td>条件項目</td><td>エリアを持たない。上位レベルの条件を定義。</td></tr>
+        <tr><td><code>01〜49</code></td><td>一般項目</td><td>通常 01, 05, 10… の順で付ける。</td></tr>
+      </table>
+    </div>
+    <div class="example-box">
+      <div class="ex-label">例 — DATA RECORD IS IN-RECと定義済み</div>
+<pre>01  IN-REC.
+  05 IN-KUBUN              PIC X(2).
+  05 IN-NAIYO.
+    10 IN-NAIYO-1          PIC X(5).
+    10 IN-NAIYO-2          PIC X(10).
+    10 FILLER              PIC X(20).</pre>
+    </div>
+    <p>これは、IN-RECという名前のレコードがあり、37バイトであるという事を示している。その内訳は、IN-KUBUNという名前のエリアが2バイトで、IN-NAIYOというエリアの中にIN-NAIYO-1というエリアが5バイト、IN-NAIYO-2というエリアが10バイトあるという事である。通常は、レコード名は01レベルでとり、PICTURE句を付け、内訳は書かない。実際の内訳は、WORKING-STORAGE SECTIONで記述する形が多く使用されている。</p>
+
+    <div class="sub-title">① WORKING-STORAGE SECTION</div>
+    <p>ここでは、プログラム中でワークとして使用するエリア、INPUTやOUTPUTのエリアをコピーしたり指定したりするエリア、カウンターやスイッチのエリアを定義するエリアである。</p>
+    <p>記述の方法は、データ記述項目と同じであるがレベルに特別な物がある。66、77、88である。77レベルは、記述する時は、このセクションの最初で定義しなければならない。</p>
+
+    <div class="clause">
+      <div class="clause-title"><span class="cl-num">ア</span> 77レベル（独立項目）</div>
+      <p>このレベルは、下位レベルをもたない。故に独立項目と呼ばれる（ただし88レベルを除く）。</p>
+    </div>
+
+    <div class="clause">
+      <div class="clause-title"><span class="cl-num">イ</span> 88レベル（条件項目）</div>
+      <p>このレベルの項目はエリアをもたない。上位レベルでエリアを定義し、88レベルでその条件を示す。</p>
+      <div class="example-box">
+        <div class="ex-label">例</div>
+<pre>77  FILE-SIGN  PIC X.
+  88 EOF-SIGN   VALUE "E".</pre>
+      </div>
+      <p>上記の様に定義して、<code>"E"</code> という文字をFILE-SIGNへ移送する。通常このエリアに<code>"E"</code>が入ったかどうかを聞く為には、<code>IF FILE-SIGN="E"</code> と記述するが88レベルを記述している為、<code>IF EOF-SIGN</code> と書くだけでよい。<code>="E"</code> というのは、書く必要がない。なぜなら、<code>VALUE "E"</code>と定義している為、PIC Xのエリアに<code>"E"</code>という文字が入った時だけ条件が満たされる。これは、各自で実際にやってみると納得出来るのだが、……</p>
+    </div>
+
+    <div class="clause">
+      <div class="clause-title"><span class="cl-num">ウ</span> 66レベル（再編成項目）</div>
+      <p>このレベルの項目は、データ項目のグループを再編成する項目であるがここでは説明を除く。</p>
+    </div>
+  </div>
+
+  <div class="section" id="ch4-pic">
+    <div class="sec-title">② PICTURE 句</div>
+    <p>この句は、エリアの長さTYPEなどを指定する句である。尚PICTUREは、PICと省略できる。</p>
+    <p>PICTUREのTYPEには、9TYPE、ATYPE、XTYPE、及び編集TYPEがある。</p>
+
+    <div class="clause">
+      <div class="clause-title"><span class="cl-num">ア</span> 9-TYPE（数字項目）</div>
+      <p><code>PIC 99.</code> という様に指定する。尚、長さを（）で囲んで指定する事ができる。<code>PIC 9(2).</code> これは、どのTYPEでも同じである。このエリア数字項目であり、0〜9以外の文字を移送する事はできない。（COMPUTATIONAL — 計算のみ）</p>
+      <div class="example-box">
+        <div class="ex-label">X TYPEからの移送に注意</div>
+<pre>PIC X(5).         PIC 9(5).
+    ↓不可              ↓可
+ABC△△  →×→  △△△△△
+12345   →○→  12345</pre>
+      </div>
+      <p>上記の様にX TYPEからの移送には、十分、注意しなければならない。</p>
+
+      <div class="sub-sub">小数点の指定</div>
+      <p>計算を行なう上で小数点は必要である。この小数点の指定には2種類あり、エリアをとらない仮想小数点とエリア1バイトを必要とする実小数点である。</p>
+      <table>
+        <tr><th>種類</th><th>指定</th><th>バイト数</th><th>特徴</th></tr>
+        <tr><td>仮想小数点</td><td><code>PIC 999V99.</code></td><td>5バイト</td><td>小数点があるとみなされる。エリア消費なし。</td></tr>
+        <tr><td>実小数点</td><td><code>PIC 999.99.</code></td><td>6バイト</td><td>エリアが1バイト確保される。</td></tr>
+      </table>
+
+      <div class="sub-sub">サインの指定</div>
+      <p>計算上＋、－のサインが必要な時がある。こんな時には<code>"S"</code>という文字をつけて表わす。<code>PIC S99.</code> これは、1バイトのエリアがとられる。</p>
+
+      <div class="sub-sub">ゾーンとパックと2進数</div>
+      <p>2バイトエリアに<code>"11"</code>という数字を移送した結果を比べてみよう。</p>
+<pre>ゾーン   F1 F1
+パック    0  1 1C
+2進      0  0 0B
+         ←1バイト→</pre>
+      <p>まずゾーン形式は、F1F1という形で入っているが、F1というものが通常1と呼んでいるものである。マシンの中では、1バイトは8ビットである。8ビットの上位4ビットは1がすべてFとされる。その為ゾーンの2バイトでは、MAX99までしか入れる事はできない。</p>
+      <p>ところが、パック形式だと、このFが除かれた形で作られる。そして、最後の4ビットが<code>"＋"</code>、<code>"－"</code>を表わす。C、Fはプラス、Dはマイナスである。ゾーンのデータにおいてサイン（＋、－）は最後の1バイトの内、上位4ビットで表わされる。その4ビットはパックに準ずる。次に2進数だがこれは、人間の目に表わしやすいように16進数表示として表われる。この2進数のサインは、エリアの最上位のビットで表わされる。このビットが1ならばマイナス、0ならばプラスである。</p>
+      <table>
+        <tr><th>形式</th><th>指定例</th><th>用途</th></tr>
+        <tr><td>ゾーン</td><td><code>PIC 9(2).</code></td><td>数字コードの様な演算をあまり必要としないエリア</td></tr>
+        <tr><td>パック</td><td><code>PIC S9(3) COMP-3.</code></td><td>サイズ（桁数）が大きいもの向き</td></tr>
+        <tr><td>2進数</td><td><code>PIC S9(3) COMP SYNC.</code></td><td>カウンターetcに最適・効率良い</td></tr>
+      </table>
+      <div class="note">
+        <div class="note-lbl">境界について（SYNC）</div>
+        <p>2進でCOMPとCOMP SYNCと2つ書いたのは訳がある。COMPという指定で2進のエリアだという事を示すがSYNCと指定すると境界が合わせられる。</p>
+        <p>2バイト単位のエリアの境界をハーフワード境界、4バイト単位のエリアの境界をフルワード境界、8バイト単位のエリアの境界をダブルワード境界と呼ぶ。この境界は、COBOLではあまり考える必要はないが、アセンブラだと必要になるのでぜひ覚えておいてほしい。</p>
+      </div>
+      <div class="example-box">
+        <div class="ex-label">指定例</div>
+<pre>① 05  CTR-IN          PIC S9(7) COMP SYNC.
+   又は
+② 01  CTR-AREA                  COMP SYNC.
+     05 CTR-IN          PIC S9(7).
+     05 CTR-OUT          PIC S9(7).</pre>
+      </div>
+      <p>① OR ②の様な指定の仕方をする。②の方で指定するとクリアが楽であるので通常②の様な使い方をする。クリアーの方法は、プロシジャーの章で説明する。</p>
+    </div>
+
+    <div class="clause">
+      <div class="clause-title"><span class="cl-num">イ</span> A-TYPE（アルファベット項目）</div>
+      <p><code>PIC AA.</code> という様に指定する。このエリアは、アルファベット項目である。このエリアに移送できるデータは、アルファベットとブランクの27文字のデータである。この項目は、ほとんど使われない。次に説明するX-TYPEで代用できるからである。</p>
+    </div>
+
+    <div class="clause">
+      <div class="clause-title"><span class="cl-num">ウ</span> X-TYPE（英数字項目）</div>
+      <p><code>PIC XX.</code> という様に指定する。このエリアは、英数字項目である。このエリアには、COBOLで使用できる全ての文字を移送できる。したがって通常、数字が入っているがその他の文字が時折入ってくるとか、FILLERで定義されるエリアをX-TYPEで定義する。尚、グループ項目（PIC句をもたないレベル項目）は、全てX-TYPEとして扱われる。</p>
+      <div class="example-box">
+        <div class="ex-label">注意例</div>
+<pre>01  IN-REC.
+  05 IN-1              PIC S9(3) COMP-3.
+  05 IN-2              PIC A(3).
+  05 IN-3              PIC X(5).
+
+上記の様なエリアが定義されている時
+MOVE SPACE TO IN-1   という命令は使えないが
+MOVE SPACE TO IN-REC という命令は使える。
+しかし、SPACEを送ったあと、IN-1というエリアを使用すると、
+ABEND OC7（データエラー）となる。</pre>
+      </div>
+    </div>
+
+    <div class="clause">
+      <div class="clause-title"><span class="cl-num">エ</span> 編集TYPE</div>
+      <p>編集用文字として、前述の9、A、Xに加えて、以下の記号がある。</p>
+      <table>
+        <tr><th>記号</th><th>意味</th></tr>
+        <tr><td><code>B</code></td><td>ブランク挿入</td></tr>
+        <tr><td><code>P</code></td><td>小数点以下の桁数を表す</td></tr>
+        <tr><td><code>－</code></td><td>マイナス表示（符号表示）→ 有符号</td></tr>
+        <tr><td><code>＋</code></td><td>プラス表示（プラスの時にプラスを明示。マイナスの時はマイナスが優先）</td></tr>
+        <tr><td><code>¥</code></td><td>通貨記号表示</td></tr>
+        <tr><td><code>Z</code></td><td>ZERO消去</td></tr>
+        <tr><td><code>＊</code></td><td>チェック保護</td></tr>
+        <tr><td><code>V</code></td><td>仮想小数点</td></tr>
+        <tr><td><code>0</code></td><td>ZERO表示</td></tr>
+        <tr><td><code>，</code></td><td>カンマ表示</td></tr>
+        <tr><td><code>．</code></td><td>ピリオド表示</td></tr>
+        <tr><td><code>CR / DB</code></td><td>データの値が"－"の時のみ表示される</td></tr>
+      </table>
+      <div class="example-box">
+        <div class="ex-label">使用例</div>
+<pre>指定                    データの値   結果
+PIC 99BB99BB99.         123456     12△△34△△56
+PIC ZZZZZZ.             001234          1234
+PIC Z,ZZZ,ZZ9.          001234         1,234
+PIC -,---,--.           -001234        -1,234
+PIC +,+++,+++.          -001234        -1,234
+PIC +,+++,+++.          +001234        +1,234
+PIC ¥,¥¥¥,¥¥¥.         12345        ¥12,345
+PIC ********.           12345        ****12345</pre>
+      </div>
+      <p>上記の様に処理される。これを使用して、金額の編集などを行なう。尚、編集した値は計算に使用する事はできない。ただし、受け項目としては使用できる。</p>
+      <div class="example-box">
+        <div class="ex-label">プリント出力例 — 下記の様なリストを出力したい時</div>
+<pre>¥1,283        -6,888,543    ***123    1△2△3△4
+¥23,881          6,231     ****10    A△B△C△D
+    ¥56             -31    ***990    E△F△3△4</pre>
+      </div>
+      <div class="example-box">
+        <div class="ex-label">上記リストの定義方法</div>
+<pre>01  PRINT.
+  05 PR-GAKU            PIC ¥¥¥,¥¥¥,¥¥¥¥,¥¥¥.
+  05 FILLER             PIC X(3).
+  05 PR-KASHI           PIC --,---,--.
+  05 FILLER             PIC X(3).
+  05 PR-CHECK           PIC *****9.
+  05 FILLER             PIC X(5).
+  05 PR-EDIT            PIC XBXBXBX.</pre>
+      </div>
+      <p>それぞれの項目にデータを移送して、PRINTをWRITEする。編集項目は主にプリントエリアの編集時に用いられる。<code>"Z"</code>、<code>"¥"</code>、<code>"，"</code>、<code>"－"</code>、<code>"."</code> は通常よく使用するので慣れておいてもらいたい。</p>
+      <div class="note">
+        <div class="note-lbl">DB・CRについて</div>
+<pre>PIC 9(5) DB.
+PIC 9(5) CR.
+
+-999 → 999DB    999CR
++999 → 999      999    となる</pre>
+        <p>移送したデータの値のマイナスの時だけ、結果の右端にDB、CRという文字が出力される。</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" id="ch4-val">
+    <div class="sec-title">③ VALUE 文節</div>
+    <pre>VALUE IS "リテラル"</pre>
+    <div class="example-box">
+      <div class="ex-label">使用方法</div>
+<pre>05  A  PIC X(11).
+   VALUE "** START **".</pre>
+    </div>
+    <p>VALUE IS の IS は省略できる。この時、Aというエリアには、<code>"** START **"</code>というリテラルを移送した結果と同じである。VALUEは、項目に移送せずに自分でもっておいた方が都合の良い時（テーブル作成）によく使用される。</p>
+  </div>
+
+  <div class="section" id="ch4-jr">
+    <div class="sec-title">④ JUST RIGHT 句</div>
+    <p>通常、X-TYPE、A-TYPEで定義されているエリア内にデータを移送する時、移送するデータが小さければ、左詰めで処理される。これを右詰めで処理させようというのがこの定義である。</p>
+    <pre>05  A  PIC X(10) JUST RIGHT.</pre>
+    <div class="example-box">
+      <div class="ex-label">処理の違い</div>
+<pre>PIC X(8).         データABC → A|B|C| | | |   ← 左詰め
+PIC X(8) JUST RIGHT.   →        | | | | |A|B|C  ← 右詰め</pre>
+    </div>
+    <p>この項目は基本項目に対してだけ指定する事ができる。</p>
+  </div>
+
+  <div class="section" id="ch4-rd">
+    <div class="sec-title">⑤ REDEFINE 文節</div>
+    <p>この文節は、一度定義したエリアに対して違った形で定義し直すものであり、新たにエリアは取れない。あくまでも同じエリアである。</p>
+    <div class="example-box">
+      <div class="ex-label">定義方法</div>
+<pre>05  A              PIC X(10).
+05  A-R REDEFINES A.
+  10 B             PIC 9(5).
+  10 C             PIC S9(5).
+  10 D             PIC X(1).
+05  A-RR REDEFINES A.
+  10 E             PIC X(3).</pre>
+    </div>
+    <p>上記の様に何度でも再定義してかまわない。再定義するバイト数が再定義されるエリアのバイト数よりも大きくする事は出来ないが、小さい分には構わない。上述の例では、エリアを使用する時にA、B、Cなど、どれを参照するかによって、エリアのもつTYPEが決定される。このREDEFINES文節は日付によく使われる。</p>
+    <div class="example-box">
+      <div class="ex-label">日付処理の応用例（YYMMDD = 年月日）</div>
+<pre>05  A-YYMMDD.
+  10 A-YYMM.
+    15 A-YY                PIC X(2).
+    15 A-MM                PIC X(2).
+  10 A-DD                  PIC X(2).
+05  A-YYMMDD-R REDEFINES A-YYMMDD.
+  10 A-YY-R                PIC 9(2).
+  10 A-MMDD.
+    15 A-MM-R              PIC 9(2).
+    15 A-DD-R              PIC 9(2).</pre>
+    </div>
+    <p>上記の様に指定すると同じエリアをX-TYPEでも9-TYPEでも使用できる。</p>
+  </div>
+
+  <div class="section" id="ch4-oc">
+    <div class="sec-title">⑥ OCCURS 文節（テーブル）</div>
+    <p>この文節は反復するデータを定義するものである。OCCURS項目で作成されるテーブルは3次元まで許される。</p>
+    <div class="syntax">
+OCCURS 整数 TIMES
+  (DEPENDING ON データ名-1)
+  { ASCENDING  } KEY IS データ名-2
+  { DESCENDING }
+INDEXED BY 指標名</div>
+
+    <div class="example-box">
+      <div class="ex-label">例1 — 基本テーブル（30個）</div>
+<pre>05  A  OCCURS 30 TIMES
+       INDEXED BY A-X1.
+  10 B  PIC X(1).
+
+<span style="color:var(--code-dim)">-- Bというエリアが30個あり、A-X1というインデックスで参照できる
+-- B(1) B(2) あるいは B(A-X1) という使い方をする</span></pre>
+    </div>
+
+    <div class="example-box">
+      <div class="ex-label">例2 — KEYで昇順定義（SEARCHと連携）</div>
+<pre>05  A  OCCURS 30 TIMES
+       ASCENDING KEY IS A-KEY
+       INDEXED BY A-X1.
+  10 A-KEY          PIC X(3).
+  10 A-NAIYO        PIC X(10).
+
+<span style="color:var(--code-dim)">-- A-KEYがエリアの1番目から30番目まで昇順であると定義
+-- SEARCHという命令に関連してくる</span></pre>
+    </div>
+
+    <div class="note">
+      <div class="note-lbl">DEPENDING ON について</div>
+      <p>この句を指定しないとテーブルの長さがわからない時に指定する。VBデータなどの指定時には必要である。</p>
+    </div>
+
+    <div class="example-box">
+      <div class="ex-label">例3 — 3次元テーブル（3×5×2=30個、600バイト）</div>
+<pre>05  A  OCCURS 3 TIMES
+       INDEXED BY A-X1.
+  10 B  OCCURS 5 TIMES
+         INDEXED BY B-X1.
+    15 C  OCCURS 2 TIMES
+           INDEXED BY C-X1.
+      20 D  PIC X(20).
+
+<span style="color:var(--code-dim)">-- D(1, 1, 1) または D(A-X1, B-X1, C-X1) の様に参照</span></pre>
+    </div>
+
+    <div class="example-box">
+      <div class="ex-label">例4 — VALUEとREDEFINEを組み合わせた文字テーブル</div>
+<pre>05  A            PIC X(10)
+    VALUE        "ABCDEFGHIJ".
+05  A-R REDEFINES A.
+  10 B  OCCURS 10 TIMES
+         INDEXED BY B-X1.
+    15 C  PIC X(1).
+
+<span style="color:var(--code-dim)">-- C(3)は"C"であり、B-X1に5をSETしてやれば、C(B-X1)は"E"である</span></pre>
+    </div>
+    <p>この様なテーブルは、VALUE句をもっているエリアをREDEFINEしてテーブルにしたり、集計用のエリアとして定義する事が多い。</p>
+  </div>
+
+  <div class="section" id="ch4-ls">
+    <div class="sec-title">(3) LINKAGE SECTION</div>
+    <p>ここでは、外部から渡されてくるデータ（パラメータ）、上位モジュールから渡されてくるデータを定義する場所である。基本的には、WORKING-STORAGE SECTIONの定義方法と同じである。</p>
+    <p>ただし、パラメータとして渡ってくるエリアを定義する時は、DATAの他に、そのDATAの長さが入ってくるエリア2バイトを定義しなければならない。</p>
+    <pre>01  PARM.
+  05 PARM-LL             PIC 9(3) COMP.
+  05 PARM-YMD            PIC X(6).</pre>
+    <p>これは、パラメータとして入ってくるのは、PARM-YMDで、6バイトである。この6バイトという長さがPARM-LLへ付加されてプログラム中へ入ってくる。このLLのエリアは、名前をつける必要はなく、<code>FILLER PIC X(2).</code> でもよい。</p>
+    <p style="text-align:right;color:var(--ink-light);font-size:.85rem">以上でデータ部の説明を終わる。</p>
+  </div>
+
+  <!-- 息抜き -->
+  <div class="break-box">
+    <div class="break-title">☆ 息抜き ☆</div>
+    <p style="text-align:center;font-weight:700;margin-bottom:12px">《太ったゼロとやせたゼロ》</p>
+    <p>プログラム中には太ったゼロとやせたゼロがある。文法のミスはないはずなのに、コンパイルが通らない。よくよく見てみると、何と……</p>
+    <p><code>MOVE……</code> が <code>M0VE……</code> となっているではないか。いやはや、やせたゼロがじゃまをしていたのか！！</p>
+    <p>こんな事はJCLでもあるんじゃないかな？　このミスをなくす様、コーディングの時は、<strong>O と 0 をわかりやすく書こう</strong>。</p>
+  </div>
+</div>
+
+<!-- ════════════════════════════════
+     第五章
+════════════════════════════════ -->
+<div class="chapter" id="ch5">
+  <div class="ch-header">
+    <div class="ch-num">第五章</div>
+    <div class="ch-title">PROCEDURE DIVISION（手続き部）</div>
+  </div>
+  <p>このDIVISIONでは、実際にやる処理をコボルの命令を使って定義する所である。</p>
+  <p>COBOL命令中、主な命令を上げてみよう。（含オプション）</p>
+  <div class="cmd-grid">
+    <div class="cmd-item">ACCEPT</div><div class="cmd-item">READ</div><div class="cmd-item">CALL</div>
+    <div class="cmd-item">ADD</div><div class="cmd-item">MOVE</div><div class="cmd-item">STOP RUN</div>
+    <div class="cmd-item">SUBTRACT</div><div class="cmd-item">SET</div><div class="cmd-item">GOBACK</div>
+    <div class="cmd-item">MULTIPLY</div><div class="cmd-item">PERFORM</div><div class="cmd-item">SEARCH</div>
+    <div class="cmd-item">DIVIDE</div><div class="cmd-item">GO TO</div><div class="cmd-item">WHEN</div>
+    <div class="cmd-item">REMAINDER</div><div class="cmd-item">OPEN</div><div class="cmd-item">DISPLAY</div>
+    <div class="cmd-item">COMPUTE</div><div class="cmd-item">CLOSE</div><div class="cmd-item">AT END</div>
+    <div class="cmd-item">IF / ELSE</div><div class="cmd-item">EXAMINE</div><div class="cmd-item">BEFORE</div>
+    <div class="cmd-item">WRITE</div><div class="cmd-item">AFTER</div>
+  </div>
+  <p>それでは、この各命令について、説明していくことにする。説明していく上で、データ部を参照する事があるので、その時は前頁に戻って見てもらいたい。</p>
+
+  <!-- ACCEPT -->
+  <div class="section" id="c-accept">
+    <div class="sec-title">1、ACCEPT</div>
+<pre>ACCEPT データ名 [FROM { SYSIN   }]
+               [     { CONSOLE }]
+               [     { 記憶名  }]</pre>
+    <p>データ名は、WORKING-STORAGE SECTIONで定義済みのエリア。FROMを書かないと、省略時解釈でSYSINからの入力とみなされる。この命令が行われると、SYSINもしくはCONSOLEから入力されたデータがデータ名で定義されているエリアへ格納される。</p>
+    <div class="example-box">
+      <div class="ex-label">例</div>
+<pre>05  A  PIC X(5).  ←─────────────  ABCDE（カード）
+    ACCEPT A.                       //SYSIN DD *
+
+この命令で、Aというエリアには"ABCDE"と入る。</pre>
+    </div>
+  </div>
+
+  <!-- ADD -->
+  <div class="section" id="c-add">
+    <div class="sec-title">2、ADD（加算）</div>
+<pre>ア. ADD 識別名-1…(n) TO 識別名-2…(n) [ROUNDED]
+イ. ADD 識別名-1…(n) GIVING 識別名-2…(n) [ROUNDED]</pre>
+    <p><strong>ア.</strong> TOの左側に書いたエリアの内容が右側に書いたエリアの内容に足し込まれて、右側のエリアの値が結果と置き換わる。ROUNDEDは、四捨五入のオプションである。</p>
+    <div class="example-box">
+      <div class="ex-label">例（形式ア）</div>
+<pre>05  A  PIC 9(3)V9(4).  <span style="color:var(--code-dim)">…… 83.235</span>
+05  B  PIC 9(4)V9(2).  <span style="color:var(--code-dim)">…… 11.46</span>
+
+ADD A B TO B ROUNDED.
+<span style="color:var(--code-dim)">    結果 B=106.（小数第3位四捨五入）</span></pre>
+    </div>
+    <p><strong>イ.</strong> この形式を使うと、GIVINGの左側のエリアの内容がすべて加算されて、右側のエリアへストアされる。</p>
+    <div class="example-box">
+      <div class="ex-label">例（形式イ）</div>
+<pre>05  A  PIC 9(2).  <span style="color:var(--code-dim)">……10</span>
+05  B  PIC 9(3).  <span style="color:var(--code-dim)">……30</span>
+05  C  PIC 9(4).  <span style="color:var(--code-dim)">……0</span>
+
+ADD A B GIVING C.
+<span style="color:var(--code-dim)">    結果 C=40（A,Bは保存）</span>
+
+ADD A,B GIVING B. <span style="color:var(--code-dim)">――</span>
+ADD A   TO B.    <span style="color:var(--code-dim)">―― 同じ結果が得られる。</span>
+
+ADD A B C TO D E F.
+<span style="color:var(--code-dim)">    この命令を行うと、A+B+CがD,E,Fにそれぞれ加算される。</span>
+
+ADD 1 TO IN-CTR.
+<span style="color:var(--code-dim)">    インプット件数、ライン数をカウントする時この形式を使う。</span></pre>
+    </div>
+  </div>
+
+  <!-- SUBTRACT -->
+  <div class="section" id="c-sub">
+    <div class="sec-title">3、SUBTRACT（減算）</div>
+<pre>ア. SUBTRACT 識別名-1…(n) FROM 識別名-2…(n) [ROUNDED]
+イ. SUBTRACT 識別名-1…(n) FROM 識別名-2…(n) GIVING 識別名-3 [ROUNDED]</pre>
+    <p><strong>ア.</strong> FROMの左側に書いたエリアの内容を全部加算して、右側のエリアの値から減算し、右側のエリアの内容が結果と置き換わる。</p>
+    <div class="example-box">
+      <div class="ex-label">例</div>
+<pre>05  A  PIC 9(2).     <span style="color:var(--code-dim)">……10</span>
+05  B  PIC 9(3).     <span style="color:var(--code-dim)">……15</span>
+05  C  PIC 9(4).     <span style="color:var(--code-dim)">……100</span>
+
+SUBTRACT A B FROM C.
+<span style="color:var(--code-dim)">    結果 C=75（A,Bは保存される）</span></pre>
+    </div>
+    <p><strong>イ.</strong> FROMの左側のエリアの内容を全て加算して右側のエリアから減算して結果がGIVINGで指定しているエリアへストアされる。</p>
+    <div class="example-box">
+      <div class="ex-label">例（GIVING + ROUNDED）</div>
+<pre>05  A  PIC 9(2)V9(2).  <span style="color:var(--code-dim)">……10.01</span>
+05  B  PIC 9(3)V9(2).  <span style="color:var(--code-dim)">……33.25</span>
+05  C  PIC 9(4)V9(1).  <span style="color:var(--code-dim)">……100.0</span>
+
+SUBTRACT A FROM B GIVING C ROUNDED
+<span style="color:var(--code-dim)">    結果 C=23.2（小数第2位四捨五入で値は置き換わる。）</span></pre>
+    </div>
+    <p>通常、ADDもSUBTRACT命令も、GIVINGオプションを使う様な時は、便利なCOMPUTE命令を使用する事が多い。</p>
+  </div>
+
+  <!-- MULTIPLY -->
+  <div class="section" id="c-mul">
+    <div class="sec-title">4、MULTIPLY（乗算）</div>
+<pre>ア. MULTIPLY 識別名-1 BY 識別名-2 [ROUNDED]
+イ. MULTIPLY 識別名-1 BY 識別名-2 GIVING 識別名-3 [ROUNDED]</pre>
+    <p><strong>ア.</strong> BYの左側のエリアの内容が右側のエリアに乗算されて結果がおきかわる。</p>
+    <div class="example-box">
+      <div class="ex-label">例（形式ア）</div>
+<pre>05  A  PIC 9(2)V9(1).  <span style="color:var(--code-dim)">… 3.1</span>
+05  B  PIC 9(3)V9(1).  <span style="color:var(--code-dim)">… 24.1</span>
+
+MULTIPLY A BY B ROUNDED.
+<span style="color:var(--code-dim)">    結果 B=74.7（小数第2位四捨五入）</span></pre>
+    </div>
+    <p><strong>イ.</strong> ADDやSUBTRACTと同様に結果はGIVINGの後に指定したエリアへストアされ、乗数・被乗数共に保存される。GIVINGのエリアは数字編集項目でもよい。</p>
+    <div class="example-box">
+      <div class="ex-label">例（形式イ）</div>
+<pre>05  A  PIC 9(2).  <span style="color:var(--code-dim)">……10</span>
+05  B  PIC 9(2).  <span style="color:var(--code-dim)">……22</span>
+05  C  PIC 9(4).  <span style="color:var(--code-dim)">……0</span>
+
+MULTIPLY A BY B GIVING C.
+<span style="color:var(--code-dim)">    結果 C=220（A、Bは保存）</span>
+
+05  C  PIC Z(4).    <span style="color:var(--code-dim)">← 編集項目でもOK</span>
+MULTIPLY A BY B GIVING C.
+<span style="color:var(--code-dim)">    結果 C=△220</span></pre>
+    </div>
+  </div>
+
+  <!-- DIVIDE -->
+  <div class="section" id="c-div">
+    <div class="sec-title">5、DIVIDE（除算）</div>
+<pre>ア. DIVIDE 識別名-1 INTO 識別名-2 [ROUNDED]
+イ. DIVIDE 識別名-1 INTO 識別名-2 GIVING 識別名-3 [ROUNDED]
+                                  [REMAINDER 識別名-4]</pre>
+    <p><strong>ア.</strong> INTOの右側のエリアの内容が左側のエリアの内容で除算され、右側のエリアの内容の値が結果と置き換わる。</p>
+    <div class="example-box">
+      <div class="ex-label">例（形式ア）</div>
+<pre>05  A  PIC 9(2)V9(1).     2.9
+05  B  PIC 9(3)V9(2).    32.28
+
+DIVIDE A INTO B ROUNDED.
+<span style="color:var(--code-dim)">    結果 B=11.13（小数第3位四捨五入）</span></pre>
+    </div>
+    <p><strong>イ.</strong> この形式のREMAINDERというのは余りを求めるオプションである。INTOの左側のエリアの値で右側のエリアの値を除算し、結果をGIVING句のエリアへストア、REMAINDER句のエリアへ余りをストアする。</p>
+    <div class="example-box">
+      <div class="ex-label">例（GIVING + REMAINDER）</div>
+<pre>05  A  PIC 9(2).   <span style="color:var(--code-dim)">……13</span>
+05  B  PIC 9(3).   <span style="color:var(--code-dim)">……100</span>
+05  C  PIC 9(2).
+05  D  PIC 9(2).
+
+DIVIDE A INTO B GIVING C REMAINDER D.
+<span style="color:var(--code-dim)">    結果 C=7、D=9</span></pre>
+    </div>
+    <p><strong>ウ.</strong> イの形式中のINTOをBYに変えると除数と被除数の関係が逆転する。この時気をつけなければいけないのは、除数、被除数のどちらかにリテラルで用いる場合である。</p>
+  </div>
+
+  <!-- COMPUTE -->
+  <div class="section" id="c-cmp">
+    <div class="sec-title">6、COMPUTE</div>
+    <p>この命令は、前途した、ADD、SUBTRACT、MULTIPLY、DIVIDEなどの機能を算術文を用いて指定できる。</p>
+    <table>
+      <tr><th>記号</th><th>意味</th><th>優先度</th></tr>
+      <tr><td><code>＊＊</code></td><td>べき乗</td><td>高</td></tr>
+      <tr><td><code>＊ ／</code></td><td>乗算・除算</td><td>↑</td></tr>
+      <tr><td><code>＋ －</code></td><td>加算・減算</td><td>低</td></tr>
+      <tr><td><code>（　）</code></td><td>優先度の指定</td><td>最高</td></tr>
+    </table>
+<pre>COMPUTE 識別名-1 [ROUNDED]
+  = （識別名-2 | リテラル | 算術演算式）</pre>
+    <div class="example-box">
+      <div class="ex-label">例 — C = (A-B)/(B+E) × D</div>
+<pre>COMPUTE C = ((A+B) / (B-E)) * D</pre>
+    </div>
+    <p>したがって通常使用している算術文がほぼ同じ形で書ける事がわかるだろう。ただし、COMPUTE命令には余りを求めるオプションはない。余りを必要とする時にはDIVIDE命令を使用しなければならない。</p>
+    <div class="note">
+      <p>受け項目（＝の左側）は数字編集項目であってもかまわない（<code>PIC ZZZ.</code> etc）。命令の実行順序は（）で囲まれている部分が先ず実行され、次にべき乗、次に乗算又は除算、次に加算又は減算の順で、同レベルの場合は左から順に処理される。</p>
+    </div>
+    <div class="example-box">
+      <div class="ex-label">複雑な式の比較 — A = B×C×D⁶ + 6 - E</div>
+<pre><span style="color:var(--code-dim)">【COMPUTE使用】</span>
+COMPUTE A = B * C * D ** 6 + 6 - E.
+
+<span style="color:var(--code-dim)">【個別命令使用（同等処理）】</span>
+MULTIPLY D BY D GIVING A.   <span style="color:var(--code-dim)">← （4回繰り返す）</span>
+MULTIPLY B BY A.
+MULTIPLY C BY A.
+ADD      6  TO A.
+SUBTRACT E  FROM A.</pre>
+    </div>
+    <p>ここで分かる様に複雑な計算式にはCOMPUTE命令の方が便利である。又、他の命令を組み合わせると全体の式がイメージしにくいという欠点もある。</p>
+    <div class="warn">
+      <div class="warn-lbl">ON SIZE ERROR オプション</div>
+      <p>COMPUTE, ADD, SUBTRACT, MULTIPLY, DIVIDE命令には、受け項目のサイズが小さくてオーバーフローした場合のオプションがある。</p>
+<pre>MULTIPLY A BY B
+  ON SIZE ERR GO TO ERR-SHORI.
+
+<span style="color:var(--code-dim)">BのエリアがオーバーフローしたらERR-SHORIというルーチンへ飛ぶ。</span></pre>
+    </div>
+  </div>
+
+  <!-- IF -->
+  <div class="section" id="c-if">
+    <div class="sec-title">7、IF 文</div>
+    <p>IF文は、条件によってそれまでの処理を変える事ができる。</p>
+<pre>IF   条件   ステートメント-1   NEXT SENTENCE
+ELSE        ステートメント-2   NEXT SENTENCE</pre>
+    <p>条件が真であればステートメント-1が実行され、偽であればステートメント-2が実行される。</p>
+    <div class="example-box">
+      <div class="ex-label">例</div>
+<pre>IF A = B
+  PERFORM S03-EQUAL-SHORI THRU S03-EXIT
+ELSE
+  NEXT SENTENCE.</pre>
+    </div>
+    <p>これは、AというエリアとBというエリアの内容がEQUALならば、S03-EQUAL-SHORIという段落名からS03-EXITという段落名までの処理を行ってから次の命令に移る。EQUALでなければなにもせずに次の命令に移る。この時のELSE NEXT SENTENCE.は省略できるがIFとELSEは対にした方が分かり易いので書いておく方が望ましい。</p>
+    <p>尚、IF文の中にまたIF文があるという様な形を<strong>入れ子方式</strong>とか<strong>ネスティング</strong>と呼ぶ。</p>
+    <div class="example-box">
+      <div class="ex-label">ネスティングの例</div>
+<pre>IF A = B
+  IF B NOT = C          <span style="color:var(--code-dim)">→ネスティング</span>
+    IF C = D
+        命令
+    ELSE
+      …</pre>
+    </div>
+  </div>
+
+  <!-- READ -->
+  <div class="section" id="c-read">
+    <div class="sec-title">8、READ</div>
+    <p>この命令はファイルを実際にプログラム内に読込んでくる命令である。このREAD命令を実行する前に、ファイルに対してOPEN命令が実行されていなければならない。実行されていないと、ABEND=U3706などでプログラムは異常終了する。</p>
+<pre>READ ファイル名 [INTO データ名]
+  AT END 命令ステートメント.</pre>
+    <div class="example-box">
+      <div class="ex-label">例</div>
+<pre>READ INFL1 INTO IN-DATA
+  AT END
+    MOVE '1' TO SW-EOF
+    GO TO READ-END</pre>
+    </div>
+    <p>この命令では、INFL1が読まれ1件のデータがWORKING-STORAGE SECTIONで定義してあるIN-DATAというエリアへ入れられる。尚、ファイルがエンドの場合は、SW-EOFに<code>'1'</code>をたて、READ-ENDという段落名の所へ飛んでいく。</p>
+    <div class="note">
+      <p>INTOを使わないと、FILE SECTIONで定義した01レベルのエリア内にデータは読み込まれている。もちろん、INTOを使っても、このエリアにはデータは入っている。すなわちINTOオプションは、<strong>READ ＋ MOVE</strong> に相当する。</p>
+    </div>
+  </div>
+
+  <!-- MOVE -->
+  <div class="section" id="c-move">
+    <div class="sec-title">9、MOVE</div>
+    <p>この命令は記憶域のある区域から1つ又は2つ以上の区域へデータを移す為に用いられる。</p>
+    <pre>MOVE 識別名-1 TO 識別名-2 (n)</pre>
+    <div class="example-box">
+      <div class="ex-label">例</div>
+<pre>MOVE ZERO TO A B C.   <span style="color:var(--code-dim)">→ A、B、Cの内容がゼロクリアーされる。</span>
+MOVE A TO B.          <span style="color:var(--code-dim)">→ Aの内容がBに移される。</span></pre>
+    </div>
+    <div class="note">
+      <p>MOVEステートメントは、インデックスには使えない。インデックスには、後述のSET命令を使う。</p>
+    </div>
+  </div>
+
+  <!-- SET -->
+  <div class="section" id="c-set">
+    <div class="sec-title">10、SET</div>
+    <p>この命令は、インデックスに値をセットしたり、加算、減算をするものである。この命令では、MOVEと違い、右側のものが左側へセットされる。</p>
+<pre>SET INDEX名   TO    識別名-1
+SET   〃      UP BY   〃
+SET   〃    DOWN BY   〃</pre>
+    <div class="example-box">
+      <div class="ex-label">例</div>
+<pre>SET IDX1 TO 1.        <span style="color:var(--code-dim)">→ IDX1というインデックスに1がセットされる。</span>
+SET IDX1 UP BY 1.     <span style="color:var(--code-dim)">→ IDX1というインデックスが＋1される。</span>
+SET IDX1 DOWN BY 3.   <span style="color:var(--code-dim)">→ IDX1というインデックスが－3される。</span></pre>
+    </div>
+  </div>
+
+  <!-- PERFORM -->
+  <div class="section" id="c-perf">
+    <div class="sec-title">11、PERFORM</div>
+    <p>コボルのプログラムを組む上で、処理別にセグメント化すると見やすくなるだけでなく、修正、デバッグも容易になる。このセグメント化した処理を連結する時に、このPERFORM命令を使用する。</p>
+<pre><span style="color:var(--code-dim)">【基本形式】</span>
+PERFORM 処理手順名-1 [THRU 処理手順名-2]
+                    [識別名-1 TIMES]
+
+<span style="color:var(--code-dim)">【条件付き】</span>
+PERFORM 処理手順名-1 [THRU] 処理手順名-2
+  UNTIL 条件
+
+<span style="color:var(--code-dim)">【VARYING（多次元テーブル処理）】</span>
+PERFORM 処理手順名-1 THRU 処理手順名-2
+  VARYING 指標名-1 FROM 指標名-2 UNTIL 条件-1
+  BY 指標名-3
+  [AFTER 指標名-4 FROM 指標名-5
+  BY 指標名-6 UNTIL 条件-2
+    [AFTER 指標名-7 FROM 指標名-8
+    BY 識別名-9 UNTIL 条件-3 ]]</pre>
+
+    <div class="example-box">
+      <div class="ex-label">基本的なPERFORMの使い方</div>
+<pre>PERFORM S03-READ THRU S03-EXIT.
+
+S03-READ.         <span style="color:var(--code-dim)">このPERFORM命令の所へきたら、</span>
+  …               <span style="color:var(--code-dim)">S03-READからS03-EXITまでの中の</span>
+S03-EXIT.         <span style="color:var(--code-dim)">処理を行なってから、PERFORM命令</span>
+  EXIT.           <span style="color:var(--code-dim)">の次の命令を行なう。</span></pre>
+    </div>
+
+    <p>一般に、メイン処理は、PERFORM命令とIF文で組み立てられる事が多い。尚、PERFORMした先から、別のセグメントへブランチすることは、望ましくない（後からの解析がやりにくくなる）。</p>
+
+    <div class="warn">
+      <div class="warn-lbl">望ましくない例</div>
+<pre>S04-SHORI.
+  …
+  GO TO S05-SUB   <span style="color:var(--code-dim)">← 別セグメントへのGO TOは望ましくない</span>
+S04-EXIT.
+  EXIT.
+
+S05-SUB.          <span style="color:var(--code-dim)">← GO TO文はそのセグメント内にとどまる方が望ましい</span>
+S05-EXIT.
+  EXIT.</pre>
+    </div>
+
+    <div class="example-box">
+      <div class="ex-label">UNTIL条件付き — ファイルエンドまで繰り返す</div>
+<pre>PERFORM S04-SHORI THRU S04-EXIT
+  UNTIL SW-END = 'E'.
+
+S04-SHORI.
+  READ INFL
+    AT END
+      MOVE 'E' TO SW-END
+      GO TO S04-EXIT.
+  …
+S04-EXIT.
+  EXIT.
+
+<span style="color:var(--code-dim)">INFLをREADし、ファイルエンドになるまで
+S04-SHORIからS04-EXITまでを繰り返す。</span></pre>
+    </div>
+
+    <div class="example-box">
+      <div class="ex-label">VARYING — 2次元テーブル処理の例</div>
+<pre>PERFORM S05-SHORI THRU S05-EXIT
+  VARYING IDX1 FROM 1
+    BY 10 UNTIL A > B
+  AFTER IDX2 FROM 1
+    BY 10 UNTIL B > C.
+
+<span style="color:var(--code-dim)">①IDX1とIDX2が1にSETされている。
+②条件A＞Bが調べられ真ならば、この命令の次のステートメントへ移る。
+③偽ならば、条件B＞Cが調べられ、IDX2は1にSETされ、IDX1が1UPされる。
+④IDX1が10を超えたら、次のステートメントへ移る。
+⑤超えていなければ、②から④が繰り返される。
+⑥条件B＞Cが偽ならば、PERFORMのS05-SHORIからS05-EXITが1回実行される。
+⑦IDX2の値が1UPされ、又条件B＞Cが調べられる。
+⑧以上の処理が繰り返されるわけである。</span></pre>
+    </div>
+    <p>この様な事から、テーブル処理に向いているといえる。</p>
+  </div>
+
+  <!-- GO TO -->
+  <div class="section" id="c-goto">
+    <div class="sec-title">12、GO TO 文</div>
+    <p>この命令は現在、処理している位置から、他の位置へブランチさせる命令である。GO TO文は、1つの処理内で使うのが望ましい。他の処理へブランチさせても、プログラム的には問題無いが、デバッグ修正等が困難になる。</p>
+    <pre>GO TO 処理手順名</pre>
+    <div class="example-box">
+      <div class="ex-label">単純ブランチの例</div>
+<pre>S04-SHORI.
+  GO TO S04-02.
+S04-01.
+  GO TO S04-03.
+S04-02.
+  GO TO S04-01.
+S04-03.
+S04-EXIT.
+  EXIT.</pre>
+    </div>
+    <p>上で説明したのは、単純ブランチだが、ある値の数によって、どこへブランチするかという命令がある。</p>
+<pre><span style="color:var(--code-dim)">【計算型GO TO — DEPENDING ON】</span>
+GO TO 処理手順名-1
+      処理手順名-2
+      処理手順名-n DEPENDING ON 識別名</pre>
+    <p>これは、識別名の内容が、1であれば、処理手順-1へブランチする。又、該当が無ければ、このGO TO文は実行されないので、次のステートメントへ移る。</p>
+    <div class="example-box">
+      <div class="ex-label">計算型GO TO の例</div>
+<pre>MOVE A TO WK-DEP.
+GO TO S03-01
+     S03-02
+     S03-03 DEPENDING ON WK-DEP.
+
+S03-01.  <span style="color:var(--code-dim)">ここでWK-DEPというのは、WORKING</span>
+  …      <span style="color:var(--code-dim)">STORAGE SECTION で定義済みの</span>
+S03-02.  <span style="color:var(--code-dim)">9-TYPEのエリアである。</span>
+  …      <span style="color:var(--code-dim)">このWK-DEPに1〜3の値が入っていれば、</span>
+S03-03.  <span style="color:var(--code-dim)">S03-01、S03-02、S03-03へ</span>
+  …      <span style="color:var(--code-dim)">それぞれブランチする。</span></pre>
+    </div>
+  </div>
+
+  <!-- OPEN -->
+  <div class="section" id="c-open">
+    <div class="sec-title">13、OPEN</div>
+    <p>この命令は、ファイルをREADあるいはWRITE出来るようにあらかじめ開いておくという命令であり、READ, WRITEの前に実行しておかなければならない。尚、1度OPENすると、CLOSE命令を実行するまではOPEN命令は実行できない。通常、プログラム中では、頭で（INITIAL処理で）行なう事が多い。</p>
+<pre>OPEN INPUT   ファイル名-1…(n)
+OPEN OUTPUT  ファイル名-2…(n)
+OPEN I-O     ファイル名-3…(n)</pre>
+    <p>ファイルをどのような使用の為に開くかという指定でINPUT（READだけ）、OUTPUT（WRITEだけ）、I-O（両方）というのを指定しなければならない。</p>
+    <div class="warn">
+      <p>I-OでREAD/WRITEをする時はインプットとして読まれたデータに書いていくので、インプットデータは残らない。この点に気を付けて欲しい。</p>
+    </div>
+  </div>
+
+  <!-- CLOSE -->
+  <div class="section" id="c-close">
+    <div class="sec-title">14、CLOSE</div>
+    <p>この命令は、既に開かれているファイルを閉じる命令である。この命令を実行する前には、必ずOPEN命令が実行されていなければならない。CLOSE命令には、INPUT, OUTPUTetcの指定はいらない。尚、CLOSE命令を実行した後、FILEのREADあるいはWRITEを行う時には、OPEN命令を実行しなければならない。</p>
+    <pre>CLOSE ファイル名-1…(n)</pre>
+    <div class="example-box">
+      <div class="ex-label">例</div>
+      <pre>CLOSE INFL OUTFL   <span style="color:var(--code-dim)">← INFL,OUTFLと名付けられたファイルを閉じる。</span></pre>
+    </div>
+    <p>このCLOSE命令において、リワインドさせるとか、させないとかetc、オプションがいくつかあるが、ここでは省略する。</p>
+  </div>
+
+  <!-- WRITE -->
+  <div class="section" id="c-write">
+    <div class="sec-title">15、WRITE</div>
+    <p>この命令は、OUTPUT、もしくはI-Oで開かれたファイルへ、書き出しを行う命令である。</p>
+<pre><span style="color:var(--code-dim)">【リスト以外のファイル】</span>
+WRITE レコード名 [FROM 識別名]
+
+<span style="color:var(--code-dim)">【リストへのWRITE（改行制御あり）】</span>
+WRITE レコード名 [FROM 識別名]
+  [BEFORE] ADVANCING 識別名 LINES
+  [AFTER ]
+<span style="color:var(--code-dim)">（通常ADVANCINGとLINESという語は省略して使う）</span></pre>
+    <div class="example-box">
+      <div class="ex-label">WRITEとFROMの等価性</div>
+<pre>WRITE OUT-REC FROM OUT-DATA.
+
+<span style="color:var(--code-dim)">← 以下と同じ意味（MOVE + WRITE）</span>
+
+MOVE  OUT-DATA TO OUT-REC.
+WRITE OUT-REC.</pre>
+    </div>
+    <p>今度は、リストにWRITEする方法であるが、大きく分けて、2種類の方法がある。1つは、1ラインプリントした後で改行を行う（BEFORE）方法、もう1つは、改行を行った後プリント（AFTER）する方法である。</p>
+    <p>この命令は、識別名の中に入っている数の分だけ、ラインを飛ばすという事であり、ここにSPECIAL-NAMESの所で指定したC01 IS 〜 の名前を使うと、改頁されてプリントできる行の最初の行を指す。</p>
+    <div class="example-box">
+      <div class="ex-label">BEFORE と AFTER の違い（PR-RECの内容 = "*** テスト プログラム ケッカ ***"）</div>
+<pre>WRITE PR-REC BEFORE 2 の場合：
+  "*** テスト プログラム ケッカ ***"  ← P（書き出し後、2+1ライン先へ）
+  （空白行）
+                                      ← P'（ここで止まる）
+
+WRITE PR-REC AFTER 2 の場合：
+  スペース（2ライン先へ先に移動）
+  "*** テスト プログラム ケッカ ***"  ← P'（ここで止まる）</pre>
+    </div>
+    <div class="note">
+      <p>効率としては、BEFOREの方が良い。なぜなら、プリントしてプリンタが改行している間に、プログラムでは次にプリントする内容をセットできるからである。尚、1つのプログラム中では、どちらかに統一した方が、間違いが少なくていい。</p>
+    </div>
+  </div>
+
+  <!-- DISPLAY -->
+  <div class="section" id="c-disp">
+    <div class="sec-title">16、DISPLAY</div>
+    <p>この命令は、SYSOUT、SYSPUNCH、CONSOLE上に、データを書き込む命令で、プログラム上でファイルは持たない。</p>
+<pre>DISPLAY 識別名-1…(n) [UPON { CONSOLE  }]
+                           { SYSOUT   }
+                           { SYSPUNCH }
+                           { SYSPCH   }</pre>
+    <p>UPON句が省略されていると、SYSOUTとみなされる。</p>
+    <table>
+      <tr><th>出力先</th><th>最大桁数</th></tr>
+      <tr><td>SYSOUT</td><td>120桁</td></tr>
+      <tr><td>CONSOLE</td><td>100桁</td></tr>
+      <tr><td>SYSPUNCH</td><td>72桁</td></tr>
+    </table>
+    <div class="example-box">
+      <div class="ex-label">例</div>
+<pre>DISPLAY "*** PROGRAM ERR ***" UPON CONSOLE.
+<span style="color:var(--code-dim)">→ コンソール上に "*** PROGRAM ERR ***" と表示される。</span>
+
+DISPLAY "ERROR△△" "CODE=" WK-CODE.
+<span style="color:var(--code-dim)">→ WK-CODEに '001' が入っていると仮定すると、
+  SYSOUT上に "ERROR△△CODE=001" とプリントされる。</span></pre>
+    </div>
+    <p>CONSOLE以外は、JCL上でDDカードを指定しておかなければならない。DISPLAYは、入出力件数を出力する時によく使われる。</p>
+  </div>
+
+  <!-- SEARCH -->
+  <div class="section" id="c-srch">
+    <div class="sec-title">17、SEARCH</div>
+    <p>この命令は、テーブルで取られたエリア内から、あるKEYに基づいて、必要なデータを探し出す命令である。SEARCHを使わずにIFでLOOPさせるやり方もある。</p>
+<pre>SEARCH テーブル名 [AT END 命令ステートメント-1]
+  WHEN 条件 命令ステートメント-2
+
+テーブル名は、エリアの上で、OCCURS句が付いている項目である。</pre>
+    <div class="example-box">
+      <div class="ex-label">SEARCHを使った場合</div>
+<pre>05  A-OCCUR  OCCURS 100 TIMES
+             INDEXED BY A-X1.
+  10 A-KEY             PIC X(3).
+  10 A-NAIYO           PIC X(25).
+05  WK-KEY             PIC X(3).
+05  WK-DATA            PIC X(25).
+
+SET A-X1 TO 1.         <span style="color:var(--code-dim)">← 必ず事前にセット</span>
+SEARCH A-OCCUR
+  AT END GO TO SEARCH-END
+WHEN WK-KEY = A-KEY(A-X1)
+  MOVE A-NAIYO(A-X1) TO WK-DATA.
+
+<span style="color:var(--code-dim)">A-OCCURのA-KEYのn番目がWK-KEYと等しいものを探し出して、
+そのn番目のA-NAIYOをWK-DATAへ移す。
+条件に合うものが無ければ、SEARCH-ENDへブランチする。</span></pre>
+    </div>
+    <div class="example-box">
+      <div class="ex-label">IFループで同等処理を記述した場合（比較）</div>
+<pre>SET A-X1 TO 1.
+S03-SEARCH.
+IF A-X1 > 100
+  GO TO S03-SEARC-END
+ELSE
+  IF A-KEY(A-X1) = WK-KEY
+    MOVE 1-NAIYO(A-X1) TO WK-DATA
+  ELSE
+    SET A-X1 UP BY 1
+    GO TO S03-SEARCH.</pre>
+    </div>
+    <p>前頁のサーチ処理と比べると、サーチの方がステートメント数が少なくてすみ、S03-SEARCHという処理手順名をとる必要が無い事がわかる。どちらを使うかは、ケースBYケースで使い分けて欲しい。</p>
+  </div>
+
+  <!-- STOP RUN / GOBACK -->
+  <div class="section" id="c-stop">
+    <div class="sec-title">18、STOP RUN、GOBACK</div>
+    <table>
+      <tr><th>命令</th><th>用途</th></tr>
+      <tr><td><code>STOP RUN</code></td><td>プログラムの停止。リンクを必要としない単体のモジュール、またはメインモジュールで使用。</td></tr>
+      <tr><td><code>GOBACK</code></td><td>制御を上位モジュールへ返す。リンクを必要とし、且つ、メインモジュールでない時に使用。</td></tr>
+    </table>
+    <p>基本的には、今まで述べてきた命令詳を使用して、プロシジャーを作成する。まだまだ命令はあるが、とりあえず基本としてここに述べた命令は覚えておいてもらいたい。</p>
+    <p>尚、ここで述べた命令の他に、CALLというのがある。</p>
+    <pre>CALL モジュール名 USING エリア名</pre>
+    <p>という形で使用するのだが、さし当たっては省略しておく。このCALL命令を使うと、そのプログラムは、他のプログラムを必要とする為、リンクという手続きをとって、ロードモジュールを作らなければならない。</p>
+  </div>
+</div>
+
+<!-- ════════════════════════════════
+     第六章
+════════════════════════════════ -->
+<div class="chapter" id="ch6">
+  <div class="ch-header">
+    <div class="ch-num">第六章</div>
+    <div class="ch-title">フロー例とコーディング例</div>
+  </div>
+  <p>ここでは、処理の基本であるマッチング処理と、コントロールブレイク処理を実際のフローとコーディング例で紹介する。尚、これらのフローは、書物より引用した物ではない為、もっとよいフローがあるかもしれない。</p>
+  <div class="note">
+    <div class="note-lbl">マッチング処理</div>
+    <p>2つ以上のファイルをつきあわせ、あるKEYによって、ファイルに更新をかける様な処理である。ファイルの個数、KEYの個数によって、<strong>1:1、1:N、1:1:1、1:1:N</strong> などのような処理がある。</p>
+  </div>
+  <div class="note" style="border-color:var(--accent)">
+    <div class="note-lbl" style="color:var(--accent)">コントロール・ブレイク処理</div>
+    <p>ファイル中のあるKEYが、変わった時点で、それまでとは、違った処理をする事をコントロール・ブレイクと呼ぶ。明細を出しながら、支社、営業部、支部のトータルを出力するという様な処理である。</p>
+  </div>
+
+  <div class="section" id="ch6-m11">
+    <div class="sec-title">1、マッチング処理のフロー例（1:1）</div>
+    <div class="sub-title">＜スウィッチを使用する場合＞</div>
+    <div class="note">
+      <div class="note-lbl">前提条件</div>
+      <p>INFL1、INFL2の各KEYは、昇順にSORTされており、同一のKEYは同一ファイル上にはない。KEY1はINFL1のKEYでKEY2はINFL2のKEYである。</p>
+    </div>
+    <div class="flow">
+<span class="fn">START</span>
+  ↓
+<span class="fn">INITIAL</span>（ファイルのOPEN）
+  ↓ ←─────────────────────────────────────────────────────────────┐
+<span class="fc">SW1 = "1" ?</span>──YES──→ <span class="fn">INFL1 READ</span>  AT END時: KEY1←HIGH-VALUE
+  ↓NO（次へ）
+<span class="fc">SW2 = "1" ?</span>──YES──→ <span class="fn">INFL2 READ</span>  AT END時: KEY2←HIGH-VALUE
+  ↓
+<span class="fc">KEY1 : KEY2</span>
+  │
+  ├─ <span class="fc">KEY1 = HIGH-VALUE</span> ──→ <span class="fn">CLOSE</span> ──→ <span class="fn">END</span>
+  │
+  ├─ <span class="fc">KEY1 &lt; KEY2</span> ──→ <span class="fn">INFL1 ONLY処理</span> ──→ SW1←"1" SW2←"0" ──→（先頭へ）┘
+  │
+  ├─ <span class="fc">KEY1 &gt; KEY2</span> ──→ <span class="fn">INFL2 ONLY処理</span> ──→ SW1←"0" SW2←"1" ──→（先頭へ）┤
+  │
+  └─ <span class="fc">KEY1 = KEY2</span> ──→ <span class="fn">マッチング処理</span> ───→ SW1←"1" SW2←"1" ──→（先頭へ）┘</div>
+
+    <div class="sub-title">＜スウィッチを使用しない場合＞（1:1）</div>
+    <div class="flow">
+<span class="fn">START</span>
+  ↓
+<span class="fn">INITIAL</span>（ファイルのOPEN）
+  ↓
+<span class="fn">INFL1 READ</span>
+  ↓
+<span class="fn">INFL2 READ</span>
+  ↓（1） ←──────────────────────────────────────────────────────────────┐
+<span class="fc">KEY1 : KEY2</span>
+  │
+  ├─ <span class="fc">KEY1 = HIGH-VALUE</span> ──→ <span class="fn">CLOSE</span> ──→ <span class="fn">END</span>
+  │
+  ├─ <span class="fc">KEY1 &lt; KEY2</span> ──→ <span class="fn">INFL1 ONLY処理</span> ──→ <span class="fn">INFL1 READ</span> ──────────────────→（1）
+  │
+  ├─ <span class="fc">KEY1 &gt; KEY2</span> ──→ <span class="fn">INFL2 ONLY処理</span> ──→ <span class="fn">INFL2 READ</span> ──────────────────→（1）
+  │
+  └─ <span class="fc">KEY1 = KEY2</span> ──→ <span class="fn">マッチング処理</span> ──→ <span class="fn">INFL1 READ</span> ──→ <span class="fn">INFL2 READ</span> ──→（1）</div>
+
+    <div class="note">
+      <div class="note-lbl">説明</div>
+      <p>スウィッチを使用する場合も使用しない場合も基本的には、同一である。ここのマッチング処理という所で、ファイル（INFL2）を更新しPUTする。このINFL1は、マスターファイルで、INFL2はトランザクションファイルを意味している。マッチング処理で注意しなければならないのは、前提条件（ソート順、KEYの存在など）と、ファイルをREADするタイミングとPUTするタイミングである。これは、KEYが1:1、1:N、N:Nともに共通している。</p>
+    </div>
+
+    <div class="sub-title">コーディング例（MAIN） — スウィッチ使用・1:1マッチング</div>
+    <div class="example-box">
+      <div class="ex-label">記入例</div>
+<pre>文番号  A         B
+  10   S01-START.
+  20             PERFORM  S02-INITIAL    THRU  S02-EXIT.
+  30   S01-LOOP.
+  40             IF SW1                 =     '1'
+  50             PERFORM  S03-READ1     THRU  S03-EXIT
+  60             ELSE
+  70             NEXT SENTENCE.
+  80             IF SW2                 =     '1'
+  90             PERFORM  S04-READ2     THRU  S04-EXIT
+ 100             ELSE
+ 110             NEXT SENTENCE.
+ 120             IF KEY1                =     KEY2
+ 130             IF KEY1                =     HIGH-VALUE
+ 140             NEXT SENTENCE
+ 150             ELSE
+ 160             PERFORM  S05-MATCH     THRU  S05-EXIT
+ 170             MOVE     '1'           TO    SW1
+ 180             MOVE     '1'           TO    SW2
+ 190             GO TO    S01-LOOP
+ 200             ELSE
+ 210             IF KEY1                &lt;     KEY2
+ 220             PERFORM  S06-IN1-ONLY  THRU  S06-EXIT
+ 230             MOVE     '1'           TO    SW1
+ 240             MOVE     '0'           TO    SW2
+ 250             GO TO    S01-LOOP
+ 260             ELSE
+ 270             PERFORM  S07-IN2-ONLY  THRU  S07-EXIT
+ 280             MOVE     '0'           TO    SW1
+ 290             MOVE     '1'           TO    SW2
+ 300             GO TO    S01-LOOP
+ 310             PERFORM  S08-CLOSE     THRU  S08-EXIT.
+ 320             STOP RUN.</pre>
+    </div>
+  </div>
+
+  <div class="section" id="ch6-m1n">
+    <div class="sec-title">2、スウィッチを使用しない場合（1:N）</div>
+    <p>☆INFL1…1 （マスター）　　☆INFL2…N （トランザクション）</p>
+    <div class="flow">
+<span class="fn">START</span>
+  ↓
+<span class="fn">INITIAL</span>（ファイルのOPEN）
+  ↓
+<span class="fn">INFL1 READ</span>
+  ↓
+<span class="fn">INFL2 READ</span>
+  ↓（1） ←─────────────────────────────────────────────────────────────────┐
+<span class="fc">KEY1 : KEY2</span>
+  │
+  ├─ <span class="fc">KEY1 = HIGH-VALUE</span> ──→ <span class="fn">CLOSE</span> ──→ <span class="fn">END</span>
+  │
+  ├─ <span class="fc">KEY1 &lt; KEY2</span>
+  │     <span class="fc">SW1 = "0"</span> ──→ <span class="fn">INFL1 ONLY処理</span> ──→ <span class="fn">INFL1 READ</span> ──────────────────→（1）
+  │     <span class="fc">SW1 = "1"</span> ──→ <span class="fn">OUT処理</span> ──→ <span class="fn">INFL1 ONLY処理</span> ──→ <span class="fn">INFL1 READ</span> ───→（1）
+  │
+  ├─ <span class="fc">KEY1 &gt; KEY2</span> ──→ <span class="fn">INFL2 ONLY処理</span> ──→ <span class="fn">INFL2 READ</span> ──────────────────→（1）
+  │
+  └─ <span class="fc">KEY1 = KEY2</span> ──→ <span class="fn">マッチング処理</span>（SW1←"1"） ──→ <span class="fn">INFL2 READ</span> ──────→（1）</div>
+    <div class="note">
+      <div class="note-lbl">説明</div>
+      <p>ここのマッチング処理とは、ファイルのPUTは行なわず、SW1に<code>"1"</code>をたてる。このスウィッチは、更新処理を行なったというスウィッチである。OUT処理で、ファイルのPUT処理を行なう。ただし、このフローは、INFL1がマスターで、マスターに更新をかけて新マスターを作成するフローである。マスターがINFL2だとすれば、OUT処理は不要となる。しかし、通常マスターには、同一KEYが複数存在することは少ないので、このフロー処理でいい。SW1のクリアはOUT処理で行なう。</p>
+    </div>
+  </div>
+
+  <div class="section" id="ch6-mnn">
+    <div class="sec-title">3、スウィッチを使用しない場合で（N:N） — 同一KEYのMAXが全く予想できない場合</div>
+    <div class="flow">
+<span class="fn">START</span>
+  ↓
+<span class="fn">INITIAL</span>
+  ↓
+<span class="fn">INFL1 READ</span>
+  ↓
+<span class="fn">INFL2 READ</span>
+  ↓（1） ←──────────────────────────────────────────────────────────────────┐
+<span class="fc">KEY1 : KEY2</span>
+  │
+  ├─ <span class="fc">KEY1 &lt; KEY2</span> ──→ <span class="fn">INFL1 ONLY処理</span> ──→ <span class="fn">INFL1 READ</span> ─────────────────→（1）
+  │
+  ├─ <span class="fc">KEY1 &gt; KEY2</span> ──→ <span class="fn">INFL2 ONLY処理</span> ──→ <span class="fn">INFL2 READ</span> ─────────────────→（1）
+  │
+  └─ <span class="fc">KEY1 = KEY2</span>
+       STR1←KEY1, STR2←KEY2
+         ↓（2） ←──────────────────────────────────────────────────────────┐
+       <span class="fc">KEY1 ≠ KEY2 ?</span>
+         ├─ YES ──→ <span class="fn">OUT処理</span> ──→ <span class="fn">INFL1 READ</span>   ──────────────────────────┤
+         └─ NO  ──→ <span class="fn">マッチング処理</span> ──→ <span class="fn">INFL2 READ</span> ──────────────────────┤
+       <span class="fc">KEY1 OR KEY2 = HIGH-VALUE ?</span>                                          │
+         └─ YES ──→ （2）へ                                                 │
+       <span class="fc">KEY1 = STR1 ?</span>                                                        │
+         ├─ ≠ ──→ （2）へ                                                  │
+         └─ = ──→ <span class="fn">INFL2 CLOSE &amp; 再オープン</span>                               │
+              ↓（3）                                                          │
+              <span class="fn">INFL2 READ</span>                                                    │
+              <span class="fc">KEY2 : STR2</span>                                                    │
+               ├─ = ──→ マッチング処理 ─────────────────────────────────────┘
+               └─ ≠ ──→ （3）へ
+         （1）に戻る</div>
+  </div>
+
+  <div class="section" id="ch6-desc">
+    <div class="sec-title">4、マッチング処理の説明</div>
+    <p>マッチングとは、複数のファイルをあるKEYによって照合させ、同一KEY同士の処理を行ない、ファイルを更新する事をいう。一般には、旧（更新前）マスターと、トランザクションファイル（取引ファイル）を照合させ、トランザクションファイルの内容によって、マスターの内容を更新して、新マスターを作成する。その際、エラーのデータはエラーファイルに出力し、同時にリスト件数表を出力する。</p>
+    <p>例えば、マスターファイルのKEYと、トランザクションのKEYを、B表の様に仮定すると、マスターファイルの1件目に更新をかけようとすると、トランザクションの1件目と2件目をREADしなければならない。又、3件目のトランザクションの<code>'05'</code>というKEYは、マスターの方にはない為、新しくマスターの<code>'04'</code>と<code>'06'</code>の間にインサートする事になる。こうして、新マスターを作成する。</p>
+    <div class="example-box">
+      <div class="ex-label">B表 — マスターとトランザクションの照合</div>
+<pre>件数  マスター  トランザクション   処理
+  1      01          01       →  01 （更新をかける）
+  2      02          01       →  02 （2件目で更新）
+  3      03          05       →  03 （該当なし、マスターそのまま）
+  4      04          06       →  04 （同上）
+  5      06          06       →  (05)← マスターにないからインサート
+  6      07          07       →  06 （更新）
+  7      09          08
+  8      10          09</pre>
+    </div>
+    <div class="note">
+      <p>したがって、通常のマスター更新処理の新マスターは、件数は増える事はあっても減る事はない。（ただし、DELETE処理が入っていれば、この限りではない）</p>
+    </div>
+    <p><strong>フローの1番最後のN:Nについて</strong></p>
+    <ul>
+      <li>N:Nのマッチング処理で、マスター及びトランザクションのKEYの両方とも、同一KEYの個数のMAXがまるで分からない時、このフローの様にオープン、クローズを繰り返し、あたかも、1:Nのマッチング処理を行うかの様に処理を行う。このSTR1、STR2というのは、KEYが変わる直前のKEYの値をストアしておくエリアである。</li>
+      <li>N:Nのマッチング処理で、マスターもしくはトランザクションのKEYのどちらかのKEYのMAXがわかっていて、且つ、RECORD-LENGTHとMAX件数を乗じた値のレングスが、ワーク（プログラム上で）上でとりうる値であれば、まずKEYが変わるまでワーク上へストアし続け、KEYが変わった時点でそのワークと、ファイルのマッチング処理を行う。これは、1:Nのマッチング処理と同様の処理を行なうことが出来る。このフローは、各自で作成してみるとよい。</li>
+      <li>N:Nのマッチング処理というのはあまりないので、1:Nのフローを完全にマスターした方がよい。N:Nは、1:Nの応用である。又、1:1:1、1:1:N、の様な多数ファイルのマッチング処理も、基本は1:Nである。</li>
+    </ul>
+  </div>
+
+  <div class="section" id="ch6-cb">
+    <div class="sec-title">5、コントロールブレークのフロー例</div>
+    <p>プリントルーチン：53ラインを超えたら見出しを打つ。</p>
+    <div class="flow">
+ライン数 &gt; 53 ──YES──→ <span class="fn">見出し処理</span>（改頁・見出し印字・カウンタ初期化）
+    ↓
+<span class="fn">データセット処理</span>（プリントエリアへデータを移送）
+    ↓
+<span class="fn">PRINT処理</span>（WRITE・ライン数カウンタ+1・エリアクリア）</div>
+    <p>このフローは、プリントルーチンの一部である。ライン数をカウントして、53ラインをこえたら改頁して見出しを打つというコントロールブレイクの基本である。この形がコントロールブレイクの基本である。非常に簡単なのだが、様々な処理が入ってくると改頁のタイミングというものは難しくなってくる。</p>
+
+    <div class="sub-title">3キー（大項目・中項目・小項目）のコントロールブレイク</div>
+    <div class="example-box">
+      <div class="ex-label">ブレークキーの定義</div>
+<pre>05  KEY.
+  10 KEY1  PIC X(3).   <span style="color:var(--code-dim)">← READ時のKEY（大項目：支社など）</span>
+  10 KEY2  PIC X(3).   <span style="color:var(--code-dim)">← 中項目：営業部など</span>
+  10 KEY3  PIC X(3).   <span style="color:var(--code-dim)">← 小項目：支部など</span>
+05  STR.
+  10 STR1  PIC X(3).   <span style="color:var(--code-dim)">← 1件前のKEY1</span>
+  10 STR2  PIC X(3).   <span style="color:var(--code-dim)">← 1件前のKEY2</span>
+  10 STR3  PIC X(3).   <span style="color:var(--code-dim)">← 1件前のKEY3</span></pre>
+    </div>
+    <div class="flow">
+<span class="fn">START</span>
+  ↓
+<span class="fn">INITIAL</span>
+  ↓（1） ←──────────────────────────────────────────────────────────────────┐
+<span class="fn">INFILE READ</span>（1件目はKEYをKEYとSTRの両方にMOVE、以後はKEYへ）
+  ↓
+<span class="fc">EOF ?</span>──YES──→ <span class="fn">小計プリント</span> → <span class="fn">中計プリント</span> → <span class="fn">合計プリント</span> → <span class="fn">件数表</span> → <span class="fn">CLOSE</span> → <span class="fn">STOP RUN</span>
+  ↓NO
+<span class="fc">KEY = STR ?</span>──YES（KEY変わらず）──→ <span class="fn">明細プリント</span> → <span class="fn">集計</span> ──────────────────→（1）
+  ↓NO（KEYが変わった）
+<span class="fc">KEY1 = STR1 ?</span>
+  ├─ ≠（大項目変更）──→ <span class="fn">小計P</span> → <span class="fn">中計P</span> → <span class="fn">合計P</span>
+  │                      KEYの内容をSTRにMOVE
+  └─ = [<span class="fc">KEY2 = STR2 ?</span>]
+       ├─ ≠（中項目変更）──→ <span class="fn">小計P</span> → <span class="fn">中計P</span>
+       │                      KEY2をSTR2へ、KEY3をSTR3へMOVE
+       └─ =（小項目変更）──→ <span class="fn">小計P</span>
+                               KEY3をSTR3へMOVE
+  ↓
+<span class="fn">明細プリント</span> → <span class="fn">集計処理</span> ──────────────────────────────────────────────→（1）
+
+※明細はREADしたデータ
+  小計・中計・合計は、READしたデータの1件前までの集計した値
+  ラストの時、明細をプリントする必要はない</div>
+
+    <p>処理の説明：</p>
+    <ol>
+      <li>1件目のREAD時にデータ中のKEYをワークエリアでとったKEYとSTRにMOVEする。1件目以外はKEYへ入れる。</li>
+      <li>FILE ENDかをきく。ENDならば、小計、中計、合計をプリントし件数表をプリントしてEND処理を行ないプログラムはストップする。ENDでなければ③へ。</li>
+      <li>KEYとSTRを比較して、同じならば明細をプリントして集計処理を行ない①へ戻る。</li>
+      <li>大項目KEY（KEY1、STR1）が、同じでなければ小計、中計、合計をプリントしKEYの内容をSTRにMOVEする。</li>
+      <li>中項目KEY（KEY2、STR2）が、同じでなければ小計、中計をプリントしKEY2の内容をSTR2へ、KEY3をSTR3へMOVEする。</li>
+      <li>小項目KEY（KEY3、STR3）が、同じでなければ（実際には比較する必要はない）小計をプリントしKEY3をSTR3へMOVEする。</li>
+      <li>④⑤⑥の処理が終ったら、明細をプリントし集計処理をして①へ戻る。</li>
+    </ol>
+
+    <div class="sub-title">コーディング例（MAIN）— コントロールブレイク</div>
+    <div class="example-box">
+      <div class="ex-label">記入例</div>
+<pre>文番号  A         B
+  10   S01-START.
+  20             PERFORM  S02-INITIAL    THRU  S02-EXIT.
+  30   S01-01.
+  40             PERFORM  S03-READ       THRU  S03-EXIT.
+  50             IF SW-END              =     '1'
+  60               GO TO S01-02
+  70             ELSE
+  80               IF KEY              =     STR
+  90                 NEXT SENTENCE
+ 100               ELSE
+ 110                 IF KEY1           =     STR1
+ 120                   IF KEY2         =     STR2
+ 130                     PERFORM S06-SHOKEI  THRU  S06-EXIT
+ 150                   ELSE
+ 160                     PERFORM S06-SHOKEI  THRU  S06-EXIT
+ 170                     PERFORM S07-CHUKEI  THRU  S07-EXIT
+ 190                 ELSE
+ 200                   PERFORM  S06-SHOKEI   THRU  S06-EXIT
+ 210                   PERFORM  S07-CHUKEI   THRU  S07-EXIT
+ 220                   PERFORM  S08-GOKEI    THRU  S08-EXIT.
+ 270             PERFORM  S04-MEISAI         THRU  S04-EXIT.
+ 280             PERFORM  S05-SHUKEI         THRU  S05-EXIT.
+ 290             GO TO S01-01.
+ 300   S01-02.
+ 310             PERFORM  S06-SHOKEI         THRU  S06-EXIT.
+ 320             PERFORM  S07-CHUKEI         THRU  S07-EXIT.
+ 330             PERFORM  S08-GOKEI          THRU  S08-EXIT.
+ 340             PERFORM  S09-KENSUHYO       THRU  S09-EXIT.
+ 350             PERFORM  S10-CLOSE          THRU  S10-EXIT.
+ 360             STOP RUN.</pre>
+    </div>
+    <div class="note">
+      <p>マッチング処理中に、コントロールブレイク処理が入るという様な処理は非常に多い。したがって、マッチング処理とコントロールブレイク処理は、単純なTAPE TO PRINTの様な処理以外は入っているとみて良いだろう。それだけに、この2つの処理はしっかりと身につけておいて欲しい。</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════
+     第七章
+════════════════════════════════ -->
+<div class="chapter" id="ch7">
+  <div class="ch-header">
+    <div class="ch-num">第七章</div>
+    <div class="ch-title">TSO</div>
+  </div>
+  <p>ここではTSOの廻わりのファイルと、TSOでテストする場合とJCLとの違い、コマンドプロシジャーの基本的なものの作成方法を簡単に述べる。詳細はプログラマーズハンドブックを参照して頂きたい。</p>
+
+  <div class="section">
+    <div class="sec-title">TSOのLOGON</div>
+    <p>LOGONとは、ユーザーがワークを確保して、我々の作業が行える様にする第1番目のコマンドである。</p>
+<pre>LOGON USER-ID/PASSWORD [↵]
+
+例：LOGON @QAKOBA/1111 [↵]</pre>
+    <p>このコマンドを入れるとTSOの画面は、READYになり使用可能となる。</p>
+  </div>
+
+  <div class="section" id="ch7-fi">
+    <div class="sec-title">1〜2、ファイル関係図 / ファイル説明</div>
+    <table>
+      <tr><th>ライブラリ名</th><th>内容</th></tr>
+      <tr><td><code>MASTER (MASTRLIB)</code></td><td>最終的なソースプログラムがSOURCEからコピーされて登録されている。</td></tr>
+      <tr><td><code>SOURCE (SOURCLIB)</code></td><td>パンチされたプログラムが入り、修正などをして更新されていくプログラムが入る。定期的にスクラッチされる。</td></tr>
+      <tr><td><code>PDSLIB</code></td><td>DCOPY又はCOPY文のソースが入っている。</td></tr>
+      <tr><td><code>TEST.CPYLIB</code></td><td>TSOより、SUBCOPYされたDCOPYが一時的に入れられる所である。毎週月曜日にスクラッチされる。</td></tr>
+      <tr><td><code>DASD.CPYLIB</code></td><td>完成されたDCOPYがTEST.CPYLIBより、コピーされて入る所である。</td></tr>
+      <tr><td><code>TESTLIB1</code></td><td>TSOよりCOMPILEされたものが入る。（通常）</td></tr>
+      <tr><td><code>TESTLIB2</code></td><td>TESTLIB1へカタログしたモジュールを、単体ならそのまま、そうでなければ他のモジュールをリンクしロードモジュールを一時的にカタログしておく所。</td></tr>
+      <tr><td><code>DASDLIB1, DASDLIB2, D1LIB1 etc</code></td><td>最終的なロードモジュールがカタログされる。</td></tr>
+    </table>
+  </div>
+
+  <div class="section" id="ch7-fl">
+    <div class="sec-title">3、ソースプログラムからロードモジュールまで</div>
+    <div class="flow">
+① コーディングを終えて、パンチに出すと → <span class="fn">SOURCEリブ</span> に登録される。
+
+② TSOから 'LIBC'、'LIBA' などのコマンドによって
+   SOURCEリブ → <span class="fn">TSOWKx</span>（TSOワーク）に持ってくる。
+   ここで修正を加えて 'SUBCB2W'、'SUBASHW' などのコマンドにより
+   コンパイルまたはアセンブルを行う。
+   → この手続きを行うと <span class="fn">TESTLIB1</span> へカタログされる。
+
+③ TESTLIB1にカタログされたモジュールと他のモジュールを連結する。
+   ← この作業をリンクと呼ぶ。
+   CALL命令がなければリンクする必要は無い。
+   リンク処理を行うコマンドとして 'SUBLKED' etc がある。
+
+④ リンクされたモジュールは一時的に、<span class="fn">TESTLIB2</span> へカタログされる。（ロードモジュール）
+
+⑤ このロードモジュールを TEST命令などによってテストを繰り返す。
+   エラーが無くなるまで② 〜 ④までの作業を繰り返す。
+
+⑥ 完全に出来上がったロードモジュールは、業務によって、
+   'DASDLIB1'、'DASDLIB2' などに 'TESTLIB2' から登録される。
+
+⑦ これで初めて動かせるモジュールができたわけである。</div>
+  </div>
+
+  <div class="section" id="ch7-jt">
+    <div class="sec-title">4、JCLでのテストとTSOでのテストの違い</div>
+    <div class="example-box">
+      <div class="ex-label">JCLによるテスト記述例</div>
+<pre>// SAMPLE       JOB  NSD,MSGLEVEL=1
+// JOBLIB        DD   DSN=TESTLIB2,DISP=SHR
+// STEP1        EXEC  PGM=SAMPLE,PARM='8106'
+// INFL          DD   DSN=TEST.DATA,
+//                    DCB=(BLKSIZE=1000,LRECL=100,RECFM=FB),
+//                    VOL=SER=DTF005,UNIT=3350,
+//                    DISP=SHR
+// PRINT         DD   SYSOUT=A
+// SYSOUT        DD   SYSOUT=A
+// SYSUDUMP      DD   SYSOUT=A</pre>
+    </div>
+    <div class="example-box">
+      <div class="ex-label">TSOコマンドによる同等処理</div>
+<pre>FREE F(INFL,PRINT,SYSOUT)
+ALLOC F(INFL)DA('TEST.DATA')VOL(DTF005)-UNIT(3350)SHR
+ALLOC F(PRINT)-DA(*)
+ALLOC F(SYSOUT)-DA(*)
+TEST 'TESTLIB2(SAMPLE)''8106'</pre>
+    </div>
+    <p>これだけKEYINするとTSO画面上にTESTという文字が出てくる。ここでGOというコマンドを入れるとプログラムは作動する。テストがうまく行くと結果が画面に現れる。これらのコマンドを一回ずつKEYINするのは非常に大変である。そこでコマンドプロシジャーというのが用意されている。これは、TSOワーク上にXX.CLISTという形で作る事が出来る。</p>
+  </div>
+
+  <div class="section" id="ch7-md">
+    <div class="sec-title">5、TSOモード関係図</div>
+    <div class="svg-flow">
+      <svg viewBox="0 0 700 260" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:700px;font-family:'Source Code Pro',monospace">
+        <defs>
+          <marker id="arr" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+            <polygon points="0 0,8 3,0 6" fill="#80c080"/>
+          </marker>
+        </defs>
+        <!-- READY -->
+        <rect x="270" y="10" width="160" height="34" rx="4" fill="#1e3a5f" stroke="#4a90d0" stroke-width="1.5"/>
+        <text x="350" y="32" text-anchor="middle" fill="#7ad0ff" font-size="14" font-weight="bold">READY</text>
+
+        <!-- 左グループ（編集系） -->
+        <rect x="20" y="78" width="220" height="34" rx="3" fill="#1e2a1e" stroke="#4a7a4a" stroke-width="1"/>
+        <text x="130" y="100" text-anchor="middle" fill="#c8e6a0" font-size="11">ASM │ COB │ LINK</text>
+
+        <!-- 右グループ（ファイル操作系） -->
+        <rect x="460" y="78" width="220" height="34" rx="3" fill="#1e2a1e" stroke="#4a7a4a" stroke-width="1"/>
+        <text x="570" y="100" text-anchor="middle" fill="#c8e6a0" font-size="11">CALL │ ALLOC │ FREE</text>
+
+        <!-- 左第2グループ（EDIT系） -->
+        <rect x="20" y="158" width="220" height="34" rx="3" fill="#2a2010" stroke="#7a6020" stroke-width="1"/>
+        <text x="130" y="180" text-anchor="middle" fill="#e8c870" font-size="11">LIST │ DEL │ EDIT</text>
+
+        <!-- 右第2グループ（TEST系） -->
+        <rect x="460" y="158" width="220" height="34" rx="3" fill="#1e2a1e" stroke="#4a7a4a" stroke-width="1"/>
+        <text x="570" y="180" text-anchor="middle" fill="#c8e6a0" font-size="11">TEST │ TESTCOB │ HELP</text>
+
+        <!-- EDIT内コマンド -->
+        <rect x="20" y="222" width="320" height="30" rx="3" fill="#2a1a10" stroke="#6a4020" stroke-width="1"/>
+        <text x="180" y="241" text-anchor="middle" fill="#e8a060" font-size="10">SAVE │ INPUT │ DEL │ CHANGE │ END │ LIST │ SET</text>
+
+        <!-- 矢印：READY → 左グループ -->
+        <line x1="310" y1="44" x2="180" y2="78" stroke="#80c080" stroke-width="1.2" marker-end="url(#arr)"/>
+        <!-- 矢印：READY → 右グループ -->
+        <line x1="390" y1="44" x2="520" y2="78" stroke="#80c080" stroke-width="1.2" marker-end="url(#arr)"/>
+        <!-- 矢印：左グループ → EDIT系 -->
+        <line x1="130" y1="112" x2="130" y2="158" stroke="#80c080" stroke-width="1.2" marker-end="url(#arr)"/>
+        <!-- 矢印：EDIT系 → EDIT内コマンド -->
+        <line x1="130" y1="192" x2="130" y2="222" stroke="#80c080" stroke-width="1.2" marker-end="url(#arr)"/>
+
+        <!-- ラベル -->
+        <text x="350" y="55" text-anchor="middle" fill="#5a7a5a" font-size="9">（ログイン後の基本状態）</text>
+        <text x="98" y="138" fill="#5a7060" font-size="9">コンパイル/アセンブル/リンク</text>
+        <text x="460" y="138" fill="#5a7060" font-size="9">ファイル割り当て・開放</text>
+        <text x="98" y="210" fill="#706050" font-size="9">ソース編集モード</text>
+        <text x="460" y="210" fill="#5a7060" font-size="9">テスト実行</text>
+      </svg>
+    </div>
+    <p>上位モードから下位モードへ遷移する。TSOでテストを繰り返す際は、READY状態からALLOC→TESTの順でコマンドを入力する。</p>
+  </div>
+
+  <div class="section" id="ch7-cl">
+    <div class="sec-title">6、CLISTの作り方</div>
+    <p>前頁のモード関係図を見てもらえば、モードの上下関係は大体分かると思う。TSO画面上にREADYと出ていたら、何もやっていないという事である。さて、コマンドプロシジャーの作り方を述べよう。</p>
+    <div class="example-box">
+      <div class="ex-label">作成手順</div>
+<pre>READY状態で：
+EDIT MIHON.CLIST NEW [E]   ← 何という名前でもよい（8桁以内）
+
+画面に "INPUT" と表示され 000010 が出る。
+前頁でテストする為に入れた KEY をそのまま1ラインずつ KEY IN する：
+
+INPUT
+000010  FREE F(INFL,PRINT,SYSOUT) [E]
+000020  ALLOC F(INFL) DA('TEST.DATA') - [E]
+          （中略）
+000060  TEST 'TESTLIB2(SANPLE)''8106' [E]
+000070  [E]
+
+ENTER-KEY を押すと INPUTモード → EDITモード
+画面に "EDIT" と表示される。
+
+END SAVE[E] とKEY IN する。
+→ モードは READY になる。</pre>
+    </div>
+    <div class="example-box">
+      <div class="ex-label">実行方法</div>
+<pre>EX MIHON [E]   ← これを入力するだけでTESTモードになる。
+
+※ このコマンドプロシジャーをTSTPROCに登録すれば、
+   EXをつけないで MIHON と打ち込むだけで作動する。</pre>
+    </div>
+    <p>これが、最も基本的なコマンドプロシジャーである。このコマンドプロシジャー内で様々な処理を行わせる事もできるが（IF＆SET etsを使って）それは省略しておく。ここでは、JCLとコマンドプロシジャーの違いを知っておいてもらいたい。</p>
+  </div>
+
+  <div class="section" id="ch7-cm">
+    <div class="sec-title">7、TSOの主なコマンド</div>
+    <table>
+      <tr><th>コマンド</th><th>用途・説明</th></tr>
+      <tr><td><code>LIBC / LIBA / LIBGP</code></td><td>ソースリブなどからソースモジュールをTSOワーク上へ持ってくるコマンド。基本はLGコマンド。</td></tr>
+      <tr><td><code>LG xxxxxxxx {COBOL|ASM|DATA} DSSOURCE({MASTRLIB|SOURCLIB|PDSLIB})</code></td><td>上記コマンドの基本となるLGコマンド本体。PASSWORD(****) で保護可。</td></tr>
+      <tr><td><code>SUBCB2W / SUBASHW / KCOBJ / KC</code></td><td>モジュールをコンパイルもしくはアセンブルして、TESTLIB1（基本的に）にカタログする。（管理コード8桁 / **=RM1,RM2,C）</td></tr>
+      <tr><td><code>SUBLKED / SUBLKED2 / KLKED</code></td><td>リンクする為のコマンド。TESTLIB2（基本的に）へカタログされる。通常6桁指定。</td></tr>
+      <tr><td><code>LS / LS =ALL</code></td><td>TSOワークへ持ってきたモジュールをソースリブなどへ戻してやるコマンド。</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ════════════════════════════════
+     第八章
+════════════════════════════════ -->
+<div class="chapter" id="ch8">
+  <div class="ch-header">
+    <div class="ch-num">第八章</div>
+    <div class="ch-title">PAD 図</div>
+  </div>
+
+  <div class="section" id="pad1">
+    <div class="sec-title">1、36ページのPAD図 — 1:1マッチング（スウィッチ使用）</div>
+    <div class="flow">
+┌─────────────────────────────────────────────────────────────────────────┐
+│ <span class="fn">START</span>                                                                     │
+│   ├─ <span class="fn">INITIAL</span>                                                              │
+│   ├─ SW1=1                                                               │
+│   ├─ SW2=1                                                               │
+│   └─ <span class="fc">[KEY1=KEY2 AND KEY1=HIGH-VALUE]</span>                                     │
+│         ├─ YES ──→ <span class="fn">CLOSE</span> ──→ <span class="fn">STOP RUN</span>                                    │
+│         └─ NO  ──→ <span class="fc">[KEY1 : KEY2]</span>                                        │
+│                       ├─ <span class="fc">KEY1 &lt; KEY2</span> ──→ <span class="fc">[SW1=1?]</span>                      │
+│                       │                    ├─ <span class="fn">INFL1 ONLY処理</span>              │
+│                       │                    │   ├─ '1'→SW1               │
+│                       │                    │   └─ '0'→SW2               │
+│                       │                    └─ <span class="fn">INFL1 READ</span>                 │
+│                       ├─ <span class="fc">KEY1 &gt; KEY2</span> ──→ <span class="fc">[SW2=1?]</span>                      │
+│                       │                    ├─ <span class="fn">INFL2 ONLY処理</span>              │
+│                       │                    │   ├─ '0'→SW1               │
+│                       │                    │   └─ '1'→SW2               │
+│                       │                    └─ <span class="fn">INFL2 READ</span>                 │
+│                       └─ <span class="fc">KEY1 = KEY2</span> ──→ <span class="fn">マッチング処理</span>                  │
+│                                              ├─ '1'→SW1                 │
+│                                              ├─ '1'→SW2                 │
+│                                              ├─ <span class="fn">INFL1 READ</span>              │
+│                                              └─ <span class="fn">INFL2 READ</span>              │
+└─────────────────────────────────────────────────────────────────────────┘</div>
+  </div>
+
+  <div class="section" id="pad2">
+    <div class="sec-title">2、38ページのPAD図 — 1:1マッチング（スウィッチ不使用）</div>
+    <div class="flow">
+┌─────────────────────────────────────────────────────────────────────────┐
+│ <span class="fn">START</span>                                                                     │
+│   ├─ <span class="fn">INITIAL</span>                                                              │
+│   ├─ <span class="fn">INFL1 READ</span>                                                          │
+│   ├─ <span class="fn">INFL2 READ</span>                                                          │
+│   └─ <span class="fc">[KEY1=KEY2 AND KEY1=HIGH-VALUE]</span>                                     │
+│         ├─ YES ──→ <span class="fn">CLOSE</span> ──→ <span class="fn">STOP RUN</span>                                    │
+│         └─ NO  ──→ <span class="fc">[KEY1 : KEY2]</span>                                        │
+│                       ├─ <span class="fc">KEY1 &lt; KEY2</span> ──→ <span class="fn">INFL1 ONLY処理</span>                 │
+│                       │                    └─ <span class="fn">INFL1 READ</span>                 │
+│                       ├─ <span class="fc">KEY1 &gt; KEY2</span> ──→ <span class="fn">INFL2 ONLY処理</span>                 │
+│                       │                    └─ <span class="fn">INFL2 READ</span>                 │
+│                       └─ <span class="fc">KEY1 = KEY2</span> ──→ <span class="fn">マッチング処理</span>                  │
+│                                              ├─ <span class="fn">INFL1 READ</span>              │
+│                                              └─ <span class="fn">INFL2 READ</span>              │
+└─────────────────────────────────────────────────────────────────────────┘</div>
+  </div>
+
+  <div class="section" id="pad3">
+    <div class="sec-title">3、39ページのPAD図 — 1:Nマッチング（スウィッチ不使用）</div>
+    <div class="flow">
+┌─────────────────────────────────────────────────────────────────────────┐
+│ <span class="fn">START</span>                                                                     │
+│   ├─ <span class="fn">INITIAL</span>                                                              │
+│   ├─ <span class="fn">INFL1 READ</span>                                                          │
+│   ├─ <span class="fn">INFL2 READ</span>                                                          │
+│   └─ <span class="fc">[KEY1=KEY2 AND KEY1=HIGH-VALUE]</span>                                     │
+│         ├─ YES ──→ <span class="fn">CLOSE</span> ──→ <span class="fn">STOP RUN</span>                                    │
+│         └─ NO  ──→ <span class="fc">[KEY1 : KEY2]</span>                                        │
+│                       ├─ <span class="fc">KEY1 &lt; KEY2</span> ──→ <span class="fc">[SW1=1?]</span>                      │
+│                       │                    ├─ <span class="fn">OUT処理</span>                    │
+│                       │                    └─ <span class="fn">INFL1 ONLY処理</span>              │
+│                       │                        └─ <span class="fn">INFL1 READ</span>             │
+│                       ├─ <span class="fc">KEY1 &gt; KEY2</span> ──→ <span class="fn">INFL2 ONLY処理</span>                 │
+│                       │                    └─ <span class="fn">INFL2 READ</span>                 │
+│                       └─ <span class="fc">KEY1 = KEY2</span> ──→ <span class="fn">マッチング処理</span>（SW1←"1"）        │
+│                                              └─ <span class="fn">INFL2 READ</span>              │
+└─────────────────────────────────────────────────────────────────────────┘</div>
+  </div>
+
+  <div class="section" id="pad4">
+    <div class="sec-title">4、40ページのPAD図 — N:Nマッチング</div>
+    <div class="flow">
+┌─────────────────────────────────────────────────────────────────────────┐
+│ <span class="fn">START</span>                                                                     │
+│   ├─ <span class="fn">INITIAL</span>                                                              │
+│   ├─ <span class="fn">INFL1 READ</span>                                                          │
+│   ├─ <span class="fn">INFL2 READ</span>                                                          │
+│   └─ <span class="fc">[KEY1=KEY2 AND KEY1=HIGH-VALUE]</span>                                     │
+│         ├─ YES ──→ <span class="fn">CLOSE</span> ──→ <span class="fn">STOP RUN</span>                                    │
+│         └─ NO  ──→ <span class="fc">[KEY1 : KEY2]</span>                                        │
+│                       ├─ <span class="fc">KEY1 &lt; KEY2</span> ──→ <span class="fn">INFL1 ONLY処理</span> ── <span class="fn">INFL1 READ</span> │
+│                       ├─ <span class="fc">KEY1 &gt; KEY2</span> ──→ <span class="fn">INFL2 ONLY処理</span> ── <span class="fn">INFL2 READ</span> │
+│                       └─ <span class="fc">KEY1 = KEY2</span>                                    │
+│                             ├─ KEY1→STR1, KEY2→STR2                      │
+│                             └─ <span class="fc">[KEY1 ≠ KEY2?]</span>                          │
+│                                   ├─ YES ──→ <span class="fn">OUT処理</span> ── <span class="fn">INFL1 READ</span>      │
+│                                   └─ NO  ──→ <span class="fn">マッチング処理</span>               │
+│                                                └─ <span class="fn">INFL2 READ</span>            │
+│                             <span class="fc">[KEY1 OR KEY2 = HIGH-VALUE?]</span>                │
+│                               ├─ YES ──→ 上の[KEY1≠KEY2]へ               │
+│                               └─ NO                                       │
+│                             <span class="fc">[KEY1=STR1?]</span>                                │
+│                               ├─ ≠ ──→ 上へ                              │
+│                               └─ = ──→ <span class="fn">INFL2 CLOSE &amp; 再OPEN</span>           │
+│                                          ── <span class="fn">INFL2 READ</span>                 │
+│                                         <span class="fc">[KEY2:STR2]</span>                     │
+│                                           ├─ ≠ → 繰返し                  │
+│                                           └─ = → マッチング処理           │
+└─────────────────────────────────────────────────────────────────────────┘</div>
+  </div>
+
+  <div class="section" id="pad5">
+    <div class="sec-title">5、43ページのPAD図 — コントロールブレイク（3キー）</div>
+    <div class="flow">
+┌─────────────────────────────────────────────────────────────────────────┐
+│ <span class="fn">START</span>                                                                     │
+│   ├─ <span class="fn">INITIAL</span>                                                              │
+│   ├─ <span class="fn">INFL1 READ</span>                                                          │
+│   └─ <span class="fc">[EOF?]</span>                                                               │
+│         ├─ YES ──→ <span class="fn">小計プリント</span> ── <span class="fn">中計プリント</span> ── <span class="fn">合計プリント</span>            │
+│         │           ── <span class="fn">件数表</span> ── <span class="fn">CLOSE</span> ── <span class="fn">STOP RUN</span>                       │
+│         └─ NO  ──→ <span class="fc">[KEY ≠ STR?]</span>                                        │
+│                       ├─ = (KEY変わらず) ──→ <span class="fn">明細</span> ── <span class="fn">集計</span> ── <span class="fn">INFILE READ</span>│
+│                       └─ ≠ (KEY変わった)                                  │
+│                             <span class="fc">[KEY1=STR1?]</span>                               │
+│                               ├─ ≠ (大項目変更)                           │
+│                               │   ──→ <span class="fn">小計P</span> ── <span class="fn">中計P</span> ── <span class="fn">合計P</span>           │
+│                               │       STR1,STR2,STR3 更新                 │
+│                               └─ = <span class="fc">[KEY2=STR2?]</span>                        │
+│                                     ├─ ≠ (中項目変更)                     │
+│                                     │   ──→ <span class="fn">小計P</span> ── <span class="fn">中計P</span>             │
+│                                     │       STR2,STR3 更新               │
+│                                     └─ = (小項目変更)                     │
+│                                         ──→ <span class="fn">小計P</span> ── STR3 更新         │
+│                             <span class="fn">明細</span> ── <span class="fn">集計</span> ── <span class="fn">INFILE READ</span>                 │
+└─────────────────────────────────────────────────────────────────────────┘</div>
+  </div>
+</div>
+
+<div class="doc-footer">
+  COBOL 入門編 ／ 東京システム営業５部１課 ／ 大井駐在オペレーター ／ 1999.11.18 再編成<br>
+  ── HTML版完全再現 ──
+</div>
+
+</div><!-- /main -->
+
+<script>
+'use strict';
+
+/* ══════════════════════════════════════════
+   1. アコーディオン（サイドバー）
+══════════════════════════════════════════ */
+function tog(el){
+  el.classList.toggle('open');
+}
+
+/* ══════════════════════════════════════════
+   2. 読書進捗バー
+══════════════════════════════════════════ */
+const progressBar = document.getElementById('progress-bar');
+function updateProgress(){
+  const scrollTop  = window.scrollY || document.documentElement.scrollTop;
+  const docHeight  = document.documentElement.scrollHeight - window.innerHeight;
+  const pct = docHeight > 0 ? Math.min(100, (scrollTop / docHeight) * 100) : 0;
+  progressBar.style.width = pct + '%';
+}
+window.addEventListener('scroll', updateProgress, {passive:true});
+updateProgress();
+
+/* ══════════════════════════════════════════
+   3. コードブロックにコピーボタンを追加
+══════════════════════════════════════════ */
+document.querySelectorAll('pre').forEach(pre => {
+  const wrap = document.createElement('div');
+  wrap.className = 'code-wrap';
+  pre.parentNode.insertBefore(wrap, pre);
+  wrap.appendChild(pre);
+
+  const btn = document.createElement('button');
+  btn.className = 'copy-btn';
+  btn.textContent = 'COPY';
+  btn.title = 'コードをコピー';
+  wrap.appendChild(btn);
+
+  btn.addEventListener('click', async () => {
+    const text = pre.textContent;
+    try {
+      await navigator.clipboard.writeText(text);
+      btn.textContent = '✓ COPIED';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.textContent = 'COPY';
+        btn.classList.remove('copied');
+      }, 2000);
+    } catch(e) {
+      // フォールバック
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.cssText = 'position:fixed;opacity:0';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      btn.textContent = '✓ OK';
+      setTimeout(() => { btn.textContent = 'COPY'; }, 1500);
+    }
+  });
+});
+
+/* ══════════════════════════════════════════
+   4. テキスト検索ハイライト
+══════════════════════════════════════════ */
+let searchMarks = [];
+
+function clearMarks(){
+  searchMarks.forEach(m => {
+    const parent = m.parentNode;
+    if(parent){
+      parent.replaceChild(document.createTextNode(m.textContent), m);
+      parent.normalize();
+    }
+  });
+  searchMarks = [];
+}
+
+function highlightText(root, re){
+  if(root.nodeType === 3){
+    const text = root.textContent;
+    if(!re.test(text)) return;
+    re.lastIndex = 0;
+    const frag = document.createDocumentFragment();
+    let last = 0, m;
+    re.lastIndex = 0;
+    while((m = re.exec(text)) !== null){
+      frag.appendChild(document.createTextNode(text.slice(last, m.index)));
+      const mk = document.createElement('mark');
+      mk.className = 'sh';
+      mk.style.cssText = 'background:#fff176;color:#000;border-radius:2px';
+      mk.textContent = m[0];
+      frag.appendChild(mk);
+      searchMarks.push(mk);
+      last = m.index + m[0].length;
+    }
+    frag.appendChild(document.createTextNode(text.slice(last)));
+    root.parentNode.replaceChild(frag, root);
+  } else if(root.nodeType === 1 &&
+    !['SCRIPT','STYLE','MARK','INPUT','TEXTAREA'].includes(root.tagName)){
+    [...root.childNodes].forEach(c => highlightText(c, re));
+  }
+}
+
+function doSearch(q){
+  clearMarks();
+  if(!q.trim()) return;
+  const re = new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'), 'gi');
+  highlightText(document.getElementById('main'), re);
+  // 最初のヒットへスクロール
+  if(searchMarks.length > 0){
+    searchMarks[0].scrollIntoView({behavior:'smooth', block:'center'});
+  }
+}
+
+/* ══════════════════════════════════════════
+   5. キーボードショートカット
+══════════════════════════════════════════ */
+document.addEventListener('keydown', e => {
+  // Ctrl+F または / でサイドバー検索にフォーカス
+  if((e.ctrlKey && e.key === 'f') || (e.key === '/' && document.activeElement.tagName !== 'INPUT')){
+    e.preventDefault();
+    const inp = document.getElementById('srch');
+    inp.focus();
+    inp.select();
+    document.getElementById('sidebar').classList.add('open');
+  }
+  // Esc で検索クリア＆サイドバーを閉じる
+  if(e.key === 'Escape'){
+    clearMarks();
+    const inp = document.getElementById('srch');
+    inp.value = '';
+    inp.blur();
+    document.getElementById('sidebar').classList.remove('open');
+  }
+  // Home キーでページトップ
+  if(e.key === 'Home' && e.ctrlKey){
+    e.preventDefault();
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+});
+
+/* ══════════════════════════════════════════
+   6. アクティブ章ハイライト（IntersectionObserver）
+══════════════════════════════════════════ */
+const allSections = document.querySelectorAll('.chapter, .section[id]');
+const sbLinks = document.querySelectorAll('#sidebar a');
+
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if(e.isIntersecting){
+      const id = e.target.id;
+      sbLinks.forEach(a => {
+        const isActive = a.getAttribute('href') === '#' + id;
+        a.style.color = isActive ? '#c8e6a0' : '';
+        a.style.fontWeight = isActive ? '600' : '';
+      });
+      // 対応するアコーディオングループを自動展開
+      const link = document.querySelector(`#sidebar a[href="#${id}"]`);
+      if(link){
+        const group = link.closest('.sb-group');
+        if(group && !group.classList.contains('open')){
+          group.classList.add('open');
+        }
+      }
+    }
+  });
+}, {rootMargin: '-15% 0px -70% 0px'});
+
+allSections.forEach(s => {
+  if(s.id) observer.observe(s);
+});
+
+/* ══════════════════════════════════════════
+   7. スムーズスクロール
+══════════════════════════════════════════ */
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    const target = document.querySelector(a.getAttribute('href'));
+    if(target){
+      target.scrollIntoView({behavior:'smooth', block:'start'});
+    }
+    document.getElementById('sidebar').classList.remove('open');
+  });
+});
+
+/* ══════════════════════════════════════════
+   8. ページロード時アニメーション
+══════════════════════════════════════════ */
+window.addEventListener('DOMContentLoaded', () => {
+  // サイドバーの最初のグループを展開
+  const firstGroup = document.querySelector('.sb-group');
+  if(firstGroup) firstGroup.classList.add('open');
+
+  // キーボードヒントをサイドバーフッターに追加
+  const hint = document.createElement('div');
+  hint.className = 'kbd-hint';
+  hint.style.cssText = 'padding:14px 18px;color:#4a4030;font-family:monospace;font-size:.63rem;border-top:1px solid #222;margin-top:16px';
+  hint.innerHTML = '<kbd>/</kbd> 検索　<kbd>Esc</kbd> リセット　<kbd>Ctrl+F</kbd> 検索';
+  document.getElementById('sidebar').appendChild(hint);
+});
+
+/* ══════════════════════════════════════════
+   9. コードブロック行番号（長いブロックのみ）
+══════════════════════════════════════════ */
+document.querySelectorAll('pre').forEach(pre => {
+  const lines = pre.textContent.split('\n').length;
+  if(lines >= 15){
+    pre.style.paddingLeft = '44px';
+    pre.style.position = 'relative';
+    // 行番号を追加しない（パフォーマンス考慮）
+    pre.setAttribute('data-lines', lines + '行');
+    // 行数バッジ
+    const badge = document.createElement('span');
+    badge.style.cssText = `
+      position:absolute;top:6px;left:8px;
+      font-size:.6rem;color:#4a6a30;
+      font-family:'Source Code Pro',monospace;
+      letter-spacing:.05em;
+    `;
+    badge.textContent = lines + 'L';
+    pre.style.position = 'relative';
+    pre.parentNode.style.position = 'relative';
+    pre.appendChild(badge);
+  }
+});
+
+/* ══════════════════════════════════════════
+   10. テーブルの行クリックハイライト
+══════════════════════════════════════════ */
+document.querySelectorAll('table tbody tr, table tr').forEach(tr => {
+  tr.addEventListener('click', () => {
+    tr.closest('table').querySelectorAll('tr').forEach(r => r.style.outline = '');
+    tr.style.outline = '2px solid var(--accent)';
+    tr.style.outlineOffset = '-2px';
+    setTimeout(() => { tr.style.outline = ''; }, 2000);
+  });
+});
+
+/* ══════════════════════════════════════════
+   11. section の「戻るリンク」を動的追加
+══════════════════════════════════════════ */
+document.querySelectorAll('.chapter').forEach(ch => {
+  const footer = document.createElement('div');
+  footer.style.cssText = `
+    text-align:right;margin-top:24px;padding-top:12px;
+    border-top:1px dashed var(--rule);
+    font-size:.75rem;font-family:'Source Code Pro',monospace;
+  `;
+  footer.innerHTML = '<a href="#toc-page" style="color:var(--rule);text-decoration:none;letter-spacing:.1em">▲ 目次へ戻る</a>';
+  ch.appendChild(footer);
+});
+</script>
+</body>
+</html>

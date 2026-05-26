@@ -1,0 +1,2127 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>COBOL入門編</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>mermaid.initialize({ startOnLoad: true, theme: 'neutral', securityLevel: 'loose' });</script>
+<style>
+/* ===== Reset & Base ===== */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif;
+  background: #f5f5f0;
+  color: #1a1a1a;
+  line-height: 2;
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ===== Progress Bar ===== */
+#progress-bar {
+  position: fixed; top: 0; left: 0;
+  width: 0; height: 3px;
+  background: linear-gradient(90deg, #5c6bc0, #283593);
+  z-index: 1000;
+  transition: width 0.15s ease;
+}
+
+/* ===== Sidebar ===== */
+.sidebar {
+  position: fixed;
+  top: 0; left: 0;
+  width: 260px; height: 100vh;
+  background: #fafafa;
+  border-right: 1px solid #e0e0e0;
+  overflow-y: auto;
+  padding: 2.5rem 0 2rem 0;
+  z-index: 100;
+  font-family: "Hiragino Sans", "Meiryo", sans-serif;
+}
+.sidebar::-webkit-scrollbar { width: 4px; }
+.sidebar::-webkit-scrollbar-thumb { background: #ccc; border-radius: 2px; }
+.sidebar-title {
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  color: #9e9e9e;
+  text-transform: uppercase;
+  padding: 0 1.5rem 0.5rem;
+  font-weight: 600;
+}
+.sidebar-chapter {
+  list-style: none;
+}
+.sidebar-chapter > li {
+  margin: 0;
+}
+.sidebar-chapter > li > a {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 1.5rem;
+  text-decoration: none;
+  color: #424242;
+  font-size: 0.88rem;
+  font-weight: 500;
+  transition: background 0.15s, color 0.15s;
+  border-left: 3px solid transparent;
+}
+.sidebar-chapter > li > a:hover {
+  background: #e8eaf6;
+  color: #1a237e;
+}
+.sidebar-chapter > li > a.active {
+  border-left-color: #5c6bc0;
+  background: #e8eaf6;
+  color: #1a237e;
+  font-weight: 600;
+}
+.chapter-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: #e0e0e0;
+  color: #757575;
+  font-size: 0.7rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.sidebar-chapter > li > a.active .chapter-num,
+.sidebar-chapter > li > a:hover .chapter-num {
+  background: #5c6bc0;
+  color: #fff;
+}
+.sidebar-sub {
+  list-style: none;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+.sidebar-chapter > li.open > .sidebar-sub {
+  max-height: 400px;
+}
+.sidebar-sub li a {
+  display: block;
+  padding: 0.25rem 1.5rem 0.25rem 3rem;
+  text-decoration: none;
+  color: #757575;
+  font-size: 0.78rem;
+  transition: color 0.15s;
+}
+.sidebar-sub li a:hover { color: #1a237e; }
+.sidebar-toggle {
+  cursor: pointer;
+  user-select: none;
+}
+.sidebar-toggle::after {
+  content: '';
+  display: inline-block;
+  width: 0; height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 5px solid #9e9e9e;
+  margin-left: auto;
+  transition: transform 0.2s;
+}
+.sidebar-chapter > li.open > a::after {
+  transform: rotate(180deg);
+}
+
+/* ===== Main Content ===== */
+.main {
+  margin-left: 260px;
+  padding: 0;
+  min-height: 100vh;
+}
+.content {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 3rem 4rem 6rem;
+}
+
+/* ===== Cover ===== */
+.cover {
+  background: linear-gradient(135deg, #1a237e 0%, #283593 40%, #3949ab 100%);
+  color: #fff;
+  padding: 6rem 4rem;
+  margin: 2rem;
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+}
+.cover::before {
+  content: '';
+  position: absolute;
+  top: -50%; right: -20%;
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
+  border-radius: 50%;
+}
+.cover::after {
+  content: '';
+  position: absolute;
+  bottom: -30%; left: -10%;
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%);
+  border-radius: 50%;
+}
+.cover-inner {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+}
+.cover-series {
+  font-size: 0.85rem;
+  letter-spacing: 0.3em;
+  opacity: 0.7;
+  margin-bottom: 1rem;
+  font-family: "Hiragino Sans", sans-serif;
+}
+.cover h1 {
+  font-size: 3.2rem;
+  letter-spacing: 0.2em;
+  font-weight: 700;
+  margin-bottom: 2rem;
+  border: none;
+  color: #fff;
+}
+.cover-divider {
+  width: 60px;
+  height: 2px;
+  background: rgba(255,255,255,0.4);
+  margin: 0 auto 2rem;
+}
+.cover-info {
+  font-size: 0.9rem;
+  opacity: 0.75;
+  line-height: 2.2;
+  font-family: "Hiragino Sans", sans-serif;
+}
+.cover-date {
+  margin-top: 3rem;
+  font-size: 0.8rem;
+  opacity: 0.5;
+  font-family: "Hiragino Sans", sans-serif;
+}
+
+/* ===== TOC ===== */
+.toc {
+  background: #fff;
+  border: 1px solid #e8e8e8;
+  border-radius: 4px;
+  padding: 2.5rem 3rem;
+  margin: 2rem 0;
+}
+.toc-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #1a1a1a;
+  position: relative;
+}
+.toc-title::after {
+  content: '';
+  display: block;
+  width: 40px; height: 2px;
+  background: #5c6bc0;
+  margin: 0.8rem auto 0;
+}
+.toc-list { list-style: none; }
+.toc-chapter {
+  margin: 1rem 0;
+  padding-top: 0.5rem;
+  border-top: 1px solid #f0f0f0;
+}
+.toc-chapter > a {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  text-decoration: none;
+  display: flex;
+  align-items: baseline;
+  gap: 0.8rem;
+}
+.toc-chapter > a:hover { color: #5c6bc0; }
+.toc-chapter-num {
+  font-size: 0.75rem;
+  background: #5c6bc0;
+  color: #fff;
+  padding: 0.1em 0.5em;
+  border-radius: 3px;
+  letter-spacing: 0.05em;
+}
+.toc-sections {
+  list-style: none;
+  margin-top: 0.4rem;
+  padding-left: 2.5rem;
+}
+.toc-sections li {
+  margin: 0.25rem 0;
+}
+.toc-sections a {
+  font-size: 0.88rem;
+  color: #616161;
+  text-decoration: none;
+}
+.toc-sections a:hover { color: #5c6bc0; text-decoration: underline; }
+
+/* ===== Chapter Headers ===== */
+.chapter-header {
+  margin: 4rem 0 2.5rem;
+  padding-bottom: 1.2rem;
+  border-bottom: 2px solid #1a237e;
+  position: relative;
+}
+.chapter-header::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 80px;
+  height: 2px;
+  background: #5c6bc0;
+}
+.chapter-header h1 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  letter-spacing: 0.08em;
+  border: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.chapter-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px; height: 36px;
+  background: #1a237e;
+  color: #fff;
+  border-radius: 50%;
+  font-size: 0.85rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* ===== Section Headers ===== */
+h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 2.5rem 0 1rem;
+  padding-left: 1rem;
+  border-left: 4px solid #5c6bc0;
+  letter-spacing: 0.05em;
+}
+h3 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #424242;
+  margin: 2rem 0 0.8rem;
+}
+h4 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #616161;
+  margin: 1.5rem 0 0.6rem;
+}
+
+/* ===== Paragraphs ===== */
+p {
+  margin: 0.8rem 0;
+  text-align: justify;
+  text-indent: 1em;
+}
+p.no-indent { text-indent: 0; }
+
+/* ===== Lists ===== */
+ul, ol {
+  margin: 0.8rem 0 0.8rem 2rem;
+}
+li {
+  margin: 0.35rem 0;
+}
+
+/* ===== Code Blocks ===== */
+.code-wrapper {
+  margin: 1.5rem 0;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+.code-header {
+  background: #37474f;
+  color: #b0bec5;
+  font-family: "MS Gothic", "Noto Sans Mono", monospace;
+  font-size: 0.72rem;
+  padding: 0.4rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  letter-spacing: 0.05em;
+}
+.code-dots {
+  display: flex;
+  gap: 5px;
+}
+.code-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+}
+.code-dot:nth-child(1) { background: #ef5350; }
+.code-dot:nth-child(2) { background: #ffa726; }
+.code-dot:nth-child(3) { background: #66bb6a; }
+pre {
+  background: #263238;
+  color: #cfd8dc;
+  padding: 1.2rem 1.5rem;
+  overflow-x: auto;
+  font-family: "MS Gothic", "Noto Sans Mono", monospace;
+  font-size: 0.82rem;
+  line-height: 1.7;
+  tab-size: 4;
+  margin: 0;
+}
+pre code {
+  background: none;
+  color: inherit;
+}
+p code, li code, td code {
+  background: #eceff1;
+  padding: 0.15em 0.4em;
+  border-radius: 3px;
+  font-size: 0.88em;
+  font-family: "MS Gothic", "Noto Sans Mono", monospace;
+  color: #37474f;
+}
+
+/* ===== Tables ===== */
+.table-wrapper {
+  margin: 1.5rem 0;
+  overflow-x: auto;
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.9rem;
+}
+th {
+  background: #e8eaf6;
+  font-weight: 600;
+  color: #1a237e;
+  padding: 0.6rem 0.8rem;
+  text-align: left;
+  border-bottom: 2px solid #5c6bc0;
+}
+td {
+  padding: 0.5rem 0.8rem;
+  border-bottom: 1px solid #e8e8e8;
+  vertical-align: top;
+}
+tr:nth-child(even) td {
+  background: #fafafa;
+}
+tr:hover td {
+  background: #f0f0f5;
+}
+
+/* ===== Command Reference Tables ===== */
+.cmd-table td:first-child {
+  font-family: "MS Gothic", monospace;
+  background: #f5f5f5;
+  white-space: nowrap;
+  font-size: 0.82rem;
+}
+
+/* ===== Mermaid ===== */
+.mermaid {
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 1.5rem;
+  margin: 2rem 0;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+.mermaid-title {
+  font-size: 0.8rem;
+  color: #9e9e9e;
+  text-align: center;
+  margin-top: 0.5rem;
+  font-family: "Hiragino Sans", sans-serif;
+  letter-spacing: 0.05em;
+}
+
+/* ===== Callout / Fun Break ===== */
+.callout {
+  margin: 2.5rem 0;
+  padding: 1.5rem 2rem;
+  background: #fffde7;
+  border-left: 4px solid #fdd835;
+  border-radius: 0 4px 4px 0;
+}
+.callout-title {
+  font-weight: 700;
+  color: #f57f17;
+  font-size: 0.95rem;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.callout-title::before {
+  content: '💡';
+  font-size: 1rem;
+}
+.callout p {
+  text-indent: 0;
+  margin: 0.3rem 0;
+}
+.callout pre {
+  margin: 0.8rem 0;
+}
+
+/* ===== Tip / Note Boxes ===== */
+.tip-box {
+  margin: 1.5rem 0;
+  padding: 1rem 1.5rem;
+  background: #e8f5e9;
+  border-left: 4px solid #4caf50;
+  border-radius: 0 4px 4px 0;
+  font-size: 0.9rem;
+}
+.tip-box::before {
+  content: '※ ';
+  font-weight: 700;
+  color: #2e7d32;
+}
+
+/* ===== Chapter End ===== */
+.chapter-end {
+  text-align: center;
+  margin: 3rem 0;
+  padding: 1.5rem;
+}
+.chapter-end::before {
+  content: '■ ■ ■';
+  color: #e0e0e0;
+  letter-spacing: 0.5em;
+  font-size: 0.8rem;
+}
+
+/* ===== Back to Top ===== */
+.back-top {
+  position: fixed;
+  bottom: 2rem; right: 2rem;
+  background: #1a237e;
+  color: #fff;
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.3s, transform 0.3s, background 0.2s;
+  font-size: 1.1rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  z-index: 50;
+}
+.back-top.show {
+  opacity: 0.85;
+  transform: translateY(0);
+}
+.back-top:hover {
+  opacity: 1;
+  background: #283593;
+}
+
+/* ===== Bookmark ===== */
+.bookmark-btn {
+  position: fixed;
+  bottom: 5.5rem; right: 2rem;
+  background: #fff;
+  color: #9e9e9e;
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  border: 1px solid #e0e0e0;
+  font-size: 1rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  z-index: 50;
+  cursor: pointer;
+  transition: color 0.2s, background 0.2s;
+}
+.bookmark-btn.active { color: #5c6bc0; }
+.bookmark-btn:hover { background: #f5f5f5; }
+
+/* ===== Scrollbar ===== */
+.main::-webkit-scrollbar { width: 8px; }
+.main::-webkit-scrollbar-track { background: #f5f5f5; }
+.main::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
+.main::-webkit-scrollbar-thumb:hover { background: #aaa; }
+
+/* ===== Selection ===== */
+::selection { background: #c5cae9; color: #1a237e; }
+</style>
+</head>
+<body>
+
+<!-- Progress Bar -->
+<div id="progress-bar"></div>
+
+<!-- Sidebar -->
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-title">目 次</div>
+  <ul class="sidebar-chapter">
+    <li class="open">
+      <a href="#ch1" class="sidebar-toggle" data-chapter="1">
+        <span class="chapter-num">1</span>COBOLの概説
+      </a>
+      <ul class="sidebar-sub">
+        <li><a href="#ch1-1">COBOLの単位</a></li>
+        <li><a href="#ch1-2">4つのDIVISION</a></li>
+        <li><a href="#ch1-3">文字セット</a></li>
+      </ul>
+    </li>
+    <li>
+      <a href="#ch2" class="sidebar-toggle" data-chapter="2">
+        <span class="chapter-num">2</span>IDENTIFICATION DIVISION
+      </a>
+      <ul class="sidebar-sub">
+        <li><a href="#ch2-1">形式と記入例</a></li>
+      </ul>
+    </li>
+    <li>
+      <a href="#ch3" class="sidebar-toggle" data-chapter="3">
+        <span class="chapter-num">3</span>ENVIRONMENT DIVISION
+      </a>
+      <ul class="sidebar-sub">
+        <li><a href="#ch3-1">形式</a></li>
+        <li><a href="#ch3-2">SPECIAL-NAMES</a></li>
+        <li><a href="#ch3-3">SOURCE/OBJECT-COMPUTER</a></li>
+        <li><a href="#ch3-4">INPUT-OUTPUT SECTION</a></li>
+        <li><a href="#ch3-5">FILE-CONTROL</a></li>
+        <li><a href="#ch3-6">I-O-CONTROL</a></li>
+      </ul>
+    </li>
+    <li>
+      <a href="#ch4" class="sidebar-toggle" data-chapter="4">
+        <span class="chapter-num">4</span>DATA DIVISION
+      </a>
+      <ul class="sidebar-sub">
+        <li><a href="#ch4-1">形式</a></li>
+        <li><a href="#ch4-2">FILE SECTION</a></li>
+        <li><a href="#ch4-3">データ記述項目</a></li>
+        <li><a href="#ch4-4">WORKING-STORAGE</a></li>
+        <li><a href="#ch4-5">PICTURE句</a></li>
+        <li><a href="#ch4-6">VALUE/REDEFINE/OCCURS</a></li>
+        <li><a href="#ch4-7">LINKAGE SECTION</a></li>
+      </ul>
+    </li>
+    <li>
+      <a href="#ch5" class="sidebar-toggle" data-chapter="5">
+        <span class="chapter-num">5</span>PROCEDURE DIVISION
+      </a>
+      <ul class="sidebar-sub">
+        <li><a href="#ch5-1">ACCEPT</a></li>
+        <li><a href="#ch5-2">加算・減算・乗算・除算</a></li>
+        <li><a href="#ch5-3">COMPUTE</a></li>
+        <li><a href="#ch5-4">IF/READ/MOVE/SET</a></li>
+        <li><a href="#ch5-5">PERFORM/GO TO</a></li>
+        <li><a href="#ch5-6">OPEN/CLOSE/WRITE/DISPLAY</a></li>
+        <li><a href="#ch5-7">SEARCH/STOP RUN/GOBACK</a></li>
+      </ul>
+    </li>
+    <li>
+      <a href="#ch6" class="sidebar-toggle" data-chapter="6">
+        <span class="chapter-num">6</span>フロー例とコーディング例
+      </a>
+      <ul class="sidebar-sub">
+        <li><a href="#ch6-1">マッチング 1:1</a></li>
+        <li><a href="#ch6-2">マッチング 1:N</a></li>
+        <li><a href="#ch6-3">マッチング N:N</a></li>
+        <li><a href="#ch6-4">マッチングの説明</a></li>
+        <li><a href="#ch6-5">コントロールブレイク</a></li>
+      </ul>
+    </li>
+    <li>
+      <a href="#ch7" class="sidebar-toggle" data-chapter="7">
+        <span class="chapter-num">7</span>TSO
+      </a>
+      <ul class="sidebar-sub">
+        <li><a href="#ch7-1">TSOのLOGON</a></li>
+        <li><a href="#ch7-2">ファイル説明</a></li>
+        <li><a href="#ch7-3">ソース→ロードモジュール</a></li>
+        <li><a href="#ch7-4">JCLとTSOの違い</a></li>
+        <li><a href="#ch7-5">TSOモード関係図</a></li>
+        <li><a href="#ch7-6">CLISTの作り方</a></li>
+        <li><a href="#ch7-7">主なコマンド</a></li>
+      </ul>
+    </li>
+    <li>
+      <a href="#ch8" class="sidebar-toggle" data-chapter="8">
+        <span class="chapter-num">8</span>PAD図（フローチャート）
+      </a>
+      <ul class="sidebar-sub">
+        <li><a href="#ch8-1">1:1 スウィッチ使用</a></li>
+        <li><a href="#ch8-2">1:1 スウィッチ不使用</a></li>
+        <li><a href="#ch8-3">1:Nマッチング</a></li>
+        <li><a href="#ch8-4">N:Nマッチング</a></li>
+        <li><a href="#ch8-5">コントロールブレイク</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+<!-- Main Content -->
+<div class="main" id="top">
+<div class="content">
+
+<!-- Cover -->
+<div class="cover">
+  <div class="cover-inner">
+    <p class="cover-series">東京システム営業５部１課 教材</p>
+    <h1>COBOL入門編</h1>
+    <div class="cover-divider"></div>
+    <p class="cover-info">
+      大井駐在オペレーター用<br>
+      1999年11月 再編成
+    </p>
+    <p class="cover-date">© 東京システム営業５部１課</p>
+  </div>
+</div>
+
+<!-- TOC -->
+<div class="toc" id="toc">
+  <p class="toc-title">目 次</p>
+  <ul class="toc-list">
+    <li class="toc-chapter">
+      <a href="#ch1"><span class="toc-chapter-num">第1章</span>COBOLの概説</a>
+      <ul class="toc-sections">
+        <li><a href="#ch1-1">COBOLの単位</a></li>
+        <li><a href="#ch1-2">4つのDIVISION</a></li>
+        <li><a href="#ch1-3">文字セット</a></li>
+      </ul>
+    </li>
+    <li class="toc-chapter">
+      <a href="#ch2"><span class="toc-chapter-num">第2章</span>IDENTIFICATION DIVISION（見出し部）</a>
+      <ul class="toc-sections">
+        <li><a href="#ch2-1">形式と記入例</a></li>
+      </ul>
+    </li>
+    <li class="toc-chapter">
+      <a href="#ch3"><span class="toc-chapter-num">第3章</span>ENVIRONMENT DIVISION（環境部）</a>
+      <ul class="toc-sections">
+        <li><a href="#ch3-1">形式</a></li>
+        <li><a href="#ch3-2">SPECIAL-NAMES</a></li>
+        <li><a href="#ch3-3">SOURCE-COMPUTER / OBJECT-COMPUTER</a></li>
+        <li><a href="#ch3-4">INPUT-OUTPUT SECTION</a></li>
+        <li><a href="#ch3-5">FILE-CONTROL</a></li>
+        <li><a href="#ch3-6">I-O-CONTROL</a></li>
+      </ul>
+    </li>
+    <li class="toc-chapter">
+      <a href="#ch4"><span class="toc-chapter-num">第4章</span>DATA DIVISION（データ部）</a>
+      <ul class="toc-sections">
+        <li><a href="#ch4-1">形式</a></li>
+        <li><a href="#ch4-2">FILE SECTION</a></li>
+        <li><a href="#ch4-3">データ記述項目</a></li>
+        <li><a href="#ch4-4">WORKING-STORAGE SECTION</a></li>
+        <li><a href="#ch4-5">PICTURE句</a></li>
+        <li><a href="#ch4-6">VALUE文節・REDEFINE・OCCURS</a></li>
+        <li><a href="#ch4-7">LINKAGE SECTION</a></li>
+      </ul>
+    </li>
+    <li class="toc-chapter">
+      <a href="#ch5"><span class="toc-chapter-num">第5章</span>PROCEDURE DIVISION（手続き部）</a>
+      <ul class="toc-sections">
+        <li><a href="#ch5-1">ACCEPT命令</a></li>
+        <li><a href="#ch5-2">ADD / SUBTRACT / MULTIPLY / DIVIDE</a></li>
+        <li><a href="#ch5-3">COMPUTE命令</a></li>
+        <li><a href="#ch5-4">IF / READ / MOVE / SET</a></li>
+        <li><a href="#ch5-5">PERFORM / GO TO</a></li>
+        <li><a href="#ch5-6">OPEN / CLOSE / WRITE / DISPLAY</a></li>
+        <li><a href="#ch5-7">SEARCH / STOP RUN / GOBACK</a></li>
+      </ul>
+    </li>
+    <li class="toc-chapter">
+      <a href="#ch6"><span class="toc-chapter-num">第6章</span>フロー例とコーディング例</a>
+      <ul class="toc-sections">
+        <li><a href="#ch6-1">マッチング処理 1:1</a></li>
+        <li><a href="#ch6-2">マッチング処理 1:N</a></li>
+        <li><a href="#ch6-3">マッチング処理 N:N</a></li>
+        <li><a href="#ch6-4">マッチングの説明</a></li>
+        <li><a href="#ch6-5">コントロールブレイク</a></li>
+      </ul>
+    </li>
+    <li class="toc-chapter">
+      <a href="#ch7"><span class="toc-chapter-num">第7章</span>TSO</a>
+      <ul class="toc-sections">
+        <li><a href="#ch7-1">TSOのLOGON</a></li>
+        <li><a href="#ch7-2">ファイル説明</a></li>
+        <li><a href="#ch7-3">ソースからロードモジュールまで</a></li>
+        <li><a href="#ch7-4">JCLとTSOの違い</a></li>
+        <li><a href="#ch7-5">TSOモード関係図</a></li>
+        <li><a href="#ch7-6">CLISTの作り方</a></li>
+        <li><a href="#ch7-7">TSOの主なコマンド</a></li>
+      </ul>
+    </li>
+    <li class="toc-chapter">
+      <a href="#ch8"><span class="toc-chapter-num">第8章</span>PAD図（Mermaidフローチャート）</a>
+      <ul class="toc-sections">
+        <li><a href="#ch8-1">1:1マッチング（スウィッチ使用）</a></li>
+        <li><a href="#ch8-2">1:1マッチング（スウィッチ不使用）</a></li>
+        <li><a href="#ch8-3">1:Nマッチング</a></li>
+        <li><a href="#ch8-4">N:Nマッチング</a></li>
+        <li><a href="#ch8-5">コントロールブレイク</a></li>
+      </ul>
+    </li>
+  </ul>
+</div>
+
+<!-- ===== CHAPTER 1 ===== -->
+<div class="chapter-header" id="ch1">
+  <h1><span class="chapter-badge">1</span>COBOLの概説</h1>
+</div>
+
+<h2 id="ch1-1">COBOLの単位</h2>
+<p>語はCOBOL予約語、あるいはプログラマーによって定義される語のいずれかである。予約語はCOBOLコンパイラーに対し、特定の統語上意味を持っている。プログラマーによって定義される語は、データ名やプログラム名などの項目で名前を付ける際はCOBOLの規則に従わなければならない。</p>
+
+<h2 id="ch1-2">4つのDIVISION</h2>
+<p>各DIVISIONは論理的な順序に配置される。DIVISIONのコーディングの順序は下記のとおりである。</p>
+
+<div class="code-wrapper">
+  <div class="code-header"><div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>COBOL — DIVISION構造</div>
+  <pre><code>IDENTIFICATION  DIVISION.    &lt;─ 見出し部
+ENVIRONMENT     DIVISION.    &lt;─ 環境部
+DATA            DIVISION.    &lt;─ データ部
+PROCEDURE       DIVISION.    &lt;─ 手続き部</code></pre>
+</div>
+
+<ul>
+<li><strong>IDENTIFICATION DIVISION</strong> — プログラム名、プログラム作成者、作成日などを記入する。</li>
+<li><strong>ENVIRONMENT DIVISION</strong> — プログラムを処理する具体的な計算機の構成に関する情報、JCLのDD名とDCB名の対応づけなどを記入する。</li>
+<li><strong>DATA DIVISION</strong> — プログラムで扱う全てのデータの形式・性質、及び作業用エリアとして使用するエリアの定義などを記入する。</li>
+<li><strong>PROCEDURE DIVISION</strong> — 計算機に実行させたい処理をCOBOLの命令により記入する。</li>
+</ul>
+
+<h2 id="ch1-3">文字セット</h2>
+<p>51種類の文字から構成される。</p>
+
+<div class="table-wrapper">
+<table>
+<tr><th>文字</th><th>意味</th></tr>
+<tr><td>0, 1〜9</td><td>数字</td></tr>
+<tr><td>A, B〜Z</td><td>英字</td></tr>
+<tr><td>△</td><td>スペース（空白）</td></tr>
+<tr><td>＋</td><td>正の符号</td></tr>
+<tr><td>−</td><td>負の符号（ハイフン）</td></tr>
+<tr><td>＊</td><td>星印（アスタリスク）</td></tr>
+<tr><td>／</td><td>斜線（スラッシュ）</td></tr>
+<tr><td>＝</td><td>等号</td></tr>
+<tr><td>¥</td><td>通貨記号</td></tr>
+<tr><td>：</td><td>コロン</td></tr>
+<tr><td>；</td><td>セミコロン</td></tr>
+<tr><td>．</td><td>ピリオド（小数点）</td></tr>
+<tr><td>" または '</td><td>引用符（IBMでは '）</td></tr>
+<tr><td>（ ）</td><td>括弧</td></tr>
+<tr><td>＞ ＜</td><td>不等号</td></tr>
+</table>
+</div>
+
+<p><strong>語の中に使用される文字:</strong><br>
+0〜9, A〜Z, −（ハイフン）は語の始めと終わりには使用できない。桁数は30桁以内。</p>
+
+<div class="code-wrapper">
+  <div class="code-header"><div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>COBOL — 語名の例</div>
+  <pre><code>例  S02-INITIAL
+    WK-FROM.
+    COUNTER-AREA  etc</code></pre>
+</div>
+
+<!-- ===== CHAPTER 2 ===== -->
+<div class="chapter-header" id="ch2">
+  <h1><span class="chapter-badge">2</span>IDENTIFICATION DIVISION（見出し部）</h1>
+</div>
+
+<h2 id="ch2-1">形式と記入例</h2>
+
+<div class="code-wrapper">
+  <div class="code-header"><div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>COBOL — IDENTIFICATION DIVISION 形式</div>
+  <pre><code>IDENTIFICATION DIVISION.
+PROGRAM-ID.       プログラム名.
+AUTHOR.           プログラム作成者
+DATE-COMPILED.    コンパイル日付
+DATE-WRITTEN.     プログラム作成日
+INSTALLATION.     会社名、課名、etc
+SECURITY.         情報の極秘等
+REMARKS.          プログラムの概要処理
+
+  ＊ 付きは省略不可、他は省略可能</code></pre>
+</div>
+
+<p>DATE-COMPILEDはコンパイル時に機械側でセットされるので、プログラマーが記入する必要はない。記入した場合には機械側の日付は無視される。</p>
+
+<h3>記入例</h3>
+<div class="code-wrapper">
+  <div class="code-header"><div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>COBOL — SS001601</div>
+  <pre><code>IDENTIFICATION DIVISION.
+PROGRAM-ID.  SS001601.
+DATE-COMPILED.
+REMARKS.     MIX DUMP.</code></pre>
+</div>
+
+<p>REMARKSは項目中にスペースがあっても、2行になっても、全くプログラムに差し支えない。</p>
+
+<!-- ===== CHAPTER 3 ===== -->
+<div class="chapter-header" id="ch3">
+  <h1><span class="chapter-badge">3</span>ENVIRONMENT DIVISION（環境部）</h1>
+</div>
+
+<h2 id="ch3-1">形式</h2>
+
+<div class="code-wrapper">
+  <div class="code-header"><div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>COBOL — ENVIRONMENT DIVISION 形式</div>
+  <pre><code>ENVIRONMENT    DIVISION.
+CONFIGURATION  SECTION.
+SOURCE-COMPUTER.
+OBJECT-COMPUTER.
+SPECIAL-NAMES.
+INPUT-OUTPUT   SECTION.
+FILE-CONTROL.
+I-O-CONTROL.
+
+  最初の4つは指定必須。他は必要に応じて指定。</code></pre>
+</div>
+
+<h3>記入例</h3>
+<div class="code-wrapper">
+  <div class="code-header"><div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>COBOL — ENVIRONMENT 記入例</div>
+  <pre><code>ENVIRONMENT    DIVISION.
+CONFIGURATION  SECTION.
+SOURCE-COMPUTER. IBM-370.
+OBJECT-COMPUTER. IBM-370.
+SPECIAL-NAMES.  C01 IS F-FILE.
+INPUT-OUTPUT   SECTION.
+FILE-CONTROL.
+  SELECT INFL ASSIGN TO UT-S-INFL.
+  SELECT OTFL ASSIGN TO UT-S-OTFL.
+I-O-CONTROL.
+  APPLY WRITE-ONLY ON OTFL.</code></pre>
+</div>
+
+<h2 id="ch3-2">SPECIAL-NAMES</h2>
+<p>プリントなどでファーストラインに名前を付けるものである（C01のみ使用）。例えば <code>C01 IS FIRST-LINE</code> と記入すると、チャネル01（C01）の名前を FIRST-LINE と定義する。PROCEDURE DIVISIONでプリントファイルにWRITEする際に使用される。BEFOREまたはAFTERでFIRST-LINEと書くと、命令が実行された後または前にプリンタのポインタはTOPを指す。</p>
+
+<h2 id="ch3-3">SOURCE-COMPUTER / OBJECT-COMPUTER</h2>
+<p>これらは文書化の働きをする。コンパイルする/実行する計算機について記述する（通常 IBM-9790 など）。</p>
+
+<h2 id="ch3-4">INPUT-OUTPUT SECTION</h2>
+<p>個々のファイルの定義。ファイルを入れる外部記憶媒体の識別（JCLのDDとの関連付け）。FILE-CONTROL段落とI-O-CONTROL段落がある。</p>
+
+<h2 id="ch3-5">FILE-CONTROL</h2>
+<p>ファイルを入出力装置に割り当てる。</p>
+
+<h3>① SELECT文節</h3>
+<p>プログラム中の個々のファイルに名前を与える。</p>
+<div class="code-wrapper">
+  <div class="code-header"><div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>構文</div>
+  <pre><code>SELECT ファイル名</code></pre>
+</div>
+<p>このファイル名はDATA DIVISION中のFD又はSD項目を持っていなければならない。</p>
+
+<h3>② ASSIGN文節</h3>
+<p>ファイルを外部媒体（JCL上のDD名）に割り当てる。</p>
+<div class="code-wrapper">
+  <div class="code-header"><div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>構文</div>
+  <pre><code>ASSIGN TO システム名</code></pre>
+</div>
+
+<div class="table-wrapper">
+<table>
+<tr><th>構成要素</th><th>説明</th></tr>
+<tr><td>クラス</td><td>DA（大容量記憶装置）、UT（ユーティリティ）、UR（ユニットレコード）</td></tr>
+<tr><td>装置</td><td>通常指定しない。UT: 2301/2302/2314等、UR: 1403/1404等</td></tr>
+<tr><td>編成</td><td>S: 標準順次編成、D: 直接編成、W: REWRITE使用時、R: 相対編成、I: 索引編成</td></tr>
+<tr><td>名前</td><td>1〜8文字のDD名</td></tr>
+</table>
+</div>
+
+<h3>③ RESERVE文節</h3>
+<div class="code-wrapper">
+  <div class="code-header"><div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>構文</div>
+  <pre><code>RESERVE { NO   } ALTERNATE [ AREA  ]
+        { 整数 }           [ AREAS ]</code></pre>
+</div>
+<p>整数で示される数だけBUFFが確保される。順次アクセスにのみ有効。</p>
+
+<h3>⑤ ACCESS MODE文節</h3>
+<div class="code-wrapper">
+  <div class="code-header"><div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>構文</div>
+  <pre><code>ACCESS MODE IS { SEQUENTIAL }
+               { RANDOM     }</code></pre>
+</div>
+<p>省略時はSEQUENTIALとみなされる。</p>
+
+<h3>⑦ ACTUAL KEY文節</h3>
+<div class="code-wrapper">
+  <div class="code-header"><div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>構文</div>
+  <pre><code>ACTUAL KEY IS データ名</code></pre>
+</div>
+<p>ランダム・アクセス時に指定。データ名は5〜259バイトの固定長項目。</p>
+
+<h3>⑧ NOMINAL KEY文節</h3>
+<div class="code-wrapper">
+  <div class="code-header"><div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>構文</div>
+  <pre><code>NOMINAL KEY IS データ名</code></pre>
+</div>
+<p>索引付ファイル及び相対ファイルをランダム・アクセス時に指定。</p>
+
+<h3>⑨ RECORD KEY文節</h3>
+<div class="code-wrapper">
+  <div class="code-header"><div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>構文</div>
+  <pre><code>RECORD KEY IS データ名</code></pre>
+</div>
+<p>索引ファイルをアクセスする為に使用。255バイト以下の固定長項目。</p>
+
+<h3>⑩ TRACK-AREA文節</h3>
+<div class="code-wrapper">
+  <div class="code-header"><div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>構文</div>
+  <pre><code>TRACK-AREA IS { データ名 }
+              { 整数     }</code></pre>
+</div>
+<p>索引ファイルに対しランダム・アクセス方式でレコードを追加する場合。8の倍数で32760バイト以内。</p>
+
+<h3>⑪ TRACK-LIMIT文節</h3>
+<div class="code-wrapper">
+  <div class="code-header"><div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>構文</div>
+  <pre><code>TRACK-LIMIT IS 整数 TRACK(S)</code></pre>
+</div>
+
+<h2 id="ch3-6">I-O-CONTROL</h2>
+
+<h3>① RERUN文節</h3>
+<p>チェックポイント・レコードを取る事を指定する。</p>
+<div class="code-wrapper">
+  <div class="code-header"><div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>構文</div>
+  <pre><code>RERUN ON システム名
+  EVERY { 整数       RECORD }
+        { [END OF] { REEL } }
+               { UNIT       }</code></pre>
+</div>
+
+<h3>② SAME文節</h3>
+<p>処理中に2つ以上のファイルが同じコア記憶域を使用する事を指定。</p>
+<div class="code-wrapper">
+  <div class="code-header"><div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>構文</div>
+  <pre><code>SAME [ SORT   ] AREA FOR ファイル名-1…n
+     [ RECORD ]</code></pre>
+</div>
+
+<h3>④ APPLY文節</h3>
+<div class="code-wrapper">
+  <div class="code-header"><div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>構文</div>
+  <pre><code>APPLY WRITE-ONLY ON ファイル名-1…n
+APPLY CORE-INDEX ON ファイル名-1…n</code></pre>
+</div>
+
+<!-- ===== CHAPTER 4 ===== -->
+<div class="chapter-header" id="ch4">
+  <h1><span class="chapter-badge">4</span>DATA DIVISION（データ部）</h1>
+</div>
+
+<h2 id="ch4-1">形式</h2>
+<div class="code-wrapper">
+  <div class="code-header"><div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>COBOL — DATA DIVISION 形式</div>
+  <pre><code>DATA DIVISION.
+FILE SECTION.
+WORKING-STORAGE SECTION.
+LINKAGE SECTION.
+REPORT SECTION.</code></pre>
+</div>
+
+<h3>記入例</h3>
+<div class="code-wrapper">
+  <div class="code-header"><div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>COBOL — DATA DIVISION 記入例</div>
+  <pre><code>DATA           DIVISION.
+FILE           SECTION.
+FD INFL               RECORDING MODE IS F
+                      RECORD   CONTAINS 20 CHARACTERS
+                      LABEL    RECORD IS STANDARD
+                      DATA     RECORD IS IN-REC.
+01 IN-REC.
+05 IN-KUBUN            PIC X(2).
+05 IN-NAIYO.
+10 IN-NAIYO-1          PIC X(5).
+10 IN-NAIYO-2          PIC X(10).
+10 FILLER              PIC X(20).
+WORKING-STORAGE SECTION.
+77 COUNTER              PIC 99.
+01 IN-DATA.
+05 IN-KBN               PIC X(5).
+05 IN-NAIYO             PIC X(15).
+LINKAGE        SECTION.
+01 PARM.
+05 PARM-LL              PIC 9(3) COMP.
+05 PARM-YMD             PIC X(6).</code></pre>
+</div>
+
+<h2 id="ch4-2">FILE SECTION</h2>
+<p>プログラム中で使用される外部データのDCBなどを記述する。1つのプログラム中で25個以内のファイル記述項目を書ける。</p>
+
+<h3>① BLOCK CONTAINS文節</h3>
+<div class="code-wrapper">
+  <div class="code-header"><div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>構文</div>
+  <pre><code>BLOCK CONTAINS [整数-1 TO] { CHARACTERS }
+                { RECORDS    }</code></pre>
+</div>
+<p>物理レコードのブロック長を指定。1レコード1ブロックのデータには指定不要。</p>
+
+<h3>② RECORD CONTAINS文節</h3>
+<div class="code-wrapper">
+  <div class="code-header"><div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>構文</div>
+  <pre><code>RECORD CONTAINS [整数-1 TO]整数-2 CHARACTERS</code></pre>
+</div>
+
+<h3>③ RECORDING MODE文節</h3>
+<div class="table-wrapper">
+<table>
+<tr><th>モード</th><th>説明</th></tr>
+<tr><td>F</td><td>全てのレコードが同じ長さ。ブロック内のレコード数固定</td></tr>
+<tr><td>U</td><td>固定/可変長可。ブロックに1レコードのみ</td></tr>
+<tr><td>V</td><td>固定/可変長可。ブロックに1〜nレコード</td></tr>
+<tr><td>S</td><td>固定/可変長可。1レコードが1ブロックより大きい場合可</td></tr>
+</table>
+</div>
+
+<h3>④ LABEL RECORD文節</h3>
+<div class="code-wrapper">
+  <div class="code-header"><div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>構文</div>
+  <pre><code>LABEL { RECORD IS  } { OMITTED       }
+      { RECORD ARE } { STANDARD      }
+             { データ名-1…n }</code></pre>
+</div>
+
+<h3>⑥ DATA RECORD文節</h3>
+<div class="code-wrapper">
+  <div class="code-header"><div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>構文</div>
+  <pre><code>DATA { RECORD IS  } データ名-1…n
+     { RECORD ARE }</code></pre>
+</div>
+
+<h2 id="ch4-3">データ記述項目</h2>
+
+<div class="code-wrapper">
+  <div class="code-header"><div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>構文</div>
+  <pre><code>レベル番号 { データ名 } PICTURE句
+           { FILLER   }</code></pre>
+</div>
+
+<p>レベル番号は01〜49まで指定できる。通常01, 05, 10…の順で付けていく。</p>
+
+<div class="code-wrapper">
+  <div class="code-header"><div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>COBOL — レベル番号の例</div>
+  <pre><code>01 IN-REC.
+05 IN-KUBUN      PIC X(2).
+05 IN-NAIYO.
+10 IN-NAIYO-1  PIC X(5).
+10 IN-NAIYO-2  PIC X(10).
+10 FILLER      PIC X(20).</code></pre>
+</div>
+
+<p>IN-RECという37バイトのレコード。IN-KUBUNが2バイト、IN-NAIYOの中にIN-NAIYO-1(5バイト)、IN-NAIYO-2(10バイト)。</p>
+
+<h2 id="ch4-4">WORKING-STORAGE SECTION</h2>
+<p>プログラム中でワークとして使用するエリア、INPUT/OUTPUTのエリアをコピー・指定するエリア、カウンターやスイッチのエリアを定義する。</p>
+
+<h3>特殊レベル</h3>
+<div class="table-wrapper">
+<table>
+<tr><th>レベル</th><th>名称</th><th>説明</th></tr>
+<tr><td>77</td><td>独立項目</td><td>下位レベルをもたない独立項目（88レベルを除く）</td></tr>
+<tr><td>88</td><td>条件項目</td><td>エリアをもたない。上位レベルの条件を示す</td></tr>
+<tr><td>66</td><td>再編成項目</td><td>データ項目のグループを再編成（REDEFINES関連）</td></tr>
+</table>
+</div>
+
+<h3>88レベルの例</h3>
+<div class="code-wrapper">
+  <div class="code-header"><div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>COBOL — 88レベル</div>
+  <pre><code>77 FILE-SIGN            PIC X.
+88 EOF-SIGN             VALUE "E".</code></pre>
+</div>
+<p><code>"E"</code>をFILE-SIGNへ移送したかどうかを確認するには、<code>IF FILE-SIGN="E"</code> ではなく <code>IF EOF-SIGN</code> と書くだけでよい。</p>
+
+<h2 id="ch4-5">PICTURE句</h2>
+<p>エリアの長さ・TYPEなどを指定。PICTUREはPICと省略できる。</p>
+
+<h3>9-TYPE</h3>
+<p>数字項目。0〜9以外を移送できない（COMPUTATIONAL）。</p>
+<div class="code-wrapper">
+  <div class="code-header"><div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>COBOL</div>
+  <pre><code>PIC 9(5).   &lt;─ 5桁数字</code></pre>
+</div>
+
+<h3>小数点の指定</h3>
+<div class="table-wrapper">
+<table>
+<tr><th>種類</th><th>記述</th><th>バイト</th></tr>
+<tr><td>仮想小数点</td><td><code>PIC 999V99.</code></td><td>5バイト（Vはエリアを取らない）</td></tr>
+<tr><td>実小数点</td><td><code>PIC 999.99.</code></td><td>6バイト（.が1バイト確保）</td></tr>
+</table>
+</div>
+
+<h3>サインの指定</h3>
+<div class="code-wrapper">
+  <div class="code-header"><div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>COBOL</div>
+  <pre><code>PIC S99.    &lt;─ 1バイトの符号エリア</code></pre>
+</div>
+
+<h3>ゾーン・パック・2進数</h3>
+<div class="table-wrapper">
+<table>
+<tr><th>形式</th><th>例（2バイトに"11"を移送）</th><th>PIC記述</th></tr>
+<tr><td>ゾーン</td><td><code>F1 F1</code></td><td><code>PIC 9(2).</code></td></tr>
+<tr><td>パック</td><td><code>01 1C</code></td><td><code>PIC S9(3) COMP-3.</code></td></tr>
+<tr><td>2進数</td><td><code>00 0B</code></td><td><code>PIC S9(3) COMP-8.</code></td></tr>
+</table>
+</div>
+
+<p>パックの最後の4ビット: C/F=プラス、D=マイナス。<br>
+2進数のサインは最上位ビット（1=マイナス、0=プラス）。</p>
+
+<div class="code-wrapper">
+  <div class="code-header"><div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>COBOL — COMP SYNCの指定方法</div>
+  <pre><code>① 05 CTR-IN               PIC S9(7) COMP SYNC.
+② 01 CTR-AREA             COMP SYNC.
+   05 CTR-IN               PIC S9(7).
+   05 CTR-OUT              PIC S9(7).</code></pre>
+</div>
+<p>②の方がクリアが楽なので通常②の使い方をすることが多い。</p>
+
+<h3>A-TYPE</h3>
+<p>アルファベット項目。アルファベットとブランクの27文字。ほとんど使われない（X-TYPEで代用可能）。</p>
+
+<h3>X-TYPE</h3>
+<p>英数字項目。COBOLで使用する全ての文字を移送可能。</p>
+
+<h3>編集TYPE</h3>
+<div class="table-wrapper">
+<table>
+<tr><th>文字</th><th>意味</th></tr>
+<tr><td>B</td><td>ブランク挿入</td></tr>
+<tr><td>P</td><td>小数点以下の桁数</td></tr>
+<tr><td>−</td><td>マイナス表示（符号）</td></tr>
+<tr><td>＋</td><td>プラス表示</td></tr>
+<tr><td>¥</td><td>通貨記号</td></tr>
+<tr><td>Z</td><td>ZERO消去</td></tr>
+<tr><td>＊</td><td>チェック保護</td></tr>
+<tr><td>V</td><td>仮想小数点</td></tr>
+<tr><td>0</td><td>ZERO表示</td></tr>
+<tr><td>，</td><td>カンマ</td></tr>
+<tr><td>．</td><td>ピリオド</td></tr>
+<tr><td>CR</td><td>値が負の時にCR表示</td></tr>
+<tr><td>DB</td><td>値が負の時にDB表示</td></tr>
+</table>
+</div>
+
+<h3>編集TYPE使用例</h3>
+<div class="table-wrapper">
+<table>
+<tr><th>指定</th><th>データの値</th><th>結果</th></tr>
+<tr><td><code>PIC 99BB99BB99.</code></td><td>123456</td><td>12△△34△△56</td></tr>
+<tr><td><code>PIC ZZZZZZ.</code></td><td>001234</td><td>△△△1234</td></tr>
+<tr><td><code>PIC Z,ZZZ,ZZ9.</code></td><td>001234</td><td>△△1,234</td></tr>
+<tr><td><code>PIC −,---,--.</code></td><td>−001234</td><td>−1,234</td></tr>
+<tr><td><code>PIC +,+,,,+,,</code></td><td>+001234</td><td>+1,234</td></tr>
+<tr><td><code>PIC ¥,¥¥¥,¥¥¥.</code></td><td>12345</td><td>¥12,345</td></tr>
+<tr><td><code>PIC ＊＊＊＊＊＊＊＊.</code></td><td>12345</td><td>*****12345</td></tr>
+</table>
+</div>
+
+<h3>DB/CRの例</h3>
+<div class="code-wrapper">
+  <div class="code-header"><div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>COBOL</div>
+  <pre><code>PIC 9(5) DB.    &lt;─ 負の値の場合 999DB（正なら 999）
+PIC 9(5) CR.    &lt;─ 負の値の場合 999CR（正なら 999）</code></pre>
+</div>
+
+<h2 id="ch4-6">VALUE文節・JUST RIGHT句・REDEFINE・OCCURS</h2>
+
+<h3>VALUE文節</h3>
+<div class="code-wrapper">
+  <div class="code-header"><div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>COBOL</div>
+  <pre><code>05 A                 PIC X(11).
+VALUE IS "** START **".</code></pre>
+</div>
+<p>ISは省略可。テーブル作成時に良く使用。</p>
+
+<h3>JUST RIGHT句</h3>
+<div class="code-wrapper">
+  <div class="code-header"><div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>COBOL</div>
+  <pre><code>05 A                 PIC X(10) JUST RIGHT.</code></pre>
+</div>
+<p>通常左詰めだが、これを右詰めにする。基本項目に対してのみ指定可能。</p>
+
+<h3>REDEFINE文節</h3>
+<p>一度定義したエリアを違った形で定義し直す。新たにエリアは取らない。</p>
+<div class="code-wrapper">
+  <div class="code-header"><div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>COBOL</div>
+  <pre><code>05 A.                      PIC X(10).
+05 A-R REDEFINES A.
+10 B                       PIC 9(5).
+10 C                       PIC S9(5).
+10 D                       PIC X(1).</code></pre>
+</div>
+
+<h3>日付のREDEFINE例</h3>
+<div class="code-wrapper">
+  <div class="code-header"><div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>COBOL</div>
+  <pre><code>05 A-YYMMDD.
+10 A-YYMM.
+15 A-YY                    PIC X(2).
+15 A-MM                    PIC X(2).
+10 A-DD                    PIC X(2).
+05 A-YYMMDD-R REDEFINES A-YYMMDD.
+10 A-YY-R                  PIC 9(2).
+10 A-MMDD.
+15 A-MM-R                  PIC 9(2).
+15 A-DD-R                  PIC 9(2).</code></pre>
+</div>
+
+<h3>OCCURS文節（テーブル）</h3>
+<div class="code-wrapper">
+  <div class="code-header"><div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>構文</div>
+  <pre><code>OCCURS 整数 TIMES
+  (DEPENDING ON データ名-1)
+  { ASCENDING  } KEY IS データ名-2
+  { DESCENDING }
+  INDEXED BY 指標名</code></pre>
+</div>
+
+<div class="code-wrapper">
+  <div class="code-header"><div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>COBOL</div>
+  <pre><code>05 A OCCURS 30 TIMES
+   INDEXED BY A-X1.
+10 B                       PIC X(1).</code></pre>
+</div>
+<p>Bというエリアが30個あり、A-X1で参照可能。B(1), B(2) または B(A-X1)。</p>
+
+<p>OCCURSは最大3次元まで可能。</p>
+<div class="code-wrapper">
+  <div class="code-header"><div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>COBOL — 3次元テーブル</div>
+  <pre><code>05 A   OCCURS 3  TIMES INDEXED BY A-X1.
+10 B   OCCURS 5  TIMES INDEXED BY B-X1.
+15 C   OCCURS 2  TIMES INDEXED BY C-X1.
+20 D                        PIC X(20).</code></pre>
+</div>
+<p>Dは3×5×2=30個、600バイト。D(1,1,1) または D(A-X1, B-X1, C-X1)。</p>
+
+<h2 id="ch4-7">LINKAGE SECTION</h2>
+<p>外部から渡されるデータ（パラメータ）、上位モジュールからのデータを定義。パラメータはDATAの他に長さが入るエリアを定義する必要がある。</p>
+<div class="code-wrapper">
+  <div class="code-header"><div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>COBOL</div>
+  <pre><code>01 PARM.
+05 PARM-LL    PIC 9(3) COMP.
+05 PARM-YMD  PIC X(6).</code></pre>
+</div>
+
+<!-- Fun Break -->
+<div class="callout">
+  <p class="callout-title">太ったゼロとやせたゼロ</p>
+  <p>プログラム中には太ったゼロ（O）とやせたゼロ（0）がある。文法のミスはないはずなのにコンパイルが通らない。よくよく見てみると、何が問題か。</p>
+  <div class="code-wrapper">
+    <div class="code-header"><div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>COBOL</div>
+    <pre><code>MOVE……が MOVE……となっているではないか。</code></pre>
+  </div>
+  <p>いやはや、やせたゼロ（0）が邪魔をしていたのか！ JCLでも同じミスをよくやる。コーディングの時はOと0を見分けやすいように書こう。</p>
+</div>
+
+<!-- ===== CHAPTER 5 ===== -->
+<div class="chapter-header" id="ch5">
+  <h1><span class="chapter-badge">5</span>PROCEDURE DIVISION（手続き部）</h1>
+</div>
+
+<p>このDIVISIONでは実際にやる処理をCOBOLの命令を使って定義する。</p>
+
+<h2>主な命令一覧</h2>
+<div class="table-wrapper">
+<table>
+<tr><td>ACCEPT</td><td>READ</td><td>CALL</td></tr>
+<tr><td>ADD</td><td>MOVE</td><td>STOP RUN</td></tr>
+<tr><td>SUBTRACT</td><td>SET</td><td>GOBACK</td></tr>
+<tr><td>MULTIPLY</td><td>PERFORM</td><td>SEARCH</td></tr>
+<tr><td>DIVIDE</td><td>GO TO</td><td>WHEN</td></tr>
+<tr><td>REMAINDER</td><td>OPEN</td><td>DISPLAY</td></tr>
+<tr><td>COMPUTE</td><td>CLOSE</td><td>AT END</td></tr>
+<tr><td>IF</td><td>EXAMINE</td><td>BEFORE</td></tr>
+<tr><td>ELSE</td><td>WRITE</td><td>AFTER</td></tr>
+</table>
+</div>
+
+<h2 id="ch5-1">1. ACCEPT命令</h2>
+<div class="code-wrapper">
+  <div class="code-header"><div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>構文</div>
+  <pre><code>ACCEPT データ名 [FROM { SYSIN   }
+                     { CONSOLE }
+                     { 記憶名  }]</code></pre>
+</div>
+<p>FROMを省略するとSYSINからの入力とみなされる。</p>
+
+<h2 id="ch5-2">2. ADD命令（加算）</h2>
+<div class="code-wrapper">
+  <div class="code-header"><div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>構文 — TO形式</div>
+  <pre><code>ADD 識別名-1…(n) TO 識別名-2…(n) [ROUNDED]</code></pre>
+</div>
+<p>TOの左側の内容が右側に足し込まれて、右側の値が結果と置き換わる。</p>
+
+<div class="code-wrapper">
+  <div class="code-header"><div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>構文 — GIVING形式</div>
+  <pre><code>ADD 識別名-1…(n) GIVING 識別名-2…(n) [ROUNDED]</code></pre>
+</div>
+<p>GIVING形式では左側の加算結果が右側へストアされる（元データは保存）。</p>
+
+<h3>例</h3>
+<div class="code-wrapper">
+  <div class="code-header"><div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>COBOL</div>
+  <pre><code>05 A PIC 9(2).    ……10
+05 B PIC 9(3).    ……30
+05 C PIC 9(4).    ……0
+ADD A B GIVING C.  &lt;─ 結果 C=40（A,Bは保存）
+ADD 1 TO IN-CTR.   &lt;─ カウントアップ</code></pre>
+</div>
+
+<h2>3. SUBTRACT命令（減算）</h2>
+<div class="code-wrapper">
+  <div class="code-header"><div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>構文</div>
+  <pre><code>SUBTRACT 識別名-1…(n) FROM 識別名-2…(n) [ROUNDED]
+SUBTRACT 識別名-1…(n) FROM 識別名-2…(n) GIVING 識別名-3 [ROUNDED]</code></pre>
+</div>
+
+<h2>4. MULTIPLY命令（乗算）</h2>
+<div class="code-wrapper">
+  <div class="code-header"><div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>構文</div>
+  <pre><code>MULTIPLY 識別名-1 BY 識別名-2 [ROUNDED]
+MULTIPLY 識別名-1 BY 識別名-2 GIVING 識別名-3 [ROUNDED]</code></pre>
+</div>
+
+<h2>5. DIVIDE命令（除算）</h2>
+<div class="code-wrapper">
+  <div class="code-header"><div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>構文</div>
+  <pre><code>DIVIDE 識別名-1 INTO 識別名-2 [ROUNDED]
+DIVIDE 識別名-1 INTO 識別名-2
+        GIVING 識別名-3 [ROUNDED]
+        [REMAINDER 識別名-4]</code></pre>
+</div>
+<p>REMAINDERは余りを求めるオプション。INTOをBYに変えると除数と被除数の関係が逆転する。</p>
+
+<h3>例</h3>
+<div class="code-wrapper">
+  <div class="code-header"><div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>COBOL</div>
+  <pre><code>05 A PIC 9(2).      ……13
+05 B PIC 9(3).      ……100
+05 C PIC 9(2).
+05 D PIC 9(2).
+DIVIDE A INTO B GIVING C REMAINDER D.
+        &lt;─ 結果 C=7, D=9</code></pre>
+</div>
+
+<h2 id="ch5-3">6. COMPUTE命令</h2>
+<p>ADD/SUBTRACT/MULTIPLY/DIVIDEの機能を算術演算式で指定できる。</p>
+
+<div class="table-wrapper">
+<table>
+<tr><th>記号</th><th>意味</th></tr>
+<tr><td>＝</td><td>イコール</td></tr>
+<tr><td>＊</td><td>乗算</td></tr>
+<tr><td>／</td><td>除算</td></tr>
+<tr><td>＋</td><td>加算</td></tr>
+<tr><td>−</td><td>減算</td></tr>
+<tr><td>＊＊</td><td>べき乗</td></tr>
+<tr><td>（ ）</td><td>優先度</td></tr>
+</table>
+</div>
+
+<div class="code-wrapper">
+  <div class="code-header"><div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>COBOL</div>
+  <pre><code>COMPUTE C = ((A+B) / (B-E)) * D.</code></pre>
+</div>
+
+<p>受項目（＝の左側）は9-TYPEでなければならない。編集項目でも可能（PIC ZZZ. など）。</p>
+
+<h3>実行順序</h3>
+<p>（ ）内 → べき乗 → 乗算/除算 → 加算/減算 → 同レベルは左から順</p>
+
+<h3>ON SIZE ERROR</h3>
+<div class="code-wrapper">
+  <div class="code-header"><div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>COBOL</div>
+  <pre><code>MULTIPLY A BY B
+  ON SIZE ERROR GO TO ERR-SHORI.</code></pre>
+</div>
+
+<h2 id="ch5-4">7. IF命令</h2>
+<div class="code-wrapper">
+  <div class="code-header"><div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>構文</div>
+  <pre><code>IF    条件    ステートメント-1    NEXT SENTENCE
+ELSE        ステートメント-2    NEXT SENTENCE</code></pre>
+</div>
+
+<div class="code-wrapper">
+  <div class="code-header"><div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>COBOL</div>
+  <pre><code>IF A = B
+  PERFORM S03-EQUAL-SHORI THRU S03-EXIT
+ELSE
+  NEXT SENTENCE.</code></pre>
+</div>
+
+<p>IF文を入れ子にすることをネスティングと呼ぶ。</p>
+
+<h2>8. READ命令</h2>
+<div class="code-wrapper">
+  <div class="code-header"><div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>構文</div>
+  <pre><code>READ ファイル名 [INTO データ名]
+  AT END 命令ステートメント.</code></pre>
+</div>
+<p>OPEN命令が実行されていなければ ABEND=U3706 となる。</p>
+
+<h2>9. MOVE命令</h2>
+<div class="code-wrapper">
+  <div class="code-header"><div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>構文</div>
+  <pre><code>MOVE 識別名-1 TO 識別名-2 (n)
+MOVE ZERO TO A B C.      &lt;─ A,B,Cをゼロクリア
+MOVE A       TO B.        &lt;─ Aの内容をBへ</code></pre>
+</div>
+<p>インデックスには使えない（SET命令を使用）。</p>
+
+<h2>10. SET命令</h2>
+<div class="code-wrapper">
+  <div class="code-header"><div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>構文</div>
+  <pre><code>SET INDEX名 TO    識別名-1
+SET INDEX名 UP BY  識別名-1
+SET INDEX名 DOWN BY 識別名-1</code></pre>
+</div>
+<p>右側のものが左側へセットされる（MOVEとは逆）。</p>
+
+<h2 id="ch5-5">11. PERFORM命令</h2>
+<div class="code-wrapper">
+  <div class="code-header"><div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>構文</div>
+  <pre><code>PERFORM 処理手順名-1 [THRU 処理手順名-2]
+            [識別名-1 TIMES]</code></pre>
+</div>
+<p>UNTILオプションで条件付き繰り返し可能。</p>
+<div class="code-wrapper">
+  <div class="code-header"><div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>COBOL</div>
+  <pre><code>PERFORM S04-SHORI THRU S04-EXIT
+  UNTIL SW-END = 'E'.</code></pre>
+</div>
+
+<p>VARYINGオプションで複雑なテーブル処理も可能。</p>
+
+<h2>12. GO TO命令</h2>
+<div class="code-wrapper">
+  <div class="code-header"><div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>構文</div>
+  <pre><code>GO TO 処理手順名
+GO TO 処理手順名-1
+     処理手順名-2
+     処理手順名-n DEPENDING ON 識別名</code></pre>
+</div>
+<p>DEPENDING ONで識別名の値に応じてブランチ先が変わる。</p>
+
+<h2 id="ch5-6">13. OPEN命令</h2>
+<div class="code-wrapper">
+  <div class="code-header"><div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>構文</div>
+  <pre><code>OPEN INPUT  ファイル名-1…(n)   &lt;─ READ専用
+OPEN OUTPUT ファイル名-2…(n)   &lt;─ WRITE専用
+OPEN I-O    ファイル名-3…(n)   &lt;─ 両方</code></pre>
+</div>
+
+<h2>14. CLOSE命令</h2>
+<div class="code-wrapper">
+  <div class="code-header"><div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>構文</div>
+  <pre><code>CLOSE ファイル名-1…(n)</code></pre>
+</div>
+
+<h2>15. WRITE命令</h2>
+<div class="code-wrapper">
+  <div class="code-header"><div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>構文</div>
+  <pre><code>WRITE レコード名 [FROM 識別名]
+[BEFORE ] ADVANCING 識別名 LINES
+[AFTER  ]</code></pre>
+</div>
+
+<p>BEFOREとAFTERの違い:</p>
+<div class="table-wrapper">
+<table>
+<tr><th>指定</th><th>動作</th></tr>
+<tr><td>BEFORE 2</td><td>先にプリント、そのあと2+1ライン進む</td></tr>
+<tr><td>AFTER 2</td><td>先に2ライン進む、プリント、さらに1ライン進む</td></tr>
+</table>
+</div>
+<p>効率はBEFOREの方が良い（プリント中に次データをセット可能）。</p>
+
+<h2>16. DISPLAY命令</h2>
+<div class="code-wrapper">
+  <div class="code-header"><div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>構文</div>
+  <pre><code>DISPLAY 識別名-1…(n) [UPON { CONSOLE  } ]
+                      { SYSOUT   }
+                      { SYSPUNCH }
+                      { SYSPCH   }</code></pre>
+</div>
+
+<div class="table-wrapper">
+<table>
+<tr><th>出力先</th><th>最大桁数</th></tr>
+<tr><td>SYSOUT</td><td>120桁</td></tr>
+<tr><td>CONSOLE</td><td>100桁</td></tr>
+<tr><td>SYSPUNCH</td><td>72桁</td></tr>
+</table>
+</div>
+
+<h2 id="ch5-7">17. SEARCH命令</h2>
+<div class="code-wrapper">
+  <div class="code-header"><div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>構文</div>
+  <pre><code>SEARCH テーブル名 [AT END 命令ステートメント-1]
+  WHEN 条件 命令ステートメント-2</code></pre>
+</div>
+
+<div class="code-wrapper">
+  <div class="code-header"><div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>COBOL</div>
+  <pre><code>SET A-X1 TO 1.
+SEARCH A-OCCUR
+  AT END GO TO SEARCH-END
+WHEN WK-KEY = A-KEY(A-X1)
+  MOVE A-NAIYO(A-X1) TO WK-DATA.</code></pre>
+</div>
+
+<p>SEARCH前に必ずインデックスに値をSETする。IF文でLOOPさせるよりステートメント数が少ない。</p>
+
+<h2>18. STOP RUN / GOBACK</h2>
+<p>STOP RUN — プログラム停止（単体モジュール）<br>
+GOBACK — 制御を上位モジュールへ返す（サブモジュール）</p>
+
+<!-- ===== CHAPTER 6 ===== -->
+<div class="chapter-header" id="ch6">
+  <h1><span class="chapter-badge">6</span>フロー例とコーディング例</h1>
+</div>
+
+<p>ここでは処理の基本であるマッチング処理とコントロールブレイク処理を実際のフローとコーディング例で紹介する。</p>
+
+<h3>マッチング処理</h3>
+<p>2つ以上のファイルをつきあわせ、あるKEYによってファイルを更新する様な処理。1:1, 1:N, 1:1:1, 1:1:N など。</p>
+
+<h3>コントロール・ブレイク処理</h3>
+<p>あるKEYが変化した時点でそれまでとは異なる処理を行う。明細を出しながら支社・営業部・支部のトータルを出力するなど。</p>
+
+<h2 id="ch6-1">1. マッチング処理（1:1）</h2>
+
+<h3>スウィッチを使用する場合</h3>
+<ul>
+<li>前提条件: INFL1とINFL2の各KEYは昇順にソートされており、同一KEYは同一ファイル上に存在しない</li>
+<li>KEY1=INFL1のKEY、KEY2=INFL2のKEY</li>
+</ul>
+
+<div class="mermaid">
+flowchart TD
+  S[START] --> I[INITIAL<br/>ファイルOPEN]
+  I --> SW1[SW-1 = '1'<br/>INFL1 READ<br/>AT END → KEY1=HV]
+  SW1 --> SW2[SW-2 = '1'<br/>INFL2 READ<br/>AT END → KEY2=HV]
+  SW2 --> CHK1{KEY1 = KEY2?}
+  CHK1 -->|等しい| CHK2{KEY1 = HV?}
+  CHK2 -->|はい| CL[CLOSE] --> E[END]
+  CHK1 -->|不等| CMP{KEY1 : KEY2}
+  CMP -->|KEY1 &lt; KEY2| O1[INFL1 ONLY処理<br/>SW1='1', SW2='0']
+  CMP -->|KEY1 &gt; KEY2| O2[INFL2 ONLY処理<br/>SW1='0', SW2='1']
+  CMP -->|KEY等しい| M[マッチング処理<br/>SW1='1', SW2='1']
+  O1 --> SW1
+  O2 --> SW2
+  M --> SW1
+</div>
+<p class="mermaid-title">図 1: 1:1マッチング（スウィッチ使用）</p>
+
+<h3>スウィッチを使用しない場合</h3>
+<div class="mermaid">
+flowchart TD
+  S[START] --> I[INITIAL<br/>ファイルOPEN]
+  I --> R1[INFL1 READ]
+  R1 --> R2[INFL2 READ]
+  R2 --> CHK1{KEY1 = KEY2?}
+  CHK1 -->|等しい| CHK2{KEY1 = HV?}
+  CHK2 -->|はい| CL[CLOSE] --> E[END]
+  CHK1 -->|不等| CMP{KEY1 : KEY2}
+  CMP -->|KEY1 &lt; KEY2| O1[INFL1 ONLY処理] --> R1B[INFL1 READ] --> R2
+  CMP -->|KEY1 &gt; KEY2| O2[INFL2 ONLY処理] --> R2B[INFL2 READ] --> CHK1
+  CMP -->|KEY等しい| M[マッチング処理] --> R1C[INFL1 READ] --> R2C[INFL2 READ] --> CHK1
+</div>
+<p class="mermaid-title">図 2: 1:1マッチング（スウィッチ不使用）</p>
+
+<h2 id="ch6-2">2. マッチング処理（1:N）</h2>
+<p>INFL1がマスター、INFL2がトランザクション。マスターに更新をかけて新マスターを作成するフロー。</p>
+
+<div class="mermaid">
+flowchart TD
+  S[START] --> I[INITIAL<br/>ファイルOPEN]
+  I --> R1[INFL1 READ]
+  R1 --> R2[INFL2 READ]
+  R2 --> CHK1{KEY1 = KEY2?}
+  CHK1 -->|等しい| CHK2{KEY1 = HV?}
+  CHK2 -->|はい| CL[CLOSE] --> E[END]
+  CHK1 -->|不等| CMP{KEY1 : KEY2}
+  CMP -->|KEY1 &lt; KEY2| CHK3{SW1 = '1'?}
+  CHK3 -->|'1'| OUT[OUT処理] --> O1[INFL1 ONLY処理] --> R1B[INFL1 READ] --> R2
+  CHK3 -->|'0'| O1B[INFL1 ONLY処理] --> R1C[INFL1 READ] --> R2
+  CMP -->|KEY1 &gt; KEY2| O2[INFL2 ONLY処理] --> R2B[INFL2 READ] --> CHK1
+  CMP -->|KEY等しい| M[マッチング処理] --> R2C[INFL2 READ] --> CHK1
+</div>
+<p class="mermaid-title">図 3: 1:Nマッチング</p>
+
+<h2 id="ch6-3">3. マッチング処理（N:N）</h2>
+<p>同一KEYのMAXが全く予想できない場合。オープン・クローズを繰り返して1:Nの様に処理する。</p>
+
+<div class="mermaid">
+flowchart TD
+  S[START] --> I[INITIAL]
+  I --> R1[INFL1 READ]
+  R1 --> R2[INFL2 READ]
+  R2 --> CHK1{KEY1 = KEY2?}
+  CHK1 -->|等しい| CHK2{KEY1 = HV?}
+  CHK2 -->|はい| STR_CHECK{KEY1 = STR1?}
+  STR_CHECK -->|不等| R2_L[(ループ2)]
+  STR_CHECK -->|等しい| RC[INFL2 CLOSE] --> RO[INFL2再OPEN]
+  RO --> R3[INFL2 READ]
+  R3 --> CHK3{KEY2 = STR2?}
+  CHK3 -->|不等| R3_L[(ループ3)]
+  CHK3 -->|等しい| R1_L[(ループ1)]
+  CHK1 -->|不等| CMP{KEY1 : KEY2}
+  CMP -->|KEY1 &lt; KEY2| O1[INFL1 ONLY処理] --> R1B[INFL1 READ] --> R2
+  CMP -->|KEY1 &gt; KEY2| O2[INFL2 ONLY処理] --> R2B[INFL2 READ] --> R2
+  CMP -->|KEY等しい| KEY_EQ[STR1=KEY1, STR2=KEY2]
+  KEY_EQ --> L2[(ループ2)]
+  L2 --> CHK4{KEY1 = KEY2?}
+  CHK4 -->|不等| CHK5{KEY1=STR1?}
+  CHK5 -->|不等| STR_CHECK
+  CHK5 -->|等しい| RC
+  CHK4 -->|等しい| CHK6{KEY1=HV or KEY2=HV?}
+  CHK6 -->|はい| STR_CHECK
+  CHK6 -->|いいえ| CMP2{KEY1 : KEY2}
+  CMP2 -->|KEY1 &lt; KEY2| OUT[OUT処理] --> R1C[INFL1 READ] --> L2
+  CMP2 -->|他| M[マッチング処理] --> R2C[INFL2 READ] --> L2
+</div>
+<p class="mermaid-title">図 4: N:Nマッチング</p>
+
+<h2 id="ch6-4">4. マッチング処理の説明</h2>
+
+<p>マッチングとは、複数のファイルをあるKEYによって照合させ、同一KEY同士の処理を行ない、ファイルを更新する事。旧マスターとトランザクションファイルを照合し、トランザクションの内容でマスターを更新して新マスターを作成する。</p>
+
+<div class="table-wrapper">
+<table>
+<tr><th>件数</th><th>マスター</th><th>トランザクション</th><th>説明</th></tr>
+<tr><td>1</td><td>01</td><td>01</td><td>更新をかける</td></tr>
+<tr><td>2</td><td>02</td><td>01</td><td></td></tr>
+<tr><td>3</td><td>03</td><td>05</td><td>該当なし → 更新なしでマスター作成</td></tr>
+<tr><td>4</td><td>04</td><td>06</td><td></td></tr>
+<tr><td>5</td><td>06</td><td>06</td><td>更新をかける</td></tr>
+<tr><td>6</td><td>07</td><td>07</td><td></td></tr>
+<tr><td rowspan="2" style="text-align:center">7</td><td rowspan="2">09</td><td>08</td><td rowspan="2">マスターに05がない → 04と06の間にインサート</td></tr>
+<tr><td>−</td></tr>
+<tr><td>8</td><td>10</td><td>09</td><td></td></tr>
+</table>
+</div>
+
+<p>したがって通常の新マスターは件数は増える事はあっても減る事はない（DELETE処理が入っている場合は除く）。</p>
+
+<h2 id="ch6-5">5. コントロールブレイクのフロー例</h2>
+
+<h3>プリントルーチン</h3>
+<p>53ラインを超えたら見出しを打つ。ライン数をカウントして53ラインを超えたら改頁して見出しを打ち、ラインカウンターを初期値化する。</p>
+
+<h3>ブレークキーの定義</h3>
+<div class="code-wrapper">
+  <div class="code-header"><div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>COBOL — ブレークキーの定義</div>
+  <pre><code>05 KEY.
+10 KEY1               PIC X(3).    &lt;─ READ時のKEY（大項目: 支社）
+10 KEY2               PIC X(3).    &lt;─ 中項目: 営業部
+10 KEY3               PIC X(3).    &lt;─ 小項目: 支部
+05 STR.
+10 STR1               PIC X(3).    &lt;─ 1件前のKEY（大）
+10 STR2               PIC X(3).    &lt;─ 1件前のKEY（中）
+10 STR3               PIC X(3).    &lt;─ 1件前のKEY（小）</code></pre>
+</div>
+
+<h3>処理の流れ</h3>
+<ol>
+<li>1件目のREAD時にKEYとSTRにMOVE</li>
+<li>FILE ENDか確認 → ENDなら小計・中計・合計をプリントしてEND</li>
+<li>KEYとSTR比較 → 同じなら明細プリントして集計処理</li>
+<li>KEY1≠STR1 → 小計・中計・合計をプリント、KEY→STRへMOVE</li>
+<li>KEY2≠STR2 → 小計・中計をプリント、KEY2→STR2, KEY3→STR3へMOVE</li>
+<li>KEY3≠STR3 → 小計をプリント、KEY3→STR3へMOVE</li>
+<li>④〜⑥終了後、明細プリント・集計処理 → ①へ戻る</li>
+</ol>
+
+<h3>コーディング例（MAIN処理）</h3>
+<div class="table-wrapper">
+<table>
+<tr><th>文番号</th><th>コード</th></tr>
+<tr><td>10</td><td><code>S01-START.</code></td></tr>
+<tr><td>20</td><td><code>PERFORM S02-INITIAL THRU S02-EXIT.</code></td></tr>
+<tr><td>30</td><td><code>S01-01.</code></td></tr>
+<tr><td>40</td><td><code>PERFORM S03-READ THRU S03-EXIT.</code></td></tr>
+<tr><td>50</td><td><code>IF SW-END = '1'</code></td></tr>
+<tr><td>60</td><td><code>GO TO S01-02</code></td></tr>
+<tr><td>70</td><td><code>ELSE</code></td></tr>
+<tr><td>80</td><td><code>IF KEY = STR</code></td></tr>
+<tr><td>90</td><td><code>NEXT SENTENCE</code></td></tr>
+<tr><td>100</td><td><code>ELSE</code></td></tr>
+<tr><td>110</td><td><code>IF KEY1 = STR1</code></td></tr>
+<tr><td>120</td><td><code>IF KEY2 = STR2</code></td></tr>
+<tr><td>130</td><td><code>PERFORM S06-SHOKEI THRU S06-EXIT</code></td></tr>
+<tr><td>150</td><td><code>ELSE</code></td></tr>
+<tr><td>160</td><td><code>PERFORM S06-SHOKEI THRU S06-EXIT</code></td></tr>
+<tr><td>170</td><td><code>PERFORM S07-CHUKEI THRU S07-EXIT</code></td></tr>
+<tr><td>190</td><td><code>ELSE</code></td></tr>
+<tr><td>200</td><td><code>PERFORM S06-SHOKEI THRU S06-EXIT</code></td></tr>
+<tr><td>210</td><td><code>PERFORM S07-CHUKEI THRU S07-EXIT</code></td></tr>
+<tr><td>220</td><td><code>PERFORM S08-GOKEI THRU S08-EXIT.</code></td></tr>
+<tr><td>270</td><td><code>PERFORM S04-MEISAI THRU S04-EXIT.</code></td></tr>
+<tr><td>280</td><td><code>PERFORM S05-SHUKEI THRU S05-EXIT.</code></td></tr>
+<tr><td>290</td><td><code>GO TO S01-01.</code></td></tr>
+<tr><td>300</td><td><code>S01-02.</code></td></tr>
+<tr><td>310</td><td><code>PERFORM S06-SHOKEI THRU S06-EXIT.</code></td></tr>
+<tr><td>320</td><td><code>PERFORM S07-CHUKEI THRU S07-EXIT.</code></td></tr>
+<tr><td>330</td><td><code>PERFORM S08-GOKEI THRU S08-EXIT.</code></td></tr>
+<tr><td>340</td><td><code>PERFORM S09-KENSUHYO THRU S09-EXIT.</code></td></tr>
+<tr><td>350</td><td><code>PERFORM S10-CLOSE THRU S10-EXIT.</code></td></tr>
+<tr><td>360</td><td><code>STOP RUN.</code></td></tr>
+</table>
+</div>
+
+<p>マッチング処理中にコントロールブレイク処理が入るという様な処理は非常に多い。この2つの処理はしっかりと身につけておこう。</p>
+
+<!-- ===== CHAPTER 7 ===== -->
+<div class="chapter-header" id="ch7">
+  <h1><span class="chapter-badge">7</span>TSO</h1>
+</div>
+
+<p>TSOの周辺のファイル、TSOでテストする場合とJCLとの違い、コマンドプロシジャーの基本的な作成方法を説明する。</p>
+
+<h2 id="ch7-1">TSOのLOGON</h2>
+<div class="code-wrapper">
+  <div class="code-header"><div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>TSOコマンド</div>
+  <pre><code>LOGON USER-ID/PASSWORD [↵]</code></pre>
+</div>
+<p>例: <code>LOGON @QAKOBA/1111 [↵]</code><br>
+このコマンドを入れるとTSO画面はREADYになり使用可能となる。</p>
+
+<h2 id="ch7-2">ファイル説明</h2>
+<div class="table-wrapper">
+<table>
+<tr><th>ファイル</th><th>説明</th></tr>
+<tr><td>MASTER (MASTRLIB)</td><td>最終的なソースプログラムが登録されている</td></tr>
+<tr><td>SOURCE (SOURCLIB)</td><td>パンチされたプログラムが入り修正・更新される。定期的にスクラッチ</td></tr>
+<tr><td>PDSLIB</td><td>DCOPY又はCOPY文のソースが入っている</td></tr>
+<tr><td>TEST.CPYLIB</td><td>TSOよりSUBCOPYされたDCOPYが一時的に入る。毎週月曜日にスクラッチ</td></tr>
+<tr><td>DASD.CPYLIB</td><td>完成されたDCOPYがTEST.CPYLIBよりコピーされて入る</td></tr>
+<tr><td>TESTLIB1</td><td>TSOよりCOMPILEされたものが入る</td></tr>
+<tr><td>TESTLIB2</td><td>リンクされたロードモジュールを一時的にカタログ</td></tr>
+<tr><td>DASDLIB1, DASDLIB2等</td><td>最終的なロードモジュールがカタログされる</td></tr>
+</table>
+</div>
+
+<h2 id="ch7-3">ソースからロードモジュールまで</h2>
+<ol>
+<li>コーディングを終えてパンチ → ソースリブに登録</li>
+<li>TSOから LIBC / LIBA でソースリブからTSOワーク上に持ってくる。修正後、SUBCB2W / SUBASHW でコンパイル/アセンブル → TESTLIB1へカタログ</li>
+<li>リンク処理（SUBLKEDなど）。CALL命令がなければリンク不要</li>
+<li>リンクされたモジュール → TESTLIB2へカタログ（ロードモジュール）</li>
+<li>TEST命令でテストを繰り返し、エラーがなくなるまで②〜④を繰り返す</li>
+<li>完成したロードモジュール → DASDLIB1 / DASDLIB2 へ登録</li>
+</ol>
+
+<h2 id="ch7-4">JCLとTSOの違い</h2>
+
+<h3>JCLの例</h3>
+<div class="code-wrapper">
+  <div class="code-header"><div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>JCL</div>
+  <pre><code>//SAMPLE     JOB  NSD,MSGLEVEL=1
+//JOBLIB     DD   DSN=TESTLIB2,DISP=SHR
+//STEP1      EXEC PGM=SAMPLE,PARM='8106'
+//INFL       DD   DSN=TEST.DATA,
+//               DCB=(BLKSIZE=1000,LRECL=100,RECFM=FB),
+//               VOL=SER=DTF005,UNIT=3350,
+//               DISP=SHR
+//PRINT      DD   SYSOUT=A
+//SYSOUT     DD   SYSOUT=A
+//SYSUDUMP   DD   SYSOUT=A</code></pre>
+</div>
+
+<h3>TSOでの同等処理</h3>
+<div class="code-wrapper">
+  <div class="code-header"><div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>TSOコマンド</div>
+  <pre><code>FREE  F(INFL,PRINT,SYSOUT)
+ALLOC F(INFL) DA('TEST.DATA') VOL(DTF005) -
+        UNIT(3350) SHR
+ALLOC F(PRINT) DA(*)
+ALLOC F(SYSOUT) DA(*)
+TEST  'TESTLIB2(SAMPLE)' '8106'</code></pre>
+</div>
+
+<h2 id="ch7-5">TSOモード関係図</h2>
+
+<div class="mermaid">
+graph TD
+  A[READY] --> B["ASM | COB | LINK<br/>CALL | ALLOC | FREE"]
+  B --> C["LIST | DEL | EDIT<br/>TEST | TESTCOB | HELP"]
+  C --> D["SAVE | INPUT | DEL<br/>CHANGE | END | LIST | SET"]
+  style A fill:#e8eaf6
+  style B fill:#c5cae9
+  style C fill:#9fa8da
+  style D fill:#7986cb
+</div>
+<p class="mermaid-title">図 5: TSOモード関係図</p>
+
+<h2 id="ch7-6">CLISTの作り方</h2>
+<ol>
+<li><code>EDIT MIHON.CLIST NEW [E]</code> とキーイン（8桁以内の名前）</li>
+<li>画面に <code>INPUT 000010</code> と出る</li>
+<li>各コマンドを1ラインずつキーイン</li>
+<li>ENTER-KEYを押してINPUTモードからEDITモードに</li>
+<li><code>END SAVE [E]</code> で保存 → READY状態に戻る</li>
+<li><code>EX MIHON [E]</code> で実行（TESTモードになる）</li>
+</ol>
+
+<h2 id="ch7-7">TSOの主なコマンド</h2>
+
+<h3>ソース取得</h3>
+<div class="code-wrapper">
+  <div class="code-header"><div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>TSOコマンド — ソース取得</div>
+  <pre><code>LIBC  管理コード8桁                     &lt;─ DSSOURCEからTSOワークへ
+LIBA  管理コード8桁
+LIBGP 管理コード8桁
+LG    管理コード8桁 {COBOL|ASM|DATA}
+      DSSOURCE({MASTRLIB|SOURCLIB|PDSLIB})</code></pre>
+</div>
+
+<h3>コンパイル/アセンブル</h3>
+<div class="code-wrapper">
+  <div class="code-header"><div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>TSOコマンド — コンパイル/アセンブル</div>
+  <pre><code>SUBCB2W  管理コード8桁 RM(＊＊)     &lt;─ COBOLコンパイル
+SUBASHW  管理コード8桁 RM(＊＊)     &lt;─ アセンブル
+KCOBJ    管理コード8桁 RM(＊＊)
+KC       管理コード8桁 RM(＊＊)
+ ＊＊ = RM1, RM2, C</code></pre>
+</div>
+
+<h3>リンク</h3>
+<div class="code-wrapper">
+  <div class="code-header"><div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>TSOコマンド — リンク</div>
+  <pre><code>SUBLKED   管理コード6桁     &lt;─ TESTLIB2へカタログ
+SUBLKED2  管理コード6桁
+KLKED     管理コード6桁</code></pre>
+</div>
+
+<h3>その他</h3>
+<div class="code-wrapper">
+  <div class="code-header"><div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>TSOコマンド</div>
+  <pre><code>LS, LS=ALL                  &lt;─ TSOワークからソースリブへ戻す</code></pre>
+</div>
+
+<!-- ===== CHAPTER 8 ===== -->
+<div class="chapter-header" id="ch8">
+  <h1><span class="chapter-badge">8</span>PAD図（Mermaidフローチャート）</h1>
+</div>
+
+<h2 id="ch8-1">1. 1:1マッチング（スウィッチ使用）</h2>
+<div class="mermaid">
+flowchart TD
+  S[START] --> I[INITIAL]
+  I --> S1[SW1 = '1'<br/>INFL1 READ]
+  S1 --> S2[SW2 = '1'<br/>INFL2 READ]
+  S2 --> EQ{KEY1 = KEY2<br/>AND<br/>KEY1 = HV?}
+  EQ -->|はい| CL[CLOSE] --> E[STOP RUN]
+  EQ -->|いいえ| CMP{KEY1 vs KEY2}
+  CMP -->|不等| BR{SW値確認}
+  BR -->|SW1=1| O1[INFL1 ONLY処理] --> RS1[SW1='1'<br/>SW2='0'] --> S1
+  BR -->|SW2=1| O2[INFL2 ONLY処理] --> RS2[SW1='0'<br/>SW2='1'] --> S2
+  BR -->|他| M[マッチング処理] --> RS3[SW1='1'<br/>SW2='1'] --> S1
+</div>
+<p class="mermaid-title">図 6: 1:1マッチング（スウィッチ使用）— PAD図</p>
+
+<h2 id="ch8-2">2. 1:1マッチング（スウィッチ不使用）</h2>
+<div class="mermaid">
+flowchart TD
+  S[START] --> I[INITIAL]
+  I --> R1[INFL1 READ]
+  R1 --> R2[INFL2 READ]
+  R2 --> EQ{KEY1 = KEY2<br/>AND<br/>KEY1 = HV?}
+  EQ -->|はい| CL[CLOSE] --> E[STOP RUN]
+  EQ -->|いいえ| CMP{KEY1 vs KEY2}
+  CMP -->|KEY1&lt;KEY2| O1[INFL1 ONLY] --> R1B[INFL1 READ] --> R2
+  CMP -->|KEY1&gt;KEY2| O2[INFL2 ONLY] --> R2B[INFL2 READ] --> EQ
+  CMP -->|等しい| M[マッチング処理] --> R1C[INFL1 READ] --> R2C[INFL2 READ] --> EQ
+</div>
+<p class="mermaid-title">図 7: 1:1マッチング（スウィッチ不使用）— PAD図</p>
+
+<h2 id="ch8-3">3. 1:Nマッチング</h2>
+<div class="mermaid">
+flowchart TD
+  S[START] --> I[INITIAL]
+  I --> R1[INFL1 READ]
+  R1 --> R2[INFL2 READ]
+  R2 --> EQ{KEY1 = KEY2<br/>AND<br/>KEY1 = HV?}
+  EQ -->|はい| CL[CLOSE] --> E[STOP RUN]
+  EQ -->|いいえ| CMP{KEY1 vs KEY2}
+  CMP -->|KEY1&lt;KEY2| CHK{SW1='1'?}
+  CHK -->|はい| OUT[OUT処理] --> O1[INFL1 ONLY] --> R1B[INFL1 READ] --> R2
+  CHK -->|いいえ| O1B[INFL1 ONLY] --> R1C[INFL1 READ] --> R2
+  CMP -->|KEY1&gt;KEY2| O2[INFL2 ONLY] --> R2B[INFL2 READ] --> EQ
+  CMP -->|等しい| M[マッチング処理] --> R2C[INFL2 READ] --> EQ
+</div>
+<p class="mermaid-title">図 8: 1:Nマッチング — PAD図</p>
+
+<h2 id="ch8-4">4. N:Nマッチング</h2>
+<div class="mermaid">
+flowchart TD
+  S[START] --> I[INITIAL]
+  I --> R1[INFL1 READ]
+  R1 --> R2[INFL2 READ]
+  R2 --> EQ1{KEY1=KEY2<br/>AND<br/>KEY1=HV?}
+  EQ1 -->|はい| STR_C{KEY1 = STR1?}
+  STR_C -->|不等| L2["← ループ2へ"]
+  STR_C -->|等しい| RC[INFL2 CLOSE] --> RO[INFL2再OPEN]
+  RO --> R3[INFL2 READ]
+  R3 --> KEY_C2{KEY2 = STR2?}
+  KEY_C2 -->|不等| R3L["← ループ3へ"]
+  KEY_C2 -->|等しい| R1L["← ループ1へ"]
+  EQ1 -->|いいえ| CMP{KEY1 vs KEY2}
+  CMP -->|KEY1&lt;KEY2| O1[INFL1 ONLY] --> R1B[INFL1 READ] --> R2
+  CMP -->|KEY1&gt;KEY2| O2[INFL2 ONLY] --> R2B[INFL2 READ] --> R2
+  CMP -->|等しい| STORE[STR1=KEY1<br/>STR2=KEY2] --> L2P["→ ループ2"]
+  L2P --> L2N{KEY1 OR KEY2 = HV?}
+  L2N -->|はい| STR_C
+  L2N -->|いいえ| CMP2{KEY1 vs KEY2}
+  CMP2 -->|KEY1&lt;KEY2| OUT2[OUT処理] --> R1C[INFL1 READ] --> L2P
+  CMP2 -->|他| M2[マッチング処理] --> R2C[INFL2 READ] --> L2P
+</div>
+<p class="mermaid-title">図 9: N:Nマッチング — PAD図</p>
+
+<h2 id="ch8-5">5. コントロールブレイク</h2>
+<div class="mermaid">
+flowchart TD
+  S[START] --> I[INITIAL]
+  I --> R1[INFL1 READ]
+  R1 --> EOF{EOF?}
+  EOF -->|Y| SH[小計プリント] --> CH[中計プリント] --> GO[合計プリント] --> KN[件数表プリント] --> CL[CLOSE] --> E[STOP RUN]
+  EOF -->|N| KS{KEY = STR?}
+  KS -->|等しい| ME[明細プリント] --> SHU[集計処理] --> R1B[INFL1 READ] --> KS
+  KS -->|不等| C1{KEY1 = STR1?}
+  C1 -->|不等 大項目変化| SH1[小計プリント] --> CH1[中計プリント] --> GO1[合計プリント] --> C2
+  C1 -->|等しい| C2{KEY2 = STR2?}
+  C2 -->|不等 中項目変化| SH2[小計プリント] --> CH2[中計プリント] --> C3
+  C2 -->|等しい| C3{KEY3 = STR3?}
+  C3 -->|不等 小項目変化| SH3[小計プリント] --> ME2[明細プリント] --> SHU2[集計処理] --> R1C[INFL1 READ] --> KS
+  C3 -->|等しい| ME2
+</div>
+<p class="mermaid-title">図 10: コントロールブレイク — PAD図</p>
+
+<div class="chapter-end"></div>
+
+</div><!-- /content -->
+</div><!-- /main -->
+
+<!-- Floating buttons -->
+<button class="bookmark-btn" id="bookmarkBtn" title="ブックマーク" onclick="toggleBookmark()">🔖</button>
+<a class="back-top" href="#top" id="backTop" title="トップへ戻る">↑</a>
+
+<script>
+// Progress bar
+const progressBar = document.getElementById('progress-bar');
+const sidebar = document.getElementById('sidebar');
+const backTop = document.getElementById('backTop');
+const bookmarkBtn = document.getElementById('bookmarkBtn');
+
+window.addEventListener('scroll', function() {
+  // Progress bar
+  const scrollTop = window.scrollY;
+  const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+  const progress = (scrollTop / docHeight) * 100;
+  progressBar.style.width = progress + '%';
+
+  // Back to top
+  backTop.classList.toggle('show', scrollTop > 400);
+
+  // Active sidebar chapter
+  const chapters = document.querySelectorAll('.chapter-header');
+  const sidebarLinks = document.querySelectorAll('.sidebar-chapter > li > a');
+  let current = '';
+  chapters.forEach(ch => {
+    const rect = ch.getBoundingClientRect();
+    if (rect.top <= 150) current = ch.id;
+  });
+  sidebarLinks.forEach(link => {
+    link.classList.remove('active');
+    if (link.getAttribute('href') === '#' + current) {
+      link.classList.add('active');
+      link.closest('li').classList.add('open');
+    }
+  });
+
+  // Smooth scroll offset for sidebar
+  sidebar.style.top = Math.min(scrollTop * 0.1, 60) + 'px';
+});
+
+// Sidebar toggle
+document.querySelectorAll('.sidebar-toggle').forEach(toggle => {
+  toggle.addEventListener('click', function(e) {
+    e.preventDefault();
+    const li = this.closest('li');
+    li.classList.toggle('open');
+    // Navigate to chapter
+    setTimeout(() => {
+      const target = document.querySelector(this.getAttribute('href'));
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 150);
+  });
+});
+
+// Bookmark functionality
+function toggleBookmark() {
+  bookmarkBtn.classList.toggle('active');
+  const hash = window.location.hash || '#top';
+  if (bookmarkBtn.classList.contains('active')) {
+    sessionStorage.setItem('cobol-bookmark', hash);
+  } else {
+    sessionStorage.removeItem('cobol-bookmark');
+  }
+}
+// Restore bookmark
+(function() {
+  const saved = sessionStorage.getItem('cobol-bookmark');
+  if (saved) {
+    bookmarkBtn.classList.add('active');
+  }
+})();
+
+// Mermaid re-render on resize (for responsive diagrams)
+let resizeTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    mermaid.run();
+  }, 500);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HTML フローチャート 比較</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Hiragino Sans", "Meiryo", sans-serif;
+    background: #f5f5f5;
+    color: #333;
+    padding: 2rem;
+  }
+  h1 { text-align: center; margin-bottom: 1rem; }
+  h1 + p { text-align: center; margin-bottom: 2rem; color: #666; }
+  section {
+    background: #fff;
+    border-radius: 8px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,.08);
+  }
+  section h2 {
+    border-bottom: 2px solid #4a90d9;
+    padding-bottom: .5rem;
+    margin-bottom: 1rem;
+  }
+  section h2 small { font-weight: normal; color: #888; font-size: .8em; }
+  .code-block {
+    background: #1e1e1e;
+    color: #d4d4d4;
+    padding: 1rem;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: .85rem;
+    margin-bottom: 1rem;
+    line-height: 1.5;
+  }
+  .code-block code { white-space: pre; }
+  .label {
+    display: inline-block;
+    background: #e8f0fe;
+    color: #4a90d9;
+    padding: .25em .6em;
+    border-radius: 4px;
+    font-size: .85rem;
+    margin-bottom: .5rem;
+  }
+
+  /* Common flowchart area */
+  .fc-area {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 200px;
+    padding: 1rem;
+  }
+
+  /* ---- SVG Flowchart ---- */
+  #svg-fc svg { max-width: 500px; }
+
+  /* ---- Table Flowchart ---- */
+  .table-fc table {
+    border-collapse: collapse;
+    margin: 0 auto;
+  }
+  .table-fc td {
+    border: 2px solid #4a90d9;
+    padding: .6rem 1.2rem;
+    text-align: center;
+    vertical-align: middle;
+    width: 160px;
+  }
+  .table-fc .node { background: #e8f0fe; font-weight: bold; }
+  .table-fc .decision { background: #fef3cd; transform: rotate(0deg); border-style: dashed; }
+  .table-fc .arrow-cell { border: none; padding: .3rem; font-size: 1.5rem; }
+  .table-fc .label-cell {
+    border: none;
+    font-size: .75rem;
+    color: #d32f2f;
+    font-weight: bold;
+    padding: .15rem .5rem;
+  }
+
+  /* ---- ASCII Flowchart ---- */
+  .ascii-fc pre {
+    font-family: "Courier New", monospace;
+    font-size: .9rem;
+    line-height: 1.2;
+    display: inline-block;
+    padding: 1rem;
+    background: #fafafa;
+    border-radius: 6px;
+  }
+</style>
+</head>
+<body>
+
+<h1>HTML ファイルでのフローチャート作成方法 比較</h1>
+<p>同じ「入力 → 検証 → 処理／エラー → 終了」の流れを5つの方法で描画します。</p>
+
+<!-- ============================================================ -->
+<!-- 1. Mermaid.js -->
+<!-- ============================================================ -->
+<section id="mermaid">
+  <h2>1. Mermaid.js <small>— テキスト記法で自動描画</small></h2>
+  <span class="label">手軽</span> <span class="label">CDN対応</span> <span class="label">保守性◎</span>
+  <p>Markdown風の記法だけで図が描けます。GitHub でもサポートされています。</p>
+  <div class="code-block"><code><span class="kw">&lt;pre class="mermaid"&gt;</span>
+flowchart TD
+  A([開始]) --&gt; B[データを入力する]
+  B --&gt; C{有効か？}
+  C --"Yes"--> D[処理を実行]
+  C --"No"--> E[エラーを表示]
+  D --&gt; F([終了])
+  E --&gt; F
+<span class="kw">&lt;/pre&gt;</span></code></div>
+  <div class="fc-area">
+    <pre class="mermaid">
+flowchart TD
+  A([開始]) --> B[データを入力する]
+  B --> C{有効か？}
+  C --"Yes"--> D[処理を実行]
+  C --"No"--> E[エラーを表示]
+  D --> F([終了])
+  E --> F
+    </pre>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- 2. Hand-crafted SVG -->
+<!-- ============================================================ -->
+<section id="svg">
+  <h2>2. SVG <small>— 手書きベクター描画</small></h2>
+  <span class="label">軽量</span> <span class="label">リサイズ対応</span> <span class="label">自由度◎</span>
+  <p>SVG 要素を直接書く方法。レスポンシブで、スタイルも CSS で制御できます。</p>
+  <div class="code-block"><code>&lt;svg viewBox="0 0 500 340"&gt;
+  &lt;!-- 矩形・菱形・線を直接記述 --&gt;
+  &lt;rect x="175" y="10" width="150" height="40" rx="20" .../&gt;
+  &lt;line x1="250" y1="50" x2="250" y2="80" .../&gt;
+  ...
+&lt;/svg&gt;</code></div>
+  <div class="fc-area" id="svg-fc">
+    <svg viewBox="0 0 500 340" xmlns="http://www.w3.org/2000/svg" style="max-width:500px;width:100%;">
+      <defs>
+        <marker id="arrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+          <polygon points="0 0, 10 3.5, 0 7" fill="#4a90d9"/>
+        </marker>
+      </defs>
+      <style>
+        .node-rect { rx:20; ry:20; fill:#e8f0fe; stroke:#4a90d9; stroke-width:2; }
+        .node-process { rx:4; ry:4; fill:#fff; stroke:#4a90d9; stroke-width:2; }
+        .node-decision { fill:#fef3cd; stroke:#f0ad4e; stroke-width:2; }
+        .node-error { rx:4; ry:4; fill:#f8d7da; stroke:#d32f2f; stroke-width:2; }
+        .label { font-size:13px; fill:#fff; font-family:"Hiragino Sans","Meiryo",sans-serif; }
+        .edge { stroke:#4a90d9; stroke-width:2; marker-end:url(#arrow); }
+        .edge-label { font-size:12px; fill:#d32f2f; font-family:"Hiragino Sans","Meiryo",sans-serif; }
+      </style>
+
+      <!-- Start -->
+      <rect class="node-rect" x="175" y="8" width="150" height="40"/>
+      <text class="label" x="250" y="33" text-anchor="middle">開始</text>
+
+      <!-- Arrow: Start → Input -->
+      <line class="edge" x1="250" y1="48" x2="250" y2="72"/>
+
+      <!-- Input -->
+      <rect class="node-process" x="170" y="72" width="160" height="40"/>
+      <text class="label" style="fill:#333;" x="250" y="97" text-anchor="middle">データを入力</text>
+
+      <!-- Arrow: Input → Decision -->
+      <line class="edge" x1="250" y1="112" x2="250" y2="136"/>
+
+      <!-- Decision (diamond) -->
+      <polygon class="node-decision" points="250,136 320,176 250,216 180,176"/>
+      <text class="label" style="fill:#333;" x="250" y="181" text-anchor="middle">有効か？</text>
+
+      <!-- Arrow: Decision → Process (Yes) -->
+      <line class="edge" x1="250" y1="216" x2="250" y2="240"/>
+      <text class="edge-label" x="260" y="233">Yes</text>
+
+      <!-- Process -->
+      <rect class="node-process" x="170" y="240" width="160" height="40"/>
+      <text class="label" style="fill:#333;" x="250" y="265" text-anchor="middle">処理を実行</text>
+
+      <!-- Arrow: Decision → Error (No) -->
+      <line class="edge" x1="320" y1="176" x2="380" y2="176"/>
+      <text class="edge-label" x="328" y="170">No</text>
+
+      <!-- Error -->
+      <rect class="node-error" x="380" y="156" width="110" height="40"/>
+      <text x="435" y="181" text-anchor="middle" style="font-size:13px;fill:#fff;font-family:'Hiragino Sans','Meiryo',sans-serif;">エラー表示</text>
+
+      <!-- Arrow: Process → End -->
+      <line class="edge" x1="250" y1="280" x2="250" y2="304"/>
+
+      <!-- Arrow: Error → End -->
+      <path class="edge" d="M435 196 L435 290 Q435 304 360 304" fill="none"/>
+
+      <!-- End -->
+      <rect class="node-rect" x="175" y="304" width="150" height="40"/>
+      <text class="label" x="250" y="329" text-anchor="middle">終了</text>
+    </svg>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- 3. vis.js Network -->
+<!-- ============================================================ -->
+<section id="visjs">
+  <h2>3. vis.js Network <small>— インタラクティブグラフ</small></h2>
+  <span class="label">ドラッグ可能</span> <span class="label">ズーム対応</span> <span class="label">ダイナミック</span>
+  <p>ノードをドラッグしたりズームできるインタラクティブなフローチャート。</p>
+  <div class="code-block"><code>const network = new vis.Network(container, data, options);
+data.nodes = [
+  {id:1, label:'開始', shape:'ellipse'},
+  {id:2, label:'データを入力', shape:'box'},
+  ...
+];</code></div>
+  <div class="fc-area">
+    <div id="vis-container" style="width:100%;max-width:500px;height:360px;border:1px solid #ddd;border-radius:8px;background:#fafafa;"></div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- 4. CSS Grid Flowchart -->
+<!-- ============================================================ -->
+<section id="css-grid">
+  <h2>4. CSS Grid <small>— HTML + CSS だけで描画</small></h2>
+  <span class="label">JavaScript不要</span> <span class="label">SEO対応</span> <span class="label">セマンティック</span>
+  <p>CSS Grid と擬似要素で矢印を描画。外部ライブラリ unnecessary な場合に便利。</p>
+  <div class="code-block"><code>.flow-step { grid-column: 3; grid-row: 1; }
+.flow-decision { grid-column: 3; grid-row: 2; }
+.flow-left { grid-column: 1; grid-row: 2; }
+.flow-right { grid-column: 5; grid-row: 2; }</code></div>
+  <div class="fc-area" style="align-items:center;">
+    <div style="
+      display:grid;
+      grid-template-columns: 1fr 40px 160px 40px 130px;
+      grid-template-rows: auto;
+      gap: 0;
+      justify-items:center;
+      align-items:center;
+    ">
+      <!-- Row 1: Start -->
+      <div style="grid-column:3;grid-row:1;background:#e8f0fe;border:2px solid #4a90d9;border-radius:20px;padding:8px 20px;text-align:center;font-weight:bold;">開始</div>
+      <!-- Arrow down -->
+      <div style="grid-column:3;grid-row:2;height:30px;display:flex;justify-content:center;align-items:center;color:#4a90d9;font-size:1.5rem;">&#9660;</div>
+      <!-- Input -->
+      <div style="grid-column:3;grid-row:3;background:#fff;border:2px solid #4a90d9;border-radius:4px;padding:8px 20px;text-align:center;font-weight:bold;">データを入力</div>
+      <!-- Arrow down -->
+      <div style="grid-column:3;grid-row:4;height:30px;display:flex;justify-content:center;align-items:center;color:#4a90d9;font-size:1.5rem;">&#9660;</div>
+      <!-- Decision (diamond via rotation) -->
+      <div style="
+        grid-column:3;grid-row:5;
+        width:100px;height:70px;
+        background:#fef3cd;border:2px dashed #f0ad4e;
+        transform:rotate(45deg);
+        display:flex;align-items:center;justify-content:center;
+        margin:10px 0;
+      "><span style="transform:rotate(-45deg);font-weight:bold;font-size:.85rem;white-space:nowrap;">有効か？</span></div>
+      <!-- Yes arrow down -->
+      <div style="grid-column:3;grid-row:6;height:30px;display:flex;justify-content:center;align-items:center;color:#4a90d9;font-size:1.5rem;position:relative;">
+        &#9660;<span style="font-size:.75rem;color:#2e7d32;position:absolute;left:-22px;">Yes</span>
+      </div>
+      <!-- Process -->
+      <div style="grid-column:3;grid-row:7;background:#fff;border:2px solid #4a90d9;border-radius:4px;padding:8px 20px;text-align:center;font-weight:bold;">処理を実行</div>
+      <!-- Arrow down -->
+      <div style="grid-column:3;grid-row:8;height:30px;display:flex;justify-content:center;align-items:center;color:#4a90d9;font-size:1.5rem;">&#9660;</div>
+      <!-- End -->
+      <div style="grid-column:3;grid-row:9;background:#e8f0fe;border:2px solid #4a90d9;border-radius:20px;padding:8px 20px;text-align:center;font-weight:bold;">終了</div>
+
+      <!-- No arrow + Error (right side) -->
+      <div style="grid-column:4;grid-row:5;display:flex;align-items:center;justify-content:flex-start;color:#4a90d9;font-size:.75rem;position:relative;">
+        <span style="color:#d32f2f;font-weight:bold;">No</span><span style="font-size:1.2rem;">&#8594;</span>
+      </div>
+      <div style="grid-column:5;grid-row:5;background:#f8d7da;border:2px solid #d32f2f;border-radius:4px;padding:8px 16px;text-align:center;font-weight:bold;color:#fff;">エラー表示</div>
+      <!-- Error → End connector (arrow down then left) -->
+      <div style="grid-column:5;grid-row:6;grid-row-end:9;display:flex;flex-direction:column;align-items:center;color:#4a90d9;font-size:1rem;">
+        <span style="font-size:1.5rem;">&#8595;</span>
+        <span style="font-size:1.5rem;">&#8595;</span>
+        <span style="font-size:1.5rem;">&#8595;</span>
+      </div>
+      <!-- Horizontal arrow from right to center end -->
+      <div style="grid-column:4;grid-row:9;display:flex;align-items:center;justify-content:flex-end;color:#4a90d9;font-size:1.2rem;">&#8592;</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- 5. ASCII Art -->
+<!-- ============================================================ -->
+<section id="ascii">
+  <h2>5. HTML テーブル <small>— 表組みで表現</small></h2>
+  <span class="label">最もシンプル</span> <span class="label">ゼロ依存</span> <span class="label">古めの環境◎</span>
+  <p><code>&lt;table&gt;</code>とHTML文字実体参照だけで構成。JavaScriptもCSSの高度な機能も不要。</p>
+  <div class="code-block"><code>&lt;table&gt;
+  &lt;tr&gt;&lt;td class="node"&gt;開始&lt;/td&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;td&gt;▼&lt;/td&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;td class="node"&gt;データを入力&lt;/td&gt;&lt;/tr&gt;
+  ...
+&lt;/table&gt;</code></div>
+  <div class="fc-area">
+    <div class="table-fc">
+      <table>
+        <tr><td class="node" style="border-radius:20px;">開始</td></tr>
+        <tr><td class="arrow-cell">▼</td></tr>
+        <tr><td class="node">データを入力</td></tr>
+        <tr><td class="arrow-cell">▼</td></tr>
+        <tr>
+          <td class="decision" style="border-radius:0;">◇ 有効か？</td>
+          <td class="label-cell">No →</td>
+          <td style="border:2px solid #d32f2f;background:#f8d7da;border-radius:4px;color:#fff;">エラー表示</td>
+        </tr>
+        <tr>
+          <td class="arrow-cell">▼<span style="color:#2e7d32;font-size:.75rem;"> Yes</span></td>
+          <td></td><td class="arrow-cell" style="border:none;">▼</td>
+        </tr>
+        <tr><td class="node">処理を実行</td><td class="arrow-cell" style="border:none;padding:.1rem .3rem;">→</td><td class="arrow-cell" style="border:none;padding:.1rem .3rem;"></td></tr>
+        <tr><td class="arrow-cell">▼</td></tr>
+        <tr><td class="node" style="border-radius:20px;">終了</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- Summary Table -->
+<!-- ============================================================ -->
+<section id="summary">
+  <h2>まとめ <small>— 各手法の特徴</small></h2>
+  <table style="width:100%;border-collapse:collapse;">
+    <thead>
+      <tr style="border-bottom:2px solid #4a90d9;">
+        <th style="padding:.5rem;text-align:left;">方法</th>
+        <th style="padding:.5rem;text-align:center;">JavaScript</th>
+        <th style="padding:.5rem;text-align:center;">外部ライブラリ</th>
+        <th style="padding:.5rem;text-align:center;">インタラクティブ</th>
+        <th style="padding:.5rem;text-align:center;">保守性</th>
+        <th style="padding:.5rem;text-align:center;">推奨ケース</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr style="border-bottom:1px solid #eee;">
+        <td style="padding:.5rem;font-weight:bold;">Mermaid.js</td>
+        <td style="text-align:center;">必要</td>
+        <td style="text-align:center;">Mermaid</td>
+        <td style="text-align:center;">✗</td>
+        <td style="text-align:center;">◎</td>
+        <td style="text-align:left;">最もおすすめです。テキストで図を記述・バージョン管理できます</td>
+      </tr>
+      <tr style="border-bottom:1px solid #eee;">
+        <td style="padding:.5rem;font-weight:bold;">SVG</td>
+        <td style="text-align:center;">不要</td>
+        <td style="text-align:center;">なし</td>
+        <td style="text-align:center;">✗</td>
+        <td style="text-align:center;">△</td>
+        <td style="text-align:left;">JSなしで綺麗な図が必要。編集にはIllustrator等が便利</td>
+      </tr>
+      <tr style="border-bottom:1px solid #eee;">
+        <td style="padding:.5rem;font-weight:bold;">vis.js</td>
+        <td style="text-align:center;">必要</td>
+        <td style="text-align:center;">vis-network</td>
+        <td style="text-align:center;">◎</td>
+        <td style="text-align:center;">◎</td>
+        <td style="text-align:left;">ドラッグ・ズーム・ダイナミック更新が必要な場合</td>
+      </tr>
+      <tr style="border-bottom:1px solid #eee;">
+        <td style="padding:.5rem;font-weight:bold;">CSS Grid</td>
+        <td style="text-align:center;">不要</td>
+        <td style="text-align:center;">なし</td>
+        <td style="text-align:center;">✗</td>
+        <td style="text-align:center;">◎</td>
+        <td style="text-align:left;">ゼロ依存でSEO対応の構造付き図が必要</td>
+      </tr>
+      <tr>
+        <td style="padding:.5rem;font-weight:bold;">HTMLテーブル</td>
+        <td style="text-align:center;">不要</td>
+        <td style="text-align:center;">なし</td>
+        <td style="text-align:center;">✗</td>
+        <td style="text-align:center;">△</td>
+        <td style="text-align:left;">外部ツールなしで即座に簡易図が必要な場合</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ============================================================ -->
+<!-- Scripts -->
+<!-- ============================================================ -->
+<!-- Mermaid.js -->
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'default',
+    flowchart: { curve: 'basis', htmlLabels: true }
+  });
+</script>
+
+<!-- vis.js Network -->
+<script src="https://unpkg.com/vis-network@9.1.6/standalone/vis-network.min.js"></script>
+<script>
+(function() {
+  try {
+    const nodes = new vis.DataSet([
+      { id: 1, label: '開始', shape: 'ellipse', color: { background: '#e8f0fe', border: '#4a90d9' }, font: { color: '#fff' } },
+      { id: 2, label: 'データを入力', shape: 'box', color: { background: '#fff', border: '#4a90d9' }, margin: 10 },
+      { id: 3, label: '有効か？', shape: 'diamond', color: { background: '#fef3cd', border: '#f0ad4e' }, margin: 20 },
+      { id: 4, label: '処理を実行', shape: 'box', color: { background: '#fff', border: '#4a90d9' }, margin: 10 },
+      { id: 5, label: 'エラー表示', shape: 'box', color: { background: '#f8d7da', border: '#d32f2f', highlight: { background: '#f8d7da', border: '#d32f2f' } }, font: { color: '#fff' }, margin: 10 },
+      { id: 6, label: '終了', shape: 'ellipse', color: { background: '#e8f0fe', border: '#4a90d9' }, font: { color: '#fff' } },
+    ]);
+    const edges = new vis.DataSet([
+      { from: 1, to: 2, arrows: 'to' },
+      { from: 2, to: 3, arrows: 'to' },
+      { from: 3, to: 4, arrows: 'to', label: 'Yes', font: { color: '#2e7d32', size: 12 } },
+      { from: 3, to: 5, arrows: 'to', label: 'No', font: { color: '#d32f2f', size: 12 } },
+      { from: 4, to: 6, arrows: 'to' },
+      { from: 5, to: 6, arrows: 'to', smooth: { type: 'curvedCW', roundness: 0.15 } },
+    ]);
+    const container = document.getElementById('vis-container');
+    const data = { nodes, edges };
+    const options = {
+      physics: { enabled: true, stabilization: { iterations: 100 } },
+      layout: { improvedLayout: true },
+      interaction: { dragNodes: true, dragView: true, zoomView: true },
+    };
+    new vis.Network(container, data, options);
+  } catch(e) {
+    document.getElementById('vis-container').innerHTML =
+      '<p style="color:red;padding:1rem;">vis.js の読み込みに失敗しました（ネットワーク環境を確認してください）</p>';
+  }
+})();
+</script>
+
+</body>
+</html>
