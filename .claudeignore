@@ -1,0 +1,16 @@
+# Python virtual environment
+.venv/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Large binary files
+document_pdf.pdf
+
+# Image directories
+COBOL入門編_ページ画像/
+
+# Claude Code session data
+.claude/

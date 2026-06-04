@@ -1,1 +1,22 @@
+# Python virtual environment
 .venv/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*.egg-info/
+*.pyc
+
+# Generated/intermediate files
+*.log
+*.tmp
+
+# IDE / Editor
+.vscode/
+*.user
+
+# OS
+.DS_Store
+
+# Claude Code
+.claude/
