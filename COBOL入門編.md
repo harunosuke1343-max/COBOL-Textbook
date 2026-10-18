@@ -243,8 +243,8 @@ SOURCE-COMPUTERと同じで、実行する計算機について記述する。ME
 
 SELECT文節は、プログラム中の個々のファイルに名前を与えるために使用される。
 
-```
-SELECT ファイル名 ASSIGN TO 外部名.
+```cobol
+SELECT  ファイル名 ASSIGN TO 外部名.
 ```
 
 このファイル名で書いた名前は、DATA DIVISION中のFD又はSD項目を有していなければならない。
@@ -253,8 +253,8 @@ SELECT ファイル名 ASSIGN TO 外部名.
 
 ASSIGN文節は、ファイルを外部媒体（JCL上のDD名）に割り当てるものである。
 
-```
-ASSIGN TO システム名
+```cobol
+ASSIGN  TO システム名
 ```
 
 システム名の構成: `クラス（装置）－編成－名前`
@@ -279,7 +279,7 @@ ASSIGN TO システム名
 
 コンパイラーが割り当てられる入出力域（BUFF）の数をユーザーが修正できるようにするものである。
 
-```
+```cobol
 RESERVE { NO   } ALTERNATE [ AREA  ]
         { 整数 }           [ AREAS ]
 ```
@@ -298,7 +298,7 @@ FILE-LIMIT IS リテラル-1 THRU リテラル-2
 
 ファイルのレコードをアクセスする方法を規定する。
 
-```
+```cobol
 ACCESS MODE IS { SEQUENTIAL }
                { RANDOM     }
 ```
@@ -317,8 +317,8 @@ PROCESSING MODE  IS SEQUENTIAL
 
 ランダム・アクセスの時には指定しなければならない。
 
-```
-ACTUAL KEY IS データ名
+```cobol
+ACTUAL KEY  IS データ名
 ```
 
 データ名は5〜259バイトの長さの固定長項目であり、DATA DIVISIONで指定しなければならない。
@@ -327,8 +327,8 @@ ACTUAL KEY IS データ名
 
 索引付ファイル及び相対ファイルをランダム・アクセスする時に指定しなければならない。
 
-```
-NOMINAL KEY IS データ名
+```cobol
+NOMINAL KEY  IS データ名
 ```
 
 データ名は1〜255バイトの長さの固定長項目で、WORKING-STORAGE SECTIONで指定できる。
@@ -337,8 +337,8 @@ NOMINAL KEY IS データ名
 
 索引ファイルをアクセスするために使用する。
 
-```
-RECORD KEY IS データ名
+```cobol
+RECORD KEY  IS データ名
 ```
 
 データ名は255バイト以下の固定長項目でなければならない。
@@ -347,7 +347,7 @@ RECORD KEY IS データ名
 
 索引ファイルに対し、ランダム・アクセス方式でレコードを追加する場合に使用される。この文節を使用するとレコード追加の効率がよくなる。
 
-```
+```cobol
 TRACK-AREA IS { データ名 }
               { 整数     }
 ```
@@ -378,8 +378,8 @@ I-O-CONTROL.
 
 チェックポイント・レコードをとることを指定するものである。
 
-```
-RERUN ON システム名
+```cobol
+RERUN ON  システム名
 EVERY { 整数       RECORD }
       { [END OF] { REEL } }
       {          { UNIT } }
@@ -392,18 +392,18 @@ EVERY { 整数       RECORD }
 
 処理中に2つ以上のファイルが同じコア記憶域を使用することを指定する。
 
-```
-SAME [ SORT   ] AREA FOR ファイル名-1...n
-     [ RECORD ]
+```cobol
+SAME  [ SORT      ] AREA FOR ファイル名-1...n
+      [ RECORD ]
 ```
 
 **③ MULTIPLE FILE TAPE文節**
 
 文書化のために使用する。
 
-```
+```cobol
 MULTIPLE FILE TAPE CONTAINS ファイル名-1...n
-POSITION 整数-1...n
+POSITION  整数-1...n
 ```
 
 **④ APPLY文節**
@@ -453,7 +453,7 @@ LINKAGE       SECTION.
 
 ここでは、プログラム中で使用される外部データのDCBなどを記述する。
 
-```
+```cobol
 FILE SECTION.
 {ファイル記述項目}
 {レコード記述項目}
@@ -478,9 +478,9 @@ FD  ファイル名
 
 物理レコードのブロック長を指定する。
 
-```
+```cobol
 BLOCK CONTAINS [整数-1 TO] { CHARACTERS }
-                       { RECORDS    }
+                         { RECORDS    }
 ```
 
 1レコード1ブロックのデータには、この文節を指定する必要はない。データがFIXの時は整数-2だけを指定する。データがVARIABLEの時は、整数-2はMAXのレコード長を指定し、整数-1を指定する時はMINのレコード長を記入する。例えば、`BLOCK CONTAINS 1 TO 3 RECORDS` と指定すると、最小1レコード・最大3レコードであることを意味している。
@@ -489,8 +489,8 @@ BLOCK CONTAINS [整数-1 TO] { CHARACTERS }
 
 データ・レコードの大きさを指定する。
 
-```
-RECORD CONTAINS [整数-1 TO] 整数-2 CHARACTERS
+```cobol
+RECORD CONTAINS  [整数-1 TO] 整数-2 CHARACTERS
 ```
 
 通常、整数-2を指定する。整数-2はMAXのレコードの大きさ。整数-1を指定する時は、データがVARIABLEの時で、レコードの最小値を指定する。記入例はBLOCK CONTAINS文節と同じである。
@@ -499,8 +499,8 @@ RECORD CONTAINS [整数-1 TO] 整数-2 CHARACTERS
 
 `F`、`U`、`V`、`S` を指定することができる。
 
-```
-RECORDING MODE IS モード
+```cobol
+RECORDING MODE  IS モード
 ```
 
 | モード | 説明 |
@@ -516,10 +516,10 @@ U、Vモードは索引付編成及び相対編成のファイルには指定で
 
 ラベルの有無を指定する。
 
-```
+```cobol
 LABEL { RECORD IS  } { OMITTED       }
       { RECORD ARE } { STANDARD      }
-                 { データ名-1...n }
+      { データ名-1...n }
 ```
 
 - `OMITTED` — ユニット・レコード装置に割り当てられているファイルに対して必ず指定しなければならない（ただしIBMではSTANDARDで処理できる）
@@ -530,16 +530,16 @@ LABEL { RECORD IS  } { OMITTED       }
 
 コメントとして扱われるので指定する必要はない。
 
-```
+```cobol
 VALUE OF データ名-1 IS { データ名-2  }
-                       { リテラル-1  }
+                   { リテラル-1  }
 ```
 
 **⑥ DATA RECORD文節**
 
 FD文の後で書くデータレコードの名前を指定する。
 
-```
+```cobol
 DATA { RECORD IS  } データ名-1...n
      { RECORD ARE }
 ```
@@ -550,15 +550,15 @@ DATA { RECORD IS  } データ名-1...n
 
 データ記述項目は、後で述べるWORKING-STORAGE SECTIONでの説明と重なる部分が多いので、簡単に述べる。
 
-```
+```cobol
 レベル番号 { データ名 } PICTURE句
-           { FILLER   }
+      { FILLER   }
 ```
 
 レベル番号はデータの内容にレベル付けをするもので、01〜49まで指定できる。通常、01、05、10... の順で付けていく事が多い。ファイルの項目のDATA RECORD文節で指定したDATA名を、ここで01レベルで定義しなければならない。
 
 ```cobol
-DATA RECORD IS IN-REC と定義済み
+                        DATA RECORD   IS IN-REC と定義済み
 01  IN-REC.
   05  IN-KUBUN          PIC           X(2).
   05  IN-NAIYO.
@@ -603,8 +603,8 @@ PICTUREのTYPEには **9-TYPE**、**A-TYPE**、**X-TYPE**、及び **編集-TYPE
 
 > **ア. 9-TYPE（数字項目）**
 
-```
-PIC 99.   または   PIC 9(2).
+```cobol
+PIC  99.   または   PIC 9(2).
 ```
 
 0〜9の数字のみを移送できる。英数字は不可（COMPUTATIONAL＝計算のみ）。長さを（）で囲んで指定する事もできるが、これはどのTYPEでも同じである。
@@ -789,8 +789,8 @@ PIC  9(5) CR.
 
 **③ VALUE文節**
 
-```
-VALUE IS "リテラル"
+```cobol
+VALUE  IS "リテラル"
 ```
 
 ```cobol
@@ -854,12 +854,12 @@ PIC X(8) JUST RIGHT   :  △ △ △ △ A B C
 
 反復するデータを定義するものである。
 
-```
-OCCURS 整数 TIMES
+```cobol
+OCCURS  整数 TIMES
   (DEPENDING ON データ名-1)
   { ASCENDING  } KEY IS データ名-2
   { DESCENDING }
-INDEXED BY 指標名
+INDEXED BY  指標名
 ```
 
 **例1:**
@@ -963,10 +963,10 @@ COBOL命令中、主な命令:
 
 ### 1. ACCEPT 命令
 
-```
+```cobol
 ACCEPT データ名 [FROM { SYSIN   }
-                     { CONSOLE }
-                     { 記憶名  }]
+                  { CONSOLE }
+                  { 記憶名  }]
 ```
 
 データ名はWORKING-STORAGE SECTIONで定義済みのエリア。FROMを書かないとSYSINからの入力とみなされる。
@@ -990,7 +990,7 @@ TOの左側に書いたエリアの内容が右側のエリアに足し込まれ
 ```
 
 ```cobol
-ADD  A B TO (B) ROUNDED.
+ADD  A B  TO  (B) ROUNDED.
   結果 B = 106.（小数第3位四捨五入）
 ```
 
@@ -1005,23 +1005,23 @@ GIVINGの左側のエリアの内容が全て加算されて、右側のエリ�
 ```
 
 ```cobol
-ADD  A B GIVING C.
+ADD  A B  GIVING  C.
   結果 C = 40（A, Bは保存）
 ```
 
 ```cobol
-ADD  A B GIVING B.  ← 同じ結果が得られる
-ADD  A TO B.        ←
+ADD  A B  GIVING  B.  ← 同じ結果が得られる
+ADD  A    TO      B.  ←
 ```
 
 ```cobol
-ADD  A B C TO D E F.
+ADD  A B C  TO  D E F.
 ```
 
 この命令を行うと、A+B+CがD、E、Fにそれぞれ加算される。
 
 ```cobol
-ADD  1 TO IN-CTR.
+ADD  1  TO  IN-CTR.
 ```
 
 インプット件数、ライン数をカウントする時にこの形式を使う。
@@ -1039,7 +1039,7 @@ FROMの左側のエリアの内容を全て加算して、右側のエリアの�
 ```
 
 ```cobol
-SUBTRACT  A B FROM C.
+SUBTRACT  A B  FROM  C.
   結果 C = 75（A, Bは保存）
 ```
 
@@ -1054,7 +1054,7 @@ FROMの左側のエリアの内容を全て加算し、右側のエリアから�
 ```
 
 ```cobol
-SUBTRACT  A FROM B GIVING C ROUNDED.
+SUBTRACT  A  FROM  B GIVING C ROUNDED.
   結果 C = 23.2（小数第2位四捨五入）
 ```
 
@@ -1072,7 +1072,7 @@ BYの左側に書いたエリアの内容が右側のエリアに乗算され、
 ```
 
 ```cobol
-MULTIPLY  A BY B ROUNDED.
+MULTIPLY  A  BY  B ROUNDED.
   結果 B = 74.7（小数第2位四捨五入）
 ```
 
@@ -1087,7 +1087,7 @@ MULTIPLY  A BY B ROUNDED.
 ```
 
 ```cobol
-MULTIPLY  A BY B GIVING C.
+MULTIPLY  A BY B  GIVING  C.
   結果 C = 220（A, Bは保存）
 ```
 
@@ -1099,8 +1099,8 @@ GIVINGのエリアは数字編集項目でもよい。
 05  C                   PIC           Z(4).
 ```
 
-```
-MULTIPLY A BY B GIVING C.
+```cobol
+MULTIPLY  A BY B  GIVING  C.
   結果 C = △220
 ```
 
@@ -1116,7 +1116,7 @@ INTOの右側のエリアの内容が左側のエリアで除算され、右側�
 ```
 
 ```cobol
-DIVIDE  A INTO B ROUNDED.
+DIVIDE  A  INTO  B ROUNDED.
   結果 B = 11.13（小数第3位四捨五入）
 ```
 
@@ -1132,7 +1132,7 @@ REMAINDERは余りを求めるオプションである。INTOの左側のエリ�
 ```
 
 ```cobol
-DIVIDE  A INTO B GIVING C REMAINDER D.
+DIVIDE  A  INTO  B GIVING C REMAINDER D.
   結果 C = 7、D = 9
 ```
 
@@ -1144,8 +1144,8 @@ ADD、SUBTRACT、MULTIPLY、DIVIDEなどの機能を算術文を用いて指定�
 
 **記号:** `=`（イコール）、`*`（乗算）、`/`（除算）、`()`（優先度）、`+`（加算）、`-`（減算）、`**`（べき乗）
 
-```
-COMPUTE 識別名-1 [ROUNDED] = 算術演算式
+```cobol
+COMPUTE  識別名-1 [ROUNDED] = 算術演算式
 ```
 
 例えば `C = (A + B) / (B - E) * D` と書きたい場合:
@@ -1171,18 +1171,18 @@ COMPUTE:
 COMPUTE   A = B * C * D ** 6 + 6 - E.
 
 個別命令:
-MULTIPLY  D BY D GIVING A.
-MULTIPLY  D BY A.                      （4回繰り返す）
-MULTIPLY  B BY A.
-MULTIPLY  C BY A.
-ADD       6 TO A.
-SUBTRACT  E FROM A.
+MULTIPLY  D BY D  GIVING  A.
+MULTIPLY  D       BY      A.           （4回繰り返す）
+MULTIPLY  B       BY      A.
+MULTIPLY  C       BY      A.
+ADD       6       TO      A.
+SUBTRACT  E       FROM    A.
 ```
 
 **ON SIZE ERROR オプション（算術命令共通）:**
 
 ```cobol
-MULTIPLY         A BY B
+MULTIPLY         A  BY  B
   ON SIZE ERROR  GO TO ERR-SHORI.
 ```
 
@@ -1192,14 +1192,14 @@ AまたはBのエリアでオーバーフローが発生したらERR-SHORIとい
 
 条件によって処理を変えることができる。
 
-```
-IF 条件  ステートメント-1  NEXT SENTENCE
-ELSE     ステートメント-2  NEXT SENTENCE
+```cobol
+IF    条件  ステートメント-1  NEXT SENTENCE
+ELSE  ステートメント-2  NEXT SENTENCE
 ```
 
 ```cobol
 IF               A = B
-  PERFORM        S03-EQUAL-SHORI THRU S03-EXIT
+  PERFORM        S03-EQUAL-SHORI  THRU  S03-EXIT
 ELSE
   NEXT SENTENCE.
 ```
@@ -1226,9 +1226,9 @@ READ ファイル名 [INTO データ名]
 ```
 
 ```cobol
-READ       INFL1 INTO IN-DATA
+READ       INFL1  INTO  IN-DATA
   AT END
-    MOVE   '1' TO SW-EOF
+    MOVE   '1'    TO    SW-EOF
     GO TO  READ-END.
 ```
 
@@ -1236,13 +1236,13 @@ INTOを使わないとFILE SECTIONで定義した01レベルのエリア内に�
 
 ### 9. MOVE 命令
 
-```
-MOVE 識別名-1 TO 識別名-2...(n)
+```cobol
+MOVE  識別名-1  TO  識別名-2...(n)
 ```
 
 ```cobol
-MOVE  ZERO TO A B C.  ← A, B, Cがゼロクリアされる
-MOVE  A TO B.         ← Aの内容がBに移される
+MOVE  ZERO  TO  A B C.  ← A, B, Cがゼロクリアされる
+MOVE  A     TO  B.      ← Aの内容がBに移される
 ```
 
 MOVEステートメントはインデックスには使えない。インデックスにはSET命令を使う。
@@ -1258,9 +1258,9 @@ SET  〃                     DOWN BY 識別名
 ```
 
 ```cobol
-SET  IDX1 TO 1.       ← IDX1に1がセットされる
-SET  IDX1 UP BY 1.    ← IDX1が+1される
-SET  IDX1 DOWN BY 3.  ← IDX1が-3される
+SET  IDX1  TO       1.  ← IDX1に1がセットされる
+SET  IDX1  UP BY    1.  ← IDX1が+1される
+SET  IDX1  DOWN BY  3.  ← IDX1が-3される
 ```
 
 右側のものが左側へセットされる（MOVEとは逆）。
@@ -1277,9 +1277,9 @@ PERFORM 処理手順名-1 [THRU 処理手順名-2]
 これは、処理手順名-1から処理手順名-2までを識別名-1回繰り返すという意味である。処理手順名-2を指定していないと、次の処理手順名が出てくるまでの処理を行う。
 
 ```cobol
-  PERFORM  S03-READ THRU S03-EXIT.
+  PERFORM  S03-READ  THRU  S03-EXIT.
 
-S03-READ.                           ← このブロックの処理を実行
+S03-READ.                             ← このブロックの処理を実行
   ...
 S03-EXIT.
   EXIT.
@@ -1288,13 +1288,13 @@ S03-EXIT.
 **UNTILオプション:**
 
 ```cobol
-  PERFORM      S04-SHORI THRU S04-EXIT
+  PERFORM      S04-SHORI  THRU  S04-EXIT
     UNTIL      SW-END = 'E'.
 
 S04-SHORI.
     READ       INFL
       AT END
-        MOVE   'E' TO SW-END
+        MOVE   'E'        TO    SW-END
         GO TO  S04-EXIT.
 S04-EXIT.
   EXIT.
@@ -1306,22 +1306,22 @@ S04-EXIT.
 
 条件付PERFORM命令でもっと複雑な処理もできる。ある値をアップしながら条件を1〜3個調べ、全ての条件を満たすまでPERFORM命令が繰り返されるというものである。処理を件数でブレイクしたり、年令でブレイクしたり、テーブルで持っているデータのブレイクをしたりする時に非常に便利である。
 
-```
-PERFORM 処理手順名-1 THRU 処理手順名-2
-  VARYING 指標名-1 FROM 識別名-2 UNTIL 条件-1
-  BY 識別名-3
+```cobol
+PERFORM  処理手順名-1  THRU  処理手順名-2
+  VARYING指標名-1 FROM 識別名-2 UNTIL 条件-1
+  BY     識別名-3
   [AFTER 指標名-4 FROM 識別名-5
-  BY 識別名-6 UNTIL 条件-2
+  BY     識別名-6 UNTIL 条件-2
   [AFTER 指標名-7 FROM 識別名-8
-  BY 識別名-9 UNTIL 条件-3 ]]]
+  BY     識別名-9 UNTIL 条件-3 ]]]
 ```
 
 ```cobol
-PERFORM    S05-SHORI THRU S05-EXIT
-  VARYING  IDX1 FROM 1
-    BY     10 UNTIL A > B
-  AFTER    IDX2 FROM 1
-    BY     10 UNTIL B > C.
+PERFORM  S05-SHORI  THRU  S05-EXIT
+  VARYINGIDX1 FROM 1
+    BY   10 UNTIL A > B
+  AFTER  IDX2 FROM 1
+    BY   10 UNTIL B > C.
 ```
 
 2次元テーブル処理に向いている。
@@ -1354,8 +1354,8 @@ S05-EXIT.
 
 ### 12. GO TO 命令
 
-```
-GO TO 処理手順名
+```cobol
+GO TO  処理手順名
 ```
 
 ```cobol
@@ -1381,7 +1381,7 @@ GO TO 処理手順名-1
 ```
 
 ```cobol
-MOVE   A TO WK-DEP.
+MOVE   A  TO  WK-DEP.
 GO TO  S03-01
      S03-02
      S03-03 DEPENDING ON WK-DEP.
@@ -1395,10 +1395,10 @@ WK-DEPに `1`〜`3` の値が入っていれば、それぞれS03-01、S03-02、
 
 ファイルをREAD/WRITEできるようにあらかじめ開いておく命令。READ/WRITEの前に実行しておかなければならない。
 
-```
-OPEN INPUT  ファイル名-1...(n)     ← READだけ
-OPEN OUTPUT ファイル名-2...(n)     ← WRITEだけ
-OPEN I-O    ファイル名-3...(n)     ← 両方
+```cobol
+OPEN  INPUT  ファイル名-1...(n)  ← READだけ
+OPEN  OUTPUT ファイル名-2...(n)  ← WRITEだけ
+OPEN  I-O    ファイル名-3...(n)  ← 両方
 ```
 
 一度OPENするとCLOSE命令を実行するまではOPEN命令は実行できない。通常、INITIAL処理で行う事が多い。I-OでREAD/WRITEをする時はインプットとして読まれたデータに書いていくので、インプットデータは残らない点に注意。
@@ -1407,8 +1407,8 @@ OPEN I-O    ファイル名-3...(n)     ← 両方
 
 この命令は、既に開かれているファイルを閉じる命令である。この命令を実行する前には、必ずOPEN命令が実行されていなければならない。
 
-```
-CLOSE ファイル名-1...(n)
+```cobol
+CLOSE  ファイル名-1...(n)
 ```
 
 ```cobol
@@ -1439,13 +1439,13 @@ WORKING-STORAGE SECTION.
   05  OUT-KEY.
 
 PROCEDURE DIVISION.
-WRITE  OUT-REC FROM OUT-DATA.
+WRITE  OUT-REC  FROM  OUT-DATA.
 ```
 
 これは以下と同じ:
 
 ```cobol
-MOVE   OUT-DATA TO OUT-REC.
+MOVE   OUT-DATA  TO  OUT-REC.
 WRITE  OUT-REC.
 ```
 
@@ -1483,7 +1483,7 @@ AFTER 2 の場合:
 
 ### 16. DISPLAY 命令
 
-```
+```cobol
 DISPLAY 識別名-1...(n) [UPON { CONSOLE  }
                           { SYSOUT   }
                           { SYSPUNCH }
@@ -1499,7 +1499,7 @@ UPON句が省略されるとSYSOUTとみなされる。
 | SYSPUNCH | 72桁 |
 
 ```cobol
-DISPLAY  "*** PROGRAM ERR ***" UPON CONSOLE.
+DISPLAY  "*** PROGRAM ERR ***"  UPON  CONSOLE.
 ```
 
 ```
@@ -1513,9 +1513,9 @@ CONSOLE以外は、JCL上でDDカードを指定しておかなければなら�
 
 テーブルで取られたエリア内から、あるKEYに基づいて必要なデータを探し出す命令。
 
-```
-SEARCH テーブル名 [AT END 命令ステートメント-1]
-  WHEN 条件 命令ステートメント-2
+```cobol
+SEARCH  テーブル名 [AT END 命令ステートメント-1]
+  WHEN  条件 命令ステートメント-2
 ```
 
 テーブル名は、エリアの上でOCCURS句が付いている項目である。SEARCHを使わずにIFでLOOPさせるやり方もある。
@@ -1530,11 +1530,11 @@ SEARCH テーブル名 [AT END 命令ステートメント-1]
 ```
 
 ```cobol
-SET       A-X1 TO 1.
+SET       A-X1            TO  1.
 SEARCH    A-OCCUR
   AT END  GO TO SEARCH-END
 WHEN      WK-KEY = A-KEY (A-X1)
-  MOVE    A-NAIYO (A-X1) TO WK-DATA.
+  MOVE    A-NAIYO (A-X1)  TO  WK-DATA.
 ```
 
 SEARCH命令を実行する前に必ずインデックスに値をセットしなければならない。このサーチ命令は、A-OCCURというエリアのA-KEYのn番目がWK-KEYと等しいものを探し出して、そのn番目のA-NAIYOをWK-DATAへ移す。テーブル上に条件に合うものが無ければ、SEARCH-ENDという処理手順名の所へブランチする。
@@ -1542,15 +1542,15 @@ SEARCH命令を実行する前に必ずインデックスに値をセットし�
 **IF文のLOOPでも同等の処理:**
 
 ```cobol
-  SET        A-X1 TO 1.
+  SET        A-X1            TO     1.
 S03-SEARCH.
   IF         A-X1 > 100
     GO TO    S03-SEARCH-END
   ELSE
     IF       A-KEY (A-X1) = WK-KEY
-      MOVE   A-NAIYO (A-X1) TO WK-DATA
+      MOVE   A-NAIYO (A-X1)  TO     WK-DATA
     ELSE
-      SET    A-X1 UP BY 1
+      SET    A-X1            UP BY  1
       GO TO  S03-SEARCH.
 ```
 
@@ -2216,19 +2216,49 @@ flowchart TD
 
 本書のCOBOLコードは、下記の規約で整桁している（語句そのものは原文のまま。追加したのは空白のみ）。
 
+**データ部**
+
 | 欄 | 開始位置 | 内容 |
 |---|---|---|
 | レベル欄 | 入れ子1段につき+2桁 | 2桁のレベル番号 + 2空白 |
 | 項目名欄 | レベル欄+4桁目 | 項目名・FD名 |
 | **句欄** | **25桁目に固定** | `PIC` `OCCURS` `INDEXED BY` `VALUE` `REDEFINES` `RECORDING MODE` などの句 |
 | **値欄** | **句欄+14桁（39桁目）** | 句の直後の値・項目名・リテラル |
-| 3列目以降 | 固定なし（2空白） | `TIMES` `BY` `MODE IS F` など |
-| 注釈（`←` `→`） | 本文の最大幅+3桁 | ブロック内で同じ列に揃える |
+| 3列目以降 | 固定なし（2空白） | `TIMES` `MODE IS F` など |
 
-- 手続き部は、命令欄＝段落名より2桁インデント（入れ子でさらに+2桁）、値欄＝「最長の命令欄+句+2桁」でブロック内に一律
-- 項目名が25桁目に達する場合は、そのブロックの句欄を（名前の末尾+3桁）まで押し下げ、句欄・値欄はブロック内で同一位置に揃える
-- 句欄幅は標準14桁。`RECORDING MODE`（15桁）などを超えるブロックでは（最長句+2）に拡張
-- フィールド間は必ず半角2つ以上。タブは使用しない。コードブロック内の行は表示幅72桁以内
-- **対象外**: 構文の「形式」ブロック（`{ }` `[ ]` を含む）、JCL・TSOコマンド・CLIST・端末出力例・図解
+```cobol
+FD  INFL                RECORDING MODE   IS F
+                        RECORD CONTAINS  20 CHARACTERS
+01  IN-REC              PIC              X(20).
+  05  IN-KBN            PIC              X(5).
+```
+
+**手続き部**（`GO TO` `MOVE TO` などの命令文）
+
+| 欄 | 開始位置 | 内容 |
+|---|---|---|
+| 命令欄 | 段落名より2桁インデント（入れ子1段ごとに+2桁） | 命令語。`GO TO` `AT END` `ON SIZE ERROR` `STOP RUN` は1句として扱う |
+| 値欄1 | 命令欄 +（最長命令語）+ 2桁 | 第1オペランド |
+| 前置詞欄 | 値欄1 +（最長オペランド）+ 2桁 | `TO` `FROM` `BY` `INTO` `GIVING` `THRU` `UP BY` `DOWN BY` `UPON` |
+| 値欄2 | 前置詞欄 +（最長前置詞）+ 2桁 | 第2オペランド |
+| 以降 | 固定なし（2空白） | `[ROUNDED]` `SW-END = 'E'.` など |
+
+```cobol
+MOVE  ZERO  TO     A B C.
+MOVE  A     TO     B.
+SET   IDX1  TO     1.
+SET   IDX1  UP BY  1.
+ADD   A B   TO     (B) ROUNDED.
+```
+
+**共通**
+
+- 項目名が25桁目に達するブロックでは、句欄を（名前の末尾+3桁）まで押し下げ、句欄・値欄はブロック内で同一位置に揃える
+- 句欄幅は標準14桁。`RECORDING MODE`（15桁）などを超えるブロックは（最長句+2桁）に拡張
+- 注釈（`←` `→`）は本文の最大幅+3桁に揃え、72桁を超える場合は直後3空白に置く
+- 構文の「形式」ブロックも同じ列に揃える。ただし `{ }` `[ ]` の選択肢-group は構造を保ち、継続行は直前行の同じ括弧の桁に揃える
+- フィールド間は必ず半角2つ以上。タブは使用しない。コードブロック内の行は表示幅72桁以内（実測 最大64桁）
+- 手続き部は段落名のあるブロックで命令欄を+2桁とし、入れ子関係は相対インデントで保つ（整形の再実行でインデントが増えない）
+- **対象外**: JCL・TSOコマンド・CLIST・端末出力例・図解（矢印・枠線を含むブロック）、および「…文節」の列挙のみからなる一覧ブロック
 
 - 第五章の命令一覧、第七章 TSOのファイル関係図・モード関係図、第八章のPAD図は、原文の図をMermaidのフローチャートで再現したものである。PAD図そのものはN-S図（ボックス図）の表記であり、条件分岐を示す三角記号は「条件が真の時に右側（後続）の処理を実行する」と読み替えている。
