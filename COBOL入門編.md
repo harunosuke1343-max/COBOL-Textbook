@@ -112,7 +112,7 @@ PROCEDURE       DIVISION.    （手続き部）
 | `*` | 星印（アスタリスク） |
 | `/` | 斜線（スラッシュ） |
 | `=` | 等号 |
-| `$` | 通貨記号 |
+| `¥` | 通貨記号 |
 | `:` | コロン |
 | `;` | セミコロン |
 | `.` | ピリオド（小数点） |
@@ -190,9 +190,9 @@ REMARKS.          MIX DUMP.
 ```cobol
 ENVIRONMENT       DIVISION.
 CONFIGURATION     SECTION.
-SPECIAL-NAMES.    C01 IS F-FILE.
 SOURCE-COMPUTER.  IBM-370.
 OBJECT-COMPUTER.  IBM-370.
+SPECIAL-NAMES.    C01 IS F-FILE.
 INPUT-OUTPUT      SECTION.
 FILE-CONTROL.
   SELECT INFL ASSIGN TO UT-S-INFL.
@@ -259,8 +259,14 @@ ASSIGN TO システム名
 
 システム名の構成: `クラス（装置）－編成－名前`
 
-- **クラス:** `DA`（大容量記憶装置）、`UT`（ユーティリティ）、`UR`（ユニットレコード）—— IBMではほとんどUTを使用
-- **装置:** 通常指定しない（UT: 2301, 2302, 2303, 2311, 2321, 2314, 2400 など）
+- **クラス:** `DA`（大容量記憶装置）、`UT`（ユーティリティ）、`UR`（ユニットレコード）—— IBMではほとんどUTを使用する
+
+  UT又はURに割り当てられるファイルは標準順次編成でなければならない。DAは順次編成又は直接編成のいずれでもよい。
+
+- **装置:** 通常指定しない
+  - `UT` … 2301、2302、2303、2311、2321、2314など
+  - `UT` … 同上＋2400など（原文もこの行は `UT` 表記。1行目は `DA` の疑いあり）
+  - `UR` … 1403、1404、1443など
 - **編成:** 1文字のフィールド
   - `S` — 標準順次編成
   - `D` — 直接編成
@@ -278,7 +284,7 @@ RESERVE { NO   } ALTERNATE [ AREA  ]
         { 整数 }           [ AREAS ]
 ```
 
-整数で示される分だけBUFFが確保される。ただし、順次アクセスにのみ有効。
+整数で示される偶数だけBUFFが確保される。ただし、順次アクセスにのみ有効。
 
 **④ FILE-LIMIT文節**
 
@@ -477,7 +483,7 @@ BLOCK CONTAINS [整数-1 TO] { CHARACTERS }
                        { RECORDS    }
 ```
 
-1レコード1ブロックのデータには、この文節を指定する必要はない。データがFIXの時は整数-2だけを指定する。データがVARIABLEの時は、整数-2はMAXのレコード長を指定し、整数-1を指定する時はMINのレコード長を記入する。
+1レコード1ブロックのデータには、この文節を指定する必要はない。データがFIXの時は整数-2だけを指定する。データがVARIABLEの時は、整数-2はMAXのレコード長を指定し、整数-1を指定する時はMINのレコード長を記入する。例えば、`BLOCK CONTAINS 1 TO 3 RECORDS` と指定すると、最小1レコード・最大3レコードであることを意味している。
 
 **② RECORD CONTAINS文節**
 
@@ -487,7 +493,7 @@ BLOCK CONTAINS [整数-1 TO] { CHARACTERS }
 RECORD CONTAINS [整数-1 TO] 整数-2 CHARACTERS
 ```
 
-通常、整数-2を指定する。整数-2はMAXのレコードの大きさ。整数-1を指定する時は、データがVARIABLEの時で、レコードの最小値を指定する。
+通常、整数-2を指定する。整数-2はMAXのレコードの大きさ。整数-1を指定する時は、データがVARIABLEの時で、レコードの最小値を指定する。記入例はBLOCK CONTAINS文節と同じである。
 
 **③ RECORDING MODE文節**
 
@@ -542,12 +548,14 @@ DATA { RECORD IS  } データ名-1...n
 
 #### (2) データ記述項目
 
+データ記述項目は、後で述べるWORKING-STORAGE SECTIONでの説明と重なる部分が多いので、簡単に述べる。
+
 ```
 レベル番号 { データ名 } PICTURE句
            { FILLER   }
 ```
 
-レベル番号はデータの内容にレベル付けをするもので、01〜49まで指定できる。通常、01、05、10... の順で付けていく事が多い。
+レベル番号はデータの内容にレベル付けをするもので、01〜49まで指定できる。通常、01、05、10... の順で付けていく事が多い。ファイルの項目のDATA RECORD文節で指定したDATA名を、ここで01レベルで定義しなければならない。
 
 ```cobol
 DATA RECORD IS IN-REC と定義済み
@@ -561,9 +569,11 @@ DATA RECORD IS IN-REC と定義済み
 
 これは、IN-RECという名前のレコードがあり、37バイトであることを示している。その内訳は、IN-KUBUNという名前のエリアが2バイトで、IN-NAIYOというエリアの中にIN-NAIYO-1というエリアが5バイト、IN-NAIYO-2というエリアが10バイトあるということである。
 
+PICTURE句及びその他の事は後で述べる事にする。通常は、レコード名は01レベルでとり、PICTURE句を付け、内訳は書かない。実際の内訳は、WORKING-STORAGE SECTIONで記述する形が多く使用されている。
+
 **① WORKING-STORAGE SECTION**
 
-プログラム中でワークとして使用するエリア、INPUT/OUTPUTのエリアをコピーしたり設定したりするエリア、カウンターやスイッチのエリアを定義するセクションである。
+プログラム中でワークとして使用するエリア、INPUT/OUTPUTのエリアをコピーしたり設定したりするエリア、カウンターやスイッチのエリアを定義するセクションである。記述の方法はデータ記述項目と同じであるが、レベルに特別な物がある。66、77、88である。
 
 特別なレベル: **66、77、88**
 
@@ -583,7 +593,7 @@ DATA RECORD IS IN-REC と定義済み
   88 EOF-SIGN  VALUE "E".
 ```
 
-上記のように定義して、`"E"` という文字を FILE-SIGN へ移送する。通常このエリアに `"E"` が入ったかどうかを聞くためには `IF FILE-SIGN="E"` と記述するが、88レベルを記述しているため、`IF EOF-SIGN` と書くだけでよい。`="E"` という部分は書く必要がない。なぜなら `VALUE "E"` と定義しているため、PIC Xのエリアに `"E"` という文字が入った時だけ条件が満たされるからである。
+上記のように定義して、`"E"` という文字を FILE-SIGN へ移送する。通常このエリアに `"E"` が入ったかどうかを聞くためには `IF FILE-SIGN="E"` と記述するが、88レベルを記述しているため、`IF EOF-SIGN` と書くだけでよい。`="E"` という部分は書く必要がない。なぜなら `VALUE "E"` と定義しているため、PIC Xのエリアに `"E"` という文字が入った時だけ条件が満たされるからである。これは、各自で実際にやってみると納得できるのだが……。
 
 **② PICTURE句**
 
@@ -597,7 +607,7 @@ PICTUREのTYPEには **9-TYPE**、**A-TYPE**、**X-TYPE**、及び **編集-TYPE
 PIC 99.   または   PIC 9(2).
 ```
 
-0〜9の数字のみを移送できる。英数字は不可。
+0〜9の数字のみを移送できる。英数字は不可（COMPUTATIONAL＝計算のみ）。長さを（）で囲んで指定する事もできるが、これはどのTYPEでも同じである。
 
 ```
 PIC X(5).          PIC 9(5).
@@ -626,6 +636,8 @@ X-TYPEからの移送には十分注意しなければならない。
 PIC S99.
 ```
 
+これは1バイトのエリアがとられる。
+
 **ゾーン形式、パック形式、2進数の違い:**
 
 ```
@@ -641,6 +653,8 @@ PIC S99.
 - **パック形式:** ゾーンが除かれた形。最後の4ビットが符号を表わす（C/F=プラス、D=マイナス）
 - **2進数:** 16進数表示。最上位ビットが符号（1=マイナス、0=プラス）
 
+ゾーンのデータにおいてサイン（＋、−）は最後の1バイトの上位4ビットで表わされ、その4ビットはパックに準ずる。
+
 ```
 ゾーン    PIC 9(2).
 パック    PIC S9(3) COMP-3.
@@ -648,7 +662,9 @@ PIC S99.
           PIC S9(3) COMP SYNC.
 ```
 
-COMP SYNCについて: 境界合わせを行う。
+※「COMP-8」は原文表記のまま。2進数の指定としては `COMP`（`COMP-2`）が一般的。
+
+COMPという指定で2進のエリアであることを示すが、SYNCと指定すると境界が合わせられる。
 
 ```
   エリア
@@ -657,6 +673,8 @@ COMP SYNCについて: 境界合わせを行う。
   ②フルワード境界     ← 4バイト単位
   ③ダブルワード境界   ← 8バイト単位
 ```
+
+2バイト単位のエリアの境界をハーフワード境界、4バイト単位をフルワード境界、8バイト単位をダブルワード境界と呼ぶ。この境界はCOBOLではあまり考える必要はないが、アセンブラだと必要になるので覚えておいてほしい。
 
 カウンターなど、2進で指定した方が効率が良く、サイズ（桁数）が大きいものはパックの方が良い。ゾーンは数字コードのような演算をあまり必要としないエリアに向いている。
 
@@ -668,7 +686,7 @@ COMP SYNCについて: 境界合わせを行う。
     05 CTR-OUT   PIC S9(7).
 ```
 
-②の方で指定するとクリアが楽なので、通常②のような使い方をする。
+②の方で指定するとクリアが楽なので、通常②のような使い方をする。クリアーの方法は、プロシジャーの章で説明する。
 
 > **イ. A-TYPE（アルファベット項目）**
 
@@ -684,7 +702,7 @@ PIC AA.
 PIC XX.
 ```
 
-COBOLで使用できる全ての文字を移送できる。FILLERで定義されるエリアをX-TYPEで定義する。グループ項目（PIC句をもたないレベル項目）は全てX-TYPEとして扱われる。
+COBOLで使用できる全ての文字を移送できる。したがって通常、数字が入っているがその他の文字が時折入ってくるとか、FILLERで定義されるエリアをX-TYPEで定義する。グループ項目（PIC句をもたないレベル項目）は全てX-TYPEとして扱われる。
 
 ```
 01 IN-REC.
@@ -697,7 +715,7 @@ COBOLで使用できる全ての文字を移送できる。FILLERで定義され
 
 > **エ. 編集-TYPE**
 
-編集用文字として `B`、`P`、`－`、`＋`、`¥`、`Z`、`＊`、`V`、`0`、`、`、`．`、`CR`、`DB` がある。
+編集用文字として、前述の9、A、Xに加えて `B`、`P`、`－`、`＋`、`¥`、`Z`、`＊`、`V`、`0`、`、`、`．`、`CR`、`DB` がある。
 
 | 文字 | 意味 |
 |------|------|
@@ -719,14 +737,14 @@ COBOLで使用できる全ての文字を移送できる。FILLERで定義され
 
 | 指定 | データの値 | 結果 |
 |------|------------|------|
-| `PIC 99BB99BB99` | `123456` | `12△△34△△56` |
-| `PIC ZZZZZZ` | `001234` | `△△△1234` |
-| `PIC Z,ZZZ,ZZ9` | `001234` | `△△△1,234` |
+| `PIC 99BB99BB99.` | `123456` | `12△△34△△56` |
+| `PIC ZZZZZZ.` | `001234` | `△△1234` |
+| `PIC Z,ZZZ,ZZ9.` | `001234` | `△△1,234` |
 | `PIC -,---,--.` | `-001234` | `△△-1,234` |
 | `PIC +,+++,+++.` | `-001234` | `△△-1,234` |
 | `PIC +,+++,+++.` | `+001234` | `△△+1,234` |
-| `PIC ¥¥¥,¥¥¥,¥¥¥` | `12345` | `△△¥12,345` |
-| `PIC ＊＊＊＊＊＊.` | `12345` | `****12345` |
+| `PIC ¥,¥¥¥,¥¥¥.` | `12345` | `¥12,345` |
+| `PIC ********.` | `12345` | `****12345` |
 
 編集した値は計算に使用することはできない。ただし、受け項目としては使用できる。
 
@@ -734,7 +752,7 @@ COBOLで使用できる全ての文字を移送できる。FILLERで定義され
 
 ```
 ¥1,283      -6,888,543    ***123    1△2△3△4
-¥23,881      6,231      ***＊10    A△B△C△D
+¥23,881      6,231      ****10    A△B△C△D
 ¥56        -31        ***990    E△F△3△4
 ```
 
@@ -742,14 +760,18 @@ COBOLで使用できる全ての文字を移送できる。FILLERで定義され
 
 ```
 01 PRINT.
-  05 PR-GAKU    PIC ¥¥¥,¥¥¥,¥¥¥¥,¥¥¥.
+  05 PR-GAKU    PIC ¥¥¥,¥¥¥,¥¥¥,¥¥¥.
   05 FILLER      PIC X(3).
-  05 PR-KASHI   PIC --,---,--.
+  05 PR-KASHI   PIC --,---,---.
   05 FILLER      PIC X(3).
   05 PR-CHECK  PIC *****9.
   05 FILLER      PIC X(5).
   05 PR-EDIT    PIC XBXBXBX.
 ```
+
+それぞれの項目にデータを移送して、PRINTをWRITEする。
+
+編集項目は主にプリントエリアの編集時に用いられる。`Z`、`¥`、`、`、`－`、`．` は通常よく使用するので慣れておいてもらいたい。
 
 DB、CRについては:
 
@@ -809,7 +831,9 @@ PIC X(8) JUST RIGHT   :  △ △ △ △ A B C
 
 何度でも再定義してかまわない。再定義するバイト数が再定義されるエリアのバイト数よりも大きくすることはできないが、小さい分には構わない。
 
-日付によく使われる:
+上記の例では、エリアを使用する時にA、B、Cなど、どれを参照するかによって、エリアのもつTYPEが決定される。
+
+このREDEFINES文節は日付によく使われる:
 
 ```
 05 A-YYMMDD.
@@ -824,7 +848,7 @@ PIC X(8) JUST RIGHT   :  △ △ △ △ A B C
     15 A-DD-R      PIC 9(2).
 ```
 
-上記のように指定すると、同じエリアをX-TYPEでも9-TYPEでも使用できる。
+上記のように指定すると、同じエリアをX-TYPEでも9-TYPEでも使用できる。（YYMMDD＝年月日）
 
 **⑥ OCCURS文節（テーブル）**
 
@@ -877,6 +901,8 @@ OCCURS項目で作成されるテーブルは3次元まで許される。
 ```
 
 Dという20バイトのエリアが3×5×2=30個、すなわち600バイトのエリアがとられる。参照は `D(1, 1, 1)` または `D(A-X1, B-X1, C-X1)` のようにする。
+
+このようなテーブルは、VALUE句をもっているエリアをREDEFINEしてテーブルにしたり、集計用のエリアとして定義する事が多い。
 
 **例4:**
 
@@ -1019,6 +1045,8 @@ SUBTRACT A B FROM C.
 
 **イ. `SUBTRACT 識別名-1...(n) FROM 識別名-2...(n) GIVING 識別名-3 [ROUNDED]`**
 
+FROMの左側のエリアの内容を全て加算し、右側のエリアから減算して、結果はGIVINGで指定しているエリアへストアされる。
+
 ```
 05 A PIC 9(2)V9(2).   ... 10.01
 05 B PIC 9(3)V9(2).   ... 33.25
@@ -1036,6 +1064,8 @@ SUBTRACT A FROM B GIVING C ROUNDED.
 
 **ア. `MULTIPLY 識別名-1 BY 識別名-2 [ROUNDED]`**
 
+BYの左側に書いたエリアの内容が右側のエリアに乗算され、結果が置き換わる。
+
 ```
 05 A PIC 9(2)V9(1).   ... 3.1
 05 B PIC 9(3)V9(1).   ... 24.1
@@ -1047,6 +1077,8 @@ MULTIPLY A BY B ROUNDED.
 ```
 
 **イ. `MULTIPLY 識別名-1 BY 識別名-2 GIVING 識別名-3 [ROUNDED]`**
+
+この形式を用いると、ADDやSUBTRACTと同様に結果はGIVINGの後に指定したエリアへストアされ、乗数・被乗数共に保存される。
 
 ```
 05 A PIC 9(2).       ... 10
@@ -1060,6 +1092,17 @@ MULTIPLY A BY B GIVING C.
 ```
 
 GIVINGのエリアは数字編集項目でもよい。
+
+```
+05 A PIC 9(2).       ... 10
+05 B PIC 9(2).       ... 22
+05 C PIC Z(4).
+```
+
+```
+MULTIPLY A BY B GIVING C.
+  結果 C = △220
+```
 
 ### 5. DIVIDE 命令（除算）
 
@@ -1079,7 +1122,7 @@ DIVIDE A INTO B ROUNDED.
 
 **イ. `DIVIDE 識別名-1 INTO 識別名-2 GIVING 識別名-3 [ROUNDED] [REMAINDER 識別名-4]`**
 
-REMAINDERは余りを求めるオプションである。
+REMAINDERは余りを求めるオプションである。INTOの左側のエリアの値で右側のエリアの値を除算し、結果をGIVING句のエリアへストア、REMAINDER句のエリアへ余りをストアする。
 
 ```
 05 A PIC 9(2).       ... 13
@@ -1092,6 +1135,8 @@ REMAINDERは余りを求めるオプションである。
 DIVIDE A INTO B GIVING C REMAINDER D.
   結果 C = 7、D = 9
 ```
+
+**ウ.** イの形式中のINTOをBYに変えると、除数と被除数の関係が逆転する。この時気をつけなければならないのは、除数・被除数のどちらかにリテラルを用いる場合である。
 
 ### 6. COMPUTE 命令
 
@@ -1222,12 +1267,14 @@ SET IDX1 DOWN BY 3.  ← IDX1が-3される
 
 ### 11. PERFORM 命令
 
-処理別にセグメント化した処理を連結する時に使用。
+プログラムを処理別にセグメント化すると見やすくなるだけでなく、修正・デバッグも容易になる。このセグメント化した処理を連結する時に、このPERFORM命令を使用する。
 
 ```
 PERFORM 処理手順名-1 [THRU 処理手順名-2]
                  [識別名-1 TIMES]
 ```
+
+これは、処理手順名-1から処理手順名-2までを識別名-1回繰り返すという意味である。処理手順名-2を指定していないと、次の処理手順名が出てくるまでの処理を行う。
 
 ```
 PERFORM S03-READ THRU S03-EXIT.
@@ -1257,12 +1304,16 @@ S04-EXIT.
 
 **VARYINGオプション（複雑なループ処理）:**
 
+条件付PERFORM命令でもっと複雑な処理もできる。ある値をアップしながら条件を1〜3個調べ、全ての条件を満たすまでPERFORM命令が繰り返されるというものである。処理を件数でブレイクしたり、年令でブレイクしたり、テーブルで持っているデータのブレイクをしたりする時に非常に便利である。
+
 ```
 PERFORM 処理手順名-1 THRU 処理手順名-2
   VARYING 指標名-1 FROM 識別名-2 UNTIL 条件-1
   BY 識別名-3
   [AFTER 指標名-4 FROM 識別名-5
-  BY 識別名-6 UNTIL 条件-2]
+  BY 識別名-6 UNTIL 条件-2
+  [AFTER 指標名-7 FROM 識別名-8
+  BY 識別名-9 UNTIL 条件-3 ]]]
 ```
 
 ```
@@ -1286,9 +1337,20 @@ PERFORM S05-SHORI THRU S05-EXIT
 7. IDX2の値が1増やし、また条件 `B > C` が調べられる
 8. 以上の処理が繰り返される
 
-条件付PER命令を使うと、ある値をアップしながら条件を調べ、全ての条件を満たすまでPERFORMが繰り返される。テーブルのデータのブレイクや集計などに非常に便利である。
+条件付PERFORM命令を使うと、ある値をアップしながら条件を調べ、全ての条件を満たすまでPERFORMが繰り返される。テーブルのデータのブレイクや集計などに非常に便利であり、このような意味でテーブル処理に向いているといえる。
 
-**注意:** 一般にメイン処理はPERFORM命令とIF文で組み立てられる事が多い。PERFORMした先から別のセグメントへブランチすることは望ましくない（解析がやりにくくなる）。
+**注意:** 一般にメイン処理はPERFORM命令とIF文で組み立てられる事が多い。PERFORMした先から別のセグメントへブランチすることは望ましくない（後からの解析がやりにくくなる）。
+
+```
+S04-SHORI.          左のようなプログラムの組み立ては
+  GO TO S05-SUB.    望ましくない。GO TO文はそのセグメント
+                    内にとどまる方が望ましい。
+S04-EXIT.
+  EXIT.
+S05-SUB.
+S05-EXIT.
+  EXIT.
+```
 
 ### 12. GO TO 命令
 
@@ -1327,6 +1389,8 @@ GO TO S03-01
 
 WK-DEPに `1`〜`3` の値が入っていれば、それぞれS03-01、S03-02、S03-03へブランチする。該当が無ければGO TO文は実行されず次のステートメントへ移る。
 
+なおWK-DEPは、WORKING-STORAGE SECTIONで定義済みの9-TYPEのエリアである。
+
 ### 13. OPEN 命令
 
 ファイルをREAD/WRITEできるようにあらかじめ開いておく命令。READ/WRITEの前に実行しておかなければならない。
@@ -1341,6 +1405,8 @@ OPEN I-O    ファイル名-3...(n)     ← 両方
 
 ### 14. CLOSE 命令
 
+この命令は、既に開かれているファイルを閉じる命令である。この命令を実行する前には、必ずOPEN命令が実行されていなければならない。
+
 ```
 CLOSE ファイル名-1...(n)
 ```
@@ -1351,7 +1417,11 @@ CLOSE INFL OUTFL.
 
 INPUT/OUTPUTの指定はいらない。CLOSEした後、ファイルのREAD/WRITEを行う時は再度OPENを実行しなければならない。
 
+なお、CLOSE命令には、リワインドさせる／させないなどのオプションがいくつかあるが、ここでは省略する。
+
 ### 15. WRITE 命令
+
+この命令は、OUTPUTもしくはI-Oで開かれたファイルへ書き出しを行う命令である。（形式はリスト以外のファイル）
 
 ```
 WRITE レコード名 [FROM 識別名]
@@ -1381,11 +1451,15 @@ WRITE OUT-REC.
 
 **リスト出力のWRITE:**
 
+リストにWRITEする方法は、大きく分けて2種類ある。1つは1ラインプリントした後で改行を行う（BEFORE）方法、もう1つは改行を行った後プリントする（AFTER）方法である。
+
 ```
 WRITE レコード名 [FROM 識別名]
   [BEFORE  ADVANCING 識別名 LINES]
   [AFTER   ADVANCING 識別名 LINES]
 ```
+
+識別名の中に入っている数の分だけラインを飛ばす。ここにSPECIAL-NAMESで指定した `C01 IS 〜` の名前を使うと、改頁されてプリントできる行の最初の行を指す。通常、ADVANCINGとLINESという語は省略して使う。
 
 BEFOREとAFTERの違い:
 
@@ -1396,12 +1470,12 @@ BEFOREとAFTERの違い:
                    C行
 
 BEFORE 2 の場合:
-  "★★★ テスト プログラム 結果 ★★★"  がA行に書き出される
+  "*** テスト プログラム ケッカ ***"  がA行に書き出される
   ポインタはCを指す（書き出した行を含む2+1行先）
 
 AFTER 2 の場合:
   ポインタはまず2行先に移る（B行）
-  "★★★ テスト プログラム 結果 ★★★"  がB行に書き出される
+  "*** テスト プログラム ケッカ ***"  がB行に書き出される
   ポインタはCを指す
 ```
 
@@ -1444,6 +1518,8 @@ SEARCH テーブル名 [AT END 命令ステートメント-1]
   WHEN 条件 命令ステートメント-2
 ```
 
+テーブル名は、エリアの上でOCCURS句が付いている項目である。SEARCHを使わずにIFでLOOPさせるやり方もある。
+
 ```
 05 A-OCCUR OCCURS 100 TIMES
   INDEXED BY A-X1.
@@ -1461,7 +1537,7 @@ WHEN WK-KEY = A-KEY (A-X1)
   MOVE A-NAIYO (A-X1) TO WK-DATA.
 ```
 
-SEARCH命令を実行する前に必ずインデックスに値をセットしなければならない。
+SEARCH命令を実行する前に必ずインデックスに値をセットしなければならない。このサーチ命令は、A-OCCURというエリアのA-KEYのn番目がWK-KEYと等しいものを探し出して、そのn番目のA-NAIYOをWK-DATAへ移す。テーブル上に条件に合うものが無ければ、SEARCH-ENDという処理手順名の所へブランチする。
 
 **IF文のLOOPでも同等の処理:**
 
@@ -1482,8 +1558,10 @@ SEARCHの方がステートメント数が少なく、S03-SEARCHという処理�
 
 ### 18. STOP RUN、GOBACK
 
-- **STOP RUN** — プログラムの停止。単体モジュールで使用する
-- **GOBACK** — 制御を上位モジュールへ返す。リンクを必要とし、かつメインモジュールでない时使用
+- **STOP RUN** — プログラムの停止。リンクを必要としない単体のモジュールで使用する
+- **GOBACK** — 制御を上位モジュールへ返す。リンクを必要とし、かつメインモジュールでない时使用（メインはSTOP RUN）
+
+基本的には、今まで述べてきた命令詳を使用してプロシジャーを作成する。まだまだ命令はあるが、とりあえず基本としてここに述べた命令は覚えておいてもらいたい。
 
 > **CALL命令:** `CALL モジュール名 USING エリア名` という形で使用する。CALL命令は別のプログラム（モジュール）をInvokeする命令で、USING句でパラメータを渡す。CALL命令を使うと、そのプログラムは他のプログラムを必要とするため、リンクという手続きを行ってロードモジュールを作成しなければならない。本教材の範囲を超えるので詳細は別の参照書を参照されたい。
 
@@ -1492,6 +1570,8 @@ SEARCHの方がステートメント数が少なく、S03-SEARCHという処理�
 ## 第六章 フロー例とコーディング例
 
 ここでは、処理の基本であるマッチング処理とコントロールブレイク処理を実際のフローとコーディング例で紹介する。
+
+なお、これらのフローは書物より引用した物ではない為、もっとよいフローがあるかもしれない。
 
 ### マッチング処理とは
 
@@ -1514,7 +1594,7 @@ flowchart TD
   READ1 --> READ2[INFL2 READ<br/>AT END: KEY2→HIGH-VALUE]
   READ2 --> CHECK_KEY{KEY1 = KEY2<br/>AND<br/>KEY1 = HIGH-VALUE}
   CHECK_KEY -->|YES| CLOSE[CLOSE]
-  CLOSE --> END([END])
+  CLOSE --> END_([END])
   CHECK_KEY -->|NO| CMP{KEY1 : KEY2}
   CMP -->|KEY1 < KEY2| INFL1_ONLY[INFL1 ONLY処理]
   CMP -->|KEY1 > KEY2| INFL2_ONLY[INFL2 ONLY処理]
@@ -1557,6 +1637,12 @@ flowchart TD
   R4 --> CHECK_KEY
 ```
 
+**《説明》**
+
+スイッチを使用する場合も使用しない場合も基本的には同一である。この「マッチング処理」という所で、ファイル（INFL2）を更新しPUTする。このINFL1はマスターファイル、INFL2はトランザクションファイルを意味している。
+
+マッチング処理で注意しなければならないのは、前提条件（ソート順、KEYの存在など）と、ファイルREADするタイミングとPUTするタイミングである。これはKEYが1:1、1:N、N:Nともに共通している。
+
 ---
 
 ### 3. スイッチを使用しない場合（1:N）
@@ -1573,10 +1659,10 @@ flowchart TD
   CLOSE --> END_([END])
   CHECK_KEY -->|NO| CMP{KEY1 : KEY2}
   CMP -->|KEY1 < KEY2| SW_CHECK{SW1 = '1'？}
-  SW_CHECK -->|YES| INFL1_ONLY[INFL1 ONLY処理<br/>OUT処理]
-  SW_CHECK -->|NO| INFL1_ONLY2[INFL1 ONLY処理]
-  INFL1_ONLY --> READ1B[INFL1 READ]
-  INFL1_ONLY2 --> READ1B
+  SW_CHECK -->|YES| OUT[OUT処理]
+  SW_CHECK -->|NO| INFL1_ONLY[INFL1 ONLY処理]
+  OUT --> READ1B[INFL1 READ]
+  INFL1_ONLY --> READ1B
   CMP -->|KEY1 > KEY2| INFL2_ONLY[INFL2 ONLY処理]
   INFL2_ONLY --> READ2B[INFL2 READ]
   CMP -->|KEY1 = KEY2| MATCH[マッチング処理]
@@ -1598,23 +1684,24 @@ flowchart TD
   INITIAL --> READ1[INFL1 READ]
   READ1 --> READ2[INFL2 READ]
   READ2 --> CHECK1{KEY1 = KEY2<br/>AND<br/>KEY1 = HIGH-VALUE}
-  CHECK1 -->|YES| CHECK3{KEY1 = STR1？}
+  CHECK1 -->|YES| CLOSE[CLOSE]
+  CLOSE --> END_([END])
   CHECK1 -->|NO| CMP1{KEY1 : KEY2}
   CMP1 -->|KEY1 < KEY2| INFL1_ONLY[INFL1 ONLY処理]
   CMP1 -->|KEY1 > KEY2| INFL2_ONLY[INFL2 ONLY処理]
   CMP1 -->|KEY1 = KEY2| STORE[STR1←KEY1<br/>STR2←KEY2]
   INFL1_ONLY --> READ1A[INFL1 READ] --> CHECK1
   INFL2_ONLY --> READ2A[INFL2 READ] --> CHECK1
-  STORE --> LOOP2{(2)<br/>KEY1 : KEY2}
+  STORE --> LOOP2{"(2) KEY1 : KEY2"}
   LOOP2 -->|KEY1 ≠ KEY2| OUT[OUT処理]
   LOOP2 -->|KEY1 = KEY2| MATCH[マッチング処理]
   OUT --> READ1B[INFL1 READ]
   MATCH --> READ2B[INFL2 READ]
   READ1B --> HV_CHECK{KEY1 OR KEY2<br/>= HIGH-VALUE？}
   READ2B --> HV_CHECK
-  HV_CHECK -->|YES| CHECK3
-  HV_CHECK -->|NO| LOOP2
-  CHECK3 -->|NO| LOOP2
+  HV_CHECK -->|YES| LOOP2
+  HV_CHECK -->|NO| CHECK3{KEY1 : STR1}
+  CHECK3 -->|NO| CHECK1
   CHECK3 -->|YES| REOPEN[INFL2 CLOSE<br/>再オープン]
   REOPEN --> READ2C[INFL2 READ]
   READ2C --> KEY2_CMP{KEY2 : STR2}
@@ -1629,6 +1716,8 @@ flowchart TD
 > マッチングとは、複数のファイルをあるKEYによって照合させ、同一KEY同士の処理を行い、ファイルを更新することをいう。一般には、旧（更新前）マスターとトランザクションファイル（取引ファイル）を照合させ、トランザクションファイルの内容によってマスターの内容を更新して新マスターを作成する。その際、エラーのデータはエラーファイルに出力し、同時にリスト件数表を出力する。
 
 **例（B表）:**
+
+例えば、マスターファイルのKEYとトランザクションのKEYをB表の様に仮定すると、マスターファイルの1件目に更新をかけようとすると、トランザクションの1件目と2件目をREADしなければならない。又、3件目のトランザクションの'05'というKEYはマスター方にはない為、新しくマスターの'04'と'06'の間にインサートする事になる。こうして新マスターを作成する。
 
 | 件数 | マスター | トランザクション | 説明 |
 |------|----------|------------------|------|
@@ -1767,7 +1856,7 @@ flowchart TD
 
 ## 第七章 TSO
 
-ここではTSOのまわりのファイルと、TSOでテストする場合とJCLとの違い、コマンドプロシジャーの基本的なものの作成方法を簡単に述べる。
+ここではTSOのまわりのファイルと、TSOでテストする場合とJCLとの違い、コマンドプロシジャーの基本的なものの作成方法を簡単に述べる。詳細はプログラマーズハンドブックを参照して頂きたい。
 
 ### TSOのLOGON
 
@@ -1789,37 +1878,36 @@ LOGON @QAKOBA/1111 ↵
 
 ```mermaid
 flowchart TD
-  subgraph ライブラリ
-    MASTRLIB[(MASTRLIB<br/>MASTER)]
-    SOURCLIB[(SOURCLIB<br/>SOURCE)]
-    PDSLIB[(PDSLIB)]
-    TESTCPYLIB[(TEST.CPYLIB)]
-    DASDCPYLIB[(DASD.CPYLIB)]
-    TESTLIB1[(TESTLIB1)]
-    TESTLIB2[(TESTLIB2)]
-    FINAL_LIBS[(DASDLIB1/2<br/>D1LIB1 など)]
-  end
-
-  TSO[[TSO<br/>ユーザ用WORK]]
-  TSOWK[(TSOWKx)]
+  TSO[TSO]
+  MASTRLIB[(MASTER<br/>MASTRLIB)]
+  SOURCLIB[(SOURCE<br/>SOURCLIB)]
+  PDSLIB[(PDSLIB)]
+  TESTCPY[(TEST.CPYLIB)]
+  DASDCPY[(DASD.CPYLIB)]
+  TESTLIB1[(TESTLIB1)]
+  TESTLIB2[(TESTLIB2)]
+  DASDLIB[(DASDLIB1<br/>DASDLIB2<br/>D1LIB1 etc)]
+  TSOWK[(TSOWKx<br/>ユーザー用 WORK)]
   TSTPROC[(TSTPROC)]
   DCMD[(DCMD)]
-  LOAD_MODULE[[LOAD MODULE]]
 
-  SOURCLIB -->|LIBCM| MASTRLIB
-  SOURCLIB -->|LIBA/LIBC| TSOWK
-  TSOWK -->|LS| SOURCLIB
-  TSOWK -->|SUBCB2W/SUBASHW| TESTLIB1
-  TESTLIB1 -.->|LINK/SUBLKED| TESTLIB2
-  TESTLIB2 -->|登録| FINAL_LIBS
-  TSOWK -->|TEST| TESTLIB2
-  TSOWK -->|SUBCOPY| TESTCPYLIB
-  TESTCPYLIB --> DASDCPYLIB
-  TSOWK -->|LIBGP| PDSLIB
-  PDSLIB -->|LS| TSOWK
-  TSTPROC -->|コマンド| TSO
-  DCMD -->|コマンド| TSO
+  MASTRLIB -->|LIBCM| SOURCLIB
+  SOURCLIB -->|LIBA / LIBC| TSO
+  TSO -->|LS| SOURCLIB
+  PDSLIB -->|LIBGP| TSO
+  TSO -->|LS| PDSLIB
+  TSO -->|SUBCOPY| TESTCPY
+  TESTCPY --> DASDCPY
+  TSO -->|COMPILE<br/>SUBASHW / SUBCB2W| TESTLIB1
+  TESTLIB1 -->|LINK<br/>SUBLKED| TESTLIB2
+  TESTLIB2 -->|LOAD MODULE| DASDLIB
+  TESTLIB2 -.->|TEST| TSO
+  TSO --- TSOWK
+  TSTPROC -.->|コマンド| TSO
+  DCMD -.->|コマンド| TSO
 ```
+
+TSTPROC・DCMDはコマンドプロシジャーを登録しておくライブラリで、ここからTSOへコマンドが提供される。TSOワークはTSOWKxとして確保される。
 
 ### 2. ファイル説明
 
@@ -1838,7 +1926,7 @@ flowchart TD
 
 1. コーディングを終えてパンチに出すとまずソースリブに登録される
 2. TSOから `LIBC`、`LIBA` のコマンドによってソースリブからTSOワーク上（TSOWKx）に持ってくる。ここで修正を加えて `SUBCB2W`、`SUBASHW` などのコマンドによりコンパイル、またはアセンブルを行う。TESTLIB1へカタログされる
-3. TESTLIB1にカタログされたモジュールと他のモジュールを連結する（リンク）。TESTLIB1のモジュールが他のモジュールを必要としていなければリンクは不要
+3. TESTLIB1にカタログされたモジュールと他のモジュールを連結する（リンク）。TESTLIB1のモジュールが他のモジュールを必要としていなければ（CALL命令がなければ）リンクする必要は無い。このリンク処理を行うコマンドとして `SUBLKED` などがある
 4. リンクされたモジュールは一時的にTESTLIB2へカタログされる（ロードモジュール）
 5. このロードモジュールをTEST命令などでテストを繰り返す。エラーが無くなるまで手順2〜4を繰り返す
 6. 完全に出来上がったロードモジュールは業務によって `DASDLIB1`、`DASDLIB2` などに `TESTLIB2` から登録される
@@ -1878,18 +1966,26 @@ TEST 'TESTLIB2(SAMPLE)' '8106'
 
 ```mermaid
 flowchart TD
-  READY[[READY]] --> LEVEL1["ASM | COB | LINK    CALL | ALLOC | FREE"]
-  LEVEL1 --> LEVEL2["LIST | DEL | EDIT     TEST | TESTCOB | HELP"]
-  LEVEL2 --> LEVEL3["SAVE | INPUT | DEL | CHANGE | END | LIST | SET"]
+  READY[[READY]]
+  READY --> L1A["ASM | COB | LINK"]
+  READY --> L1B["CALL | ALLOC | FREE"]
+  L1A --> L2A["LIST | DEL | EDIT"]
+  L1B --> L2B["TEST | TESTCOB | HELP"]
+  L2A --> L3["SAVE | INPUT | DEL | CHANGE | END | LIST | SET"]
+  L2B --> L3
 ```
+
+左側はコンパイル・リンク系のモード、右側はファイル制御・テスト系のモードで、どちらも最下層のモード群を支える上下関係になっている。
 
 ### 6. CLISTの作り方
 
-TSO画面上に `READY` と出たら何もやっていないという状態である。
+TSO画面上に `READY` と出たら何もやっていないという状態である。まずコマンドプロシジャーを作る。
 
 ```
 EDIT MIHON.CLIST NEW ↵ E ↵
 ```
+
+（名前は何でもよい。8桁以内）KEYINすると画面に `INPUT` と出る。ここで、前頁でテストする為に入れたコマンドをそのまま1ラインずつKEYINする。
 
 ```
 INPUT
@@ -1902,23 +1998,68 @@ INPUT
 
 ENTER-KEYを押すとINPUTモードからEDITモードになり、`EDIT` と画面に出る。ここで `END SAVE ↵` とKEYINするとモードはREADYになる。
 
-実行するには:
+これで、初めに `MIHON.CLIST` とKEYINしたものの中身ができた事になる。後はこれを作動させてTESTモードにすればいいのである。
+
+実行には、次の様にKEYINする:
 
 ```
 EX MIHON ↵
 ```
 
-TESTモードになり画面にTESTと出る。このコマンドプロシジャーをTSTPROCに登録すれば `EX` を付けずに `MIHON` と打ち込むだけで作動する。
+TESTモードになり画面にTESTと出る。何回もKEYINすることを解消したわけである。なお、このコマンドプロシジャーをTSTPROCに登録すれば `EX` を付けずに `MIHON` と打ち込むだけで作動する。
+
+これが最も基本的なコマンドプロシジャーである。このコマンドプロシジャー内で様々な処理を行わせる事もできるが（IF＆SET etcを使って）それは省略しておく。ここではJCLとコマンドプロシジャーの違いを知っておいてもらいたい。
 
 ### 7. TSOの主なコマンド
 
-| コマンド群 | 指定 | 説明 |
-|------------|------|------|
-| **LIBC / LIBA / LIBGP** | 管理コード8桁 | ソースリブなどからモジュールをTSOワーク上へ持ってくる。基本はLGコマンド |
-| **LG** | 管理コード8桁 / 言語(COBOL/ASM/DATA) / ソース先 | `LG ******** {COBOL,ASM,DATA} DSSOURCE(MASTRLIB,SOURCLIB,PDSLIB) PASSWORD(****)` |
-| **SUBCB2W / SUBASHW / KCOBJ / KC** | 管理コード8桁 / RM(**) | コンパイルまたはアセンブルしてTESTLIB1へカタログ |
-| **SUBLKED / SUBLKED2 / KLKED** | 通常6桁指定 | リンクしてTESTLIB2へカタログ |
-| **LS, LS =ALL** | - | TSOワークへ持ってきたモジュールをソースリブなどへ戻す |
+**LIBC / LIBA / LIBGP**
+
+```
+LIBC   ********
+LIBA   ********
+LIBGP  ********
+       管理コード8桁
+```
+
+このコマンドの基本は下記のLGコマンドである。
+
+**LG**
+
+```
+LG ******** { COBOL } DSSOURCE( { MASTRLIB } )
+            { ASM   }           { SOURCLIB }
+            { DATA  }           { PDSLIB   }
+
+   PASSWORD(****)
+```
+
+上記のコマンドは、ソースリブなどからソースモジュールをTSOワーク上へ持ってくるコマンドである。
+
+**SUBCB2W / SUBASHW / KCOBJ / KC**
+
+```
+SUBCB2W  ********   RM(**)
+SUBASHW  ********   RM(**)
+KCOBJ    ********   RM(**)
+KC       ********   RM(**)
+   管理コード8桁    **=RM1,RM2,C
+```
+
+上記のコマンドは、モジュールをコンパイルもしくはアセンブルしてTESTLIB1（基本的に）へカタログする。このコマンドにはオプションが幾つかあるが、それは省略する。
+
+**SUBLKED / SUBLKED2 / KLKED**
+
+```
+SUBLKED   ******
+SUBLKED2  ******   通常6桁指定
+KLKED     ******
+```
+
+上記のコマンドはリンクする為のコマンドである。TESTLIB2（基本的に）へカタログされる。
+
+**LS、LS =ALL**
+
+TSOワークへ持ってきたモジュールをソースリブなどへ戻してやるコマンドである。
 
 ---
 
@@ -1926,29 +2067,33 @@ TESTモードになり画面にTESTと出る。このコマンドプロシジャ
 
 ### 1. PAD図（1:1マッチング、スイッチ使用）
 
+*原見出し: 1、36ページのPAD図（1:1マッチング、スウィッチ使用）*
+
 ```mermaid
 flowchart TD
   START([START]) --> INITIAL[INITIAL]
-  INITIAL --> SET_SW1[SW1=1]
-  SET_SW1 --> SET_SW2[SW2=1]
-  SET_SW2 --> CHECK{KEY1 = KEY2<br/>AND<br/>KEY1 = HIGH-VALUE}
+  INITIAL --> SW1{SW1=1}
+  SW1 -->|YES| READ1[INFL1 READ]
+  READ1 --> SW2{SW2=1}
+  SW2 -->|YES| READ2[INFL2 READ]
+  READ2 --> CHECK{KEY1 = KEY2<br/>AND<br/>KEY1 = HIGH-VALUE}
+  CHECK -->|等しい| CLOSE[CLOSE]
+  CLOSE --> END_([STOP RUN])
   CHECK -->|等しくない| COMP{KEY1 : KEY2}
   COMP -->|KEY1 < KEY2| INFL1_ONLY[INFL1 ONLY処理]
   COMP -->|KEY1 > KEY2| INFL2_ONLY[INFL2 ONLY処理]
   COMP -->|KEY1 = KEY2| MATCH_PROC[マッチング処理]
-  INFL1_ONLY --> SET_A[SW1←'1'<br/>SW2←'0']
-  INFL2_ONLY --> SET_B[SW1←'0'<br/>SW2←'1']
-  MATCH_PROC --> SET_C[SW1←'1'<br/>SW2←'1']
-  SET_A --> READ1[INFL1 READ]
-  SET_B --> READ1
-  SET_C --> READ1
-  READ1 --> READ2[INFL2 READ]
-  READ2 --> CHECK
-  CHECK -->|等しい| CLOSE[CLOSE]
-  CLOSE --> END_([STOP RUN])
+  INFL1_ONLY --> SET_A["'1'→SW1<br/>'0'→SW2"]
+  INFL2_ONLY --> SET_B["'0'→SW1<br/>'1'→SW2"]
+  MATCH_PROC --> SET_C["'1'→SW1<br/>'1'→SW2"]
+  SET_A --> SW1
+  SET_B --> SW1
+  SET_C --> SW1
 ```
 
 ### 2. PAD図（1:1マッチング、スイッチ不使用）
+
+*原見出し: 2、38ページのPAD図（1:1マッチング、スウィッチ不使用）*
 
 ```mermaid
 flowchart TD
@@ -1973,6 +2118,8 @@ flowchart TD
 
 ### 3. PAD図（1:Nマッチング、スイッチ不使用）
 
+*原見出し: 3、39ページのPAD図（1:Nマッチング、スウィッチ不使用）*
+
 ```mermaid
 flowchart TD
   START([START]) --> INITIAL[INITIAL]
@@ -1980,17 +2127,15 @@ flowchart TD
   READ1 --> READ2[INFL2 READ]
   READ2 --> CHECK{KEY1 = KEY2<br/>AND<br/>KEY1 = HIGH-VALUE}
   CHECK -->|等しくない| COMP{KEY1 : KEY2}
-  COMP -->|KEY1 < KEY2| SW_CHECK{SW1=1}
+  COMP -->|KEY1 < KEY2| SW_CHECK{SW1 = '1'？}
   SW_CHECK -->|YES| OUT_PROC[OUT処理]
-  OUT_PROC --> INFL1_ONLY[INFL1 ONLY処理]
-  SW_CHECK -->|NO| INFL1_ONLY2[INFL1 ONLY処理]
-  INFL1_ONLY --> R1[INFL1 READ]
-  INFL1_ONLY2 --> R1
+  SW_CHECK -->|NO| INFL1_ONLY[INFL1 ONLY処理]
+  OUT_PROC --> R1[INFL1 READ]
+  INFL1_ONLY --> R1
   COMP -->|KEY1 > KEY2| INFL2_ONLY[INFL2 ONLY処理]
   INFL2_ONLY --> R2[INFL2 READ]
   COMP -->|KEY1 = KEY2| MATCH[マッチング処理]
-  MATCH --> INFL2_ONLY2[INFL2 ONLY処理]
-  INFL2_ONLY2 --> R3[INFL2 READ]
+  MATCH --> R3[INFL2 READ]
   R1 --> CHECK
   R2 --> CHECK
   R3 --> CHECK
@@ -2000,36 +2145,42 @@ flowchart TD
 
 ### 4. PAD図（N:Nマッチング）
 
+*原見出し: 4、40ページのPAD図（N:Nマッチング）*
+
 ```mermaid
 flowchart TD
   START([START]) --> INITIAL[INITIAL]
   INITIAL --> READ1[INFL1 READ]
   READ1 --> READ2[INFL2 READ]
   READ2 --> CHECK1{KEY1 = KEY2<br/>AND<br/>KEY1 = HIGH-VALUE}
+  CHECK1 -->|等しい| CLOSE[CLOSE]
+  CLOSE --> END_([STOP RUN])
   CHECK1 -->|等しくない| COMP1{KEY1 : KEY2}
   COMP1 -->|KEY1 < KEY2| INFL1_ONLY[INFL1 ONLY処理]
   COMP1 -->|KEY1 > KEY2| INFL2_ONLY[INFL2 ONLY処理]
   COMP1 -->|KEY1 = KEY2| STORE[KEY1→STR1<br/>KEY2→STR2]
   INFL1_ONLY --> R1[INFL1 READ] --> CHECK1
   INFL2_ONLY --> R2[INFL2 READ] --> CHECK1
-  STORE --> LOOP2{KEY1 : KEY2}
+  STORE --> LOOP2{"(2) KEY1 : KEY2"}
   LOOP2 -->|等しくない| OUT[OUT処理]
   LOOP2 -->|等しい| MATCH[マッチング処理]
   OUT --> R3[INFL1 READ]
   MATCH --> R4[INFL2 READ]
   R3 --> HV{KEY1 OR KEY2<br/>= HIGH-VALUE？}
   R4 --> HV
-  HV -->|YES| CMP_STR{KEY1 = STR1？}
-  HV -->|NO| LOOP2
-  CMP_STR -->|NO| LOOP2
-  CMP_STR -->|YES| REOPEN[INFL2 CLOSE<br/>再OPEN]
-  REOPEN --> R5[INFL2 READ]
+  HV -->|YES| LOOP2
+  HV -->|NO| CMP_STR{KEY1 : STR1}
+  CMP_STR -->|等しくない| CHECK1
+  CMP_STR -->|等しい| REOPEN[INFL2 CLOSE<br/>AND 再OPEN]
+  REOPEN --> R5{"(3) INFL2 READ"}
   R5 --> CMP_KEY2{KEY2 : STR2}
   CMP_KEY2 -->|等しくない| R5
   CMP_KEY2 -->|等しい| CHECK1
 ```
 
 ### 5. PAD図（コントロールブレイク）
+
+*原見出し: 5、43ページのPAD図（コントロールブレイク）*
 
 ```mermaid
 flowchart TD
@@ -2053,5 +2204,12 @@ flowchart TD
 ```
 
 ---
+---
 
-*以上*
+## 付記（デジタル化に際して）
+
+- **ページ対応**: 原PDFのページ番号と本文の印刷ページ番号は「印刷ページ ＝ PDFページ − 3」の関係にある（PDF 5ページ目 = 本文 − 2 −）。第八章のPAD図のページ（印刷 − 58 −〜 − 62 −）は横向きにスキャンされている。
+- **原文の表記どおり**に写した箇所: 第三章 (5) FILE-CONTROL の形式一覧の「ATCUAL KEY 文節」（ACTUAL KEY の誤記）、第八章 PAD図中の「HIGT VALUE」「GLOSE」など。旧式のタイプライター打ちのため、この種の誤記が原文に存在する。
+- **PICTURE句の通貨記号**は原文どおり `¥` とした（原文のタイプライターは `¥` キー）。
+- **2進数の指定**「COMP-8」は原文表記のまま。IBM COBOLでは2進（バイナリ）は `COMP`（`COMP-2`）である。
+- 第五章の命令一覧、第七章 TSOのファイル関係図・モード関係図、第八章のPAD図は、原文の図をMermaidのフローチャートで再現したものである。PAD図そのものはN-S図（ボックス図）の表記であり、条件分岐を示す三角記号は「条件が真の時に右側（後続）の処理を実行する」と読み替えている。
