@@ -142,13 +142,13 @@ COUNTER-AREA  など
 
 ```cobol
 *IDENTIFICATION DIVISION.
-*PROGRAM-ID.           プログラム名．
-  AUTHOR.               プログラム作成者
-  DATE-COMPILED.        コンパイル日付
-  DATE-WRITTEN.         プログラム作成日
-  INSTALLATION.         会社名、課名、など
-  SECURITY.             情報の極秘等
-  REMARKS.              プログラムの概要処理
+*PROGRAM-ID.               プログラム名．
+  AUTHOR.                  プログラム作成者
+  DATE-COMPILED.           コンパイル日付
+  DATE-WRITTEN.            プログラム作成日
+  INSTALLATION.            会社名、課名、など
+  SECURITY.                情報の極秘等
+  REMARKS.                 プログラムの概要処理
 ```
 
 `*`の2つ（`IDENTIFICATION DIVISION`、`PROGRAM-ID`）は省略不可。他は省略可能。
@@ -309,8 +309,8 @@ ACCESS MODE IS { SEQUENTIAL }
 
 指定してもコメントとして扱われる。
 
-```
-PROCESSING MODE IS SEQUENTIAL
+```cobol
+PROCESSING MODE  IS SEQUENTIAL
 ```
 
 **⑦ ACTUAL KEY文節**
@@ -433,20 +433,20 @@ REPORT SECTION.
 ```cobol
 DATA            DIVISION.
 FILE            SECTION.
-FD INFL         RECORDING MODE IS F
-                RECORD      CONTAINS 20 CHARACTERS
-                LABEL       RECORD IS STANDARD
-                DATA        RECORD IS IN-REC.
-01 IN-REC               PIC X(20).
+FD  INFL                RECORDING MODE  IS F
+                        RECORD          CONTAINS 20 CHARACTERS
+                        LABEL           RECORD IS STANDARD
+                        DATA            RECORD IS IN-REC.
+01  IN-REC              PIC             X(20).
 WORKING-STORAGE SECTION.
-77 COUNTER             PIC 99.
-01 IN-DATA.
-  05 IN-KBN            PIC X(5).
-  05 IN-NAIYO          PIC X(15).
+77  COUNTER             PIC             99.
+01  IN-DATA.
+  05  IN-KBN            PIC             X(5).
+  05  IN-NAIYO          PIC             X(15).
 LINKAGE       SECTION.
-01 PARM.
-  05 PARM-LL           PIC 9(3) COMP.
-  05 PARM-YMD          PIC X(6).
+01  PARM.
+  05  PARM-LL           PIC             9(3) COMP.
+  05  PARM-YMD          PIC             X(6).
 ```
 
 #### (1) FILE SECTION
@@ -559,12 +559,12 @@ DATA { RECORD IS  } データ名-1...n
 
 ```cobol
 DATA RECORD IS IN-REC と定義済み
-01 IN-REC.
-  05 IN-KUBUN      PIC X(2).
-  05 IN-NAIYO.
-    10 IN-NAIYO-1  PIC X(5).
-    10 IN-NAIYO-2  PIC X(10).
-    10 FILLER      PIC X(20).
+01  IN-REC.
+  05  IN-KUBUN          PIC           X(2).
+  05  IN-NAIYO.
+    10  IN-NAIYO-1      PIC           X(5).
+    10  IN-NAIYO-2      PIC           X(10).
+    10  FILLER          PIC           X(20).
 ```
 
 これは、IN-RECという名前のレコードがあり、37バイトであることを示している。その内訳は、IN-KUBUNという名前のエリアが2バイトで、IN-NAIYOというエリアの中にIN-NAIYO-1というエリアが5バイト、IN-NAIYO-2というエリアが10バイトあるということである。
@@ -589,8 +589,8 @@ PICTURE句及びその他の事は後で述べる事にする。通常は、レ�
 **88レベルの使用例:**
 
 ```cobol
-77  FILE-SIGN PIC X.
-  88 EOF-SIGN  VALUE "E".
+77  FILE-SIGN           PIC           X.
+  88  EOF-SIGN          VALUE         "E".
 ```
 
 上記のように定義して、`"E"` という文字を FILE-SIGN へ移送する。通常このエリアに `"E"` が入ったかどうかを聞くためには `IF FILE-SIGN="E"` と記述するが、88レベルを記述しているため、`IF EOF-SIGN` と書くだけでよい。`="E"` という部分は書く必要がない。なぜなら `VALUE "E"` と定義しているため、PIC Xのエリアに `"E"` という文字が入った時だけ条件が満たされるからである。これは、各自で実際にやってみると納得できるのだが……。
@@ -632,8 +632,8 @@ X-TYPEからの移送には十分注意しなければならない。
 
 計算上で＋、−のサインが必要な時がある。`S` という文字をつけて表わす。
 
-```
-PIC S99.
+```cobol
+PIC  S99.
 ```
 
 これは1バイトのエリアがとられる。
@@ -690,25 +690,25 @@ COMPという指定で2進のエリアであることを示すが、SYNCと指�
 
 > **イ. A-TYPE（アルファベット項目）**
 
-```
-PIC AA.
+```cobol
+PIC  AA.
 ```
 
 アルファベットとブランクの27文字のみを移送できる。ほとんど使われない。X-TYPEで代用できるからである。
 
 > **ウ. X-TYPE（英数字項目）**
 
-```
-PIC XX.
+```cobol
+PIC  XX.
 ```
 
 COBOLで使用できる全ての文字を移送できる。したがって通常、数字が入っているがその他の文字が時折入ってくるとか、FILLERで定義されるエリアをX-TYPEで定義する。グループ項目（PIC句をもたないレベル項目）は全てX-TYPEとして扱われる。
 
-```
-01 IN-REC.
-  05 IN-1    PIC S9(3) COMP-3.
-  05 IN-2    PIC A(3).
-  05 IN-3    PIC X(5).
+```cobol
+01  IN-REC.
+  05  IN-1              PIC           S9(3) COMP-3.
+  05  IN-2              PIC           A(3).
+  05  IN-3              PIC           X(5).
 ```
 
 上記のようなエリアが定義されている時、`MOVE SPACE TO IN-1` は使えないが `MOVE SPACE TO IN-REC` は使える。ただしSPACEを送ったあとIN-1を使用すると ABEND OC7（データエラー）となる。
@@ -758,15 +758,15 @@ COBOLで使用できる全ての文字を移送できる。したがって通常
 
 上記のようなリストを出力したい時は、下記のように定義する:
 
-```
-01 PRINT.
-  05 PR-GAKU    PIC ¥¥¥,¥¥¥,¥¥¥,¥¥¥.
-  05 FILLER      PIC X(3).
-  05 PR-KASHI   PIC --,---,---.
-  05 FILLER      PIC X(3).
-  05 PR-CHECK  PIC *****9.
-  05 FILLER      PIC X(5).
-  05 PR-EDIT    PIC XBXBXBX.
+```cobol
+01  PRINT.
+  05  PR-GAKU           PIC           ¥¥¥,¥¥¥,¥¥¥,¥¥¥.
+  05  FILLER            PIC           X(3).
+  05  PR-KASHI          PIC           --,---,---.
+  05  FILLER            PIC           X(3).
+  05  PR-CHECK          PIC           *****9.
+  05  FILLER            PIC           X(5).
+  05  PR-EDIT           PIC           XBXBXBX.
 ```
 
 それぞれの項目にデータを移送して、PRINTをWRITEする。
@@ -775,9 +775,9 @@ COBOLで使用できる全ての文字を移送できる。したがって通常
 
 DB、CRについては:
 
-```
-PIC 9(5) DB.
-PIC 9(5) CR.
+```cobol
+PIC  9(5) DB.
+PIC  9(5) CR.
 ```
 
 マイナスの時のみ右端にDB、CRという文字が出力される。
@@ -793,9 +793,9 @@ PIC 9(5) CR.
 VALUE IS "リテラル"
 ```
 
-```
-05 A PIC X(11).
-  VALUE "** START **".
+```cobol
+05  A                   PIC           X(11).
+                        VALUE         "** START **".
 ```
 
 `VALUE IS` の `IS` は省略できる。この時、Aというエリアには `"** START **"` というリテラルをMOVEした結果と同じになる。VALUEは、実行時にデータ名にMOVEせず、コンパイル時に初期値として定義しておきたい場合（テーブル作成など）によく使用される。
@@ -804,8 +804,8 @@ VALUE IS "リテラル"
 
 通常、X-TYPE・A-TYPEで定義されているエリア内にデータを移送する時は左詰めとなる。これを右詰めに処理させようというのがこの定義である。
 
-```
-05 A PIC X(10) JUST RIGHT.
+```cobol
+05  A  PIC  X(10) JUST RIGHT.
 ```
 
 ```
@@ -820,13 +820,13 @@ PIC X(8) JUST RIGHT   :  △ △ △ △ A B C
 一度定義したエリアに対して違った形で定義し直すものであり、新たにエリアは取れない。あくまでも同じエリアである。
 
 ```cobol
-05 A               PIC X(10).
-05 A-R REDEFINES A.
-  10 B              PIC 9(5).
-  10 C              PIC S9(5).
-  10 D              PIC X(1).
-05 A-RR REDEFINES A.
-  10 E              PIC X(3).
+05  A                   PIC           X(10).
+05  A-R                 REDEFINES     A.
+  10  B                 PIC           9(5).
+  10  C                 PIC           S9(5).
+  10  D                 PIC           X(1).
+05  A-RR                REDEFINES     A.
+  10  E                 PIC           X(3).
 ```
 
 何度でも再定義してかまわない。再定義するバイト数が再定義されるエリアのバイト数よりも大きくすることはできないが、小さい分には構わない。
@@ -835,17 +835,17 @@ PIC X(8) JUST RIGHT   :  △ △ △ △ A B C
 
 このREDEFINES文節は日付によく使われる:
 
-```
-05 A-YYMMDD.
-  10 A-YYMM.
-    15 A-YY        PIC X(2).
-    15 A-MM        PIC X(2).
-  10 A-DD          PIC X(2).
-05 A-YYMMDD-R REDEFINES A-YYMMDD.
-  10 A-YY-R        PIC 9(2).
-  10 A-MMDD.
-    15 A-MM-R      PIC 9(2).
-    15 A-DD-R      PIC 9(2).
+```cobol
+05  A-YYMMDD.
+  10  A-YYMM.
+    15  A-YY            PIC           X(2).
+    15  A-MM            PIC           X(2).
+  10  A-DD              PIC           X(2).
+05  A-YYMMDD-R          REDEFINES     A-YYMMDD.
+  10  A-YY-R            PIC           9(2).
+  10  A-MMDD.
+    15  A-MM-R          PIC           9(2).
+    15  A-DD-R          PIC           9(2).
 ```
 
 上記のように指定すると、同じエリアをX-TYPEでも9-TYPEでも使用できる。（YYMMDD＝年月日）
@@ -864,22 +864,22 @@ INDEXED BY 指標名
 
 **例1:**
 
-```
-05 A OCCURS 30 TIMES
-  INDEXED BY A-X1.
-  10 B             PIC X(1).
+```cobol
+05  A                   OCCURS        30 TIMES
+                        INDEXED BY    A-X1.
+  10  B                 PIC           X(1).
 ```
 
 Bというエリアが30個あり、A-X1というインデックスで参照できる。実際にBのエリアを参照する時は `B(1)`、`B(2)` または `B(A-X1)` のような使い方をする。
 
 **例2:**
 
-```
-05 A OCCURS 30 TIMES
-  ASCENDING KEY IS A-KEY
-  INDEXED BY A-X1.
-  10 A-KEY        PIC X(3).
-  10 A-NAIYO      PIC X(10).
+```cobol
+05  A                   OCCURS         30 TIMES
+                        ASCENDING KEY  IS A-KEY
+                        INDEXED BY     A-X1.
+  10  A-KEY             PIC            X(3).
+  10  A-NAIYO           PIC            X(10).
 ```
 
 A-KEYが1番目から30番目まで昇順であると定義している。これはSEARCH命令に関連してくる。
@@ -890,14 +890,14 @@ OCCURS項目で作成されるテーブルは3次元まで許される。
 
 **例3:**
 
-```
-05 A OCCURS 3 TIMES
-  INDEXED BY A-X1.
-  10 B OCCURS 5 TIMES
-    INDEXED BY B-X1.
-    15 C OCCURS 2 TIMES
-      INDEXED BY C-X1.
-      20 D          PIC X(20).
+```cobol
+05  A                   OCCURS        3 TIMES
+                        INDEXED BY    A-X1.
+  10  B                 OCCURS        5 TIMES
+                        INDEXED BY    B-X1.
+    15  C               OCCURS        2 TIMES
+                        INDEXED BY    C-X1.
+      20  D             PIC           X(20).
 ```
 
 Dという20バイトのエリアが3×5×2=30個、すなわち600バイトのエリアがとられる。参照は `D(1, 1, 1)` または `D(A-X1, B-X1, C-X1)` のようにする。
@@ -906,13 +906,13 @@ Dという20バイトのエリアが3×5×2=30個、すなわち600バイトの�
 
 **例4:**
 
-```
-05 A             PIC X(10)
-  VALUE "ABCDEFGHIJ".
-05 A-R REDEFINES A.
-  10 B OCCURS 10 TIMES
-    INDEXED BY B-X1.
-    15 C           PIC X(1).
+```cobol
+05  A                   PIC           X(10)
+                        VALUE         "ABCDEFGHIJ".
+05  A-R                 REDEFINES     A.
+  10  B                 OCCURS        10 TIMES
+                        INDEXED BY    B-X1.
+    15  C               PIC           X(1).
 ```
 
 このように定義すると、B-X1の値を変えることによりAの中の任意の1文字を参照できる。例えば `C(3)` は `"C"` であり、`B-X1` に5をSETすれば `C(B-X1)` は `"E"` である。
@@ -924,9 +924,9 @@ Dという20バイトのエリアが3×5×2=30個、すなわち600バイトの�
 パラメータとして渡ってくるエリアを定義する時は、DATAの他にそのDATAの長さが入ってくるエリア2バイトを定義しなければならない。
 
 ```cobol
-01 PARM.
-  05 PARM-LL     PIC 9(3) COMP.
-  05 PARM-YMD    PIC X(6).
+01  PARM.
+  05  PARM-LL           PIC           9(3) COMP.
+  05  PARM-YMD          PIC           X(6).
 ```
 
 これは、パラメータとして入ってくるのはPARM-YMDで6バイトである。この6バイトという長さがPARM-LLへ付加されてプログラム中へ入ってくる。LLのエリアは名前を付ける必要はなく `FILLER PIC X(2).` でもよい。
@@ -972,8 +972,8 @@ ACCEPT データ名 [FROM { SYSIN   }
 データ名はWORKING-STORAGE SECTIONで定義済みのエリア。FROMを書かないとSYSINからの入力とみなされる。
 
 ```cobol
-05 A PIC X(5).    ← ABCDE（カード）
-ACCEPT A.         ← //SYSIN DD *
+05  A                   PIC           X(5).  ← ABCDE（カード）
+ACCEPT  A.                                   ← //SYSIN DD *
 ```
 
 この命令でAというエリアには `"ABCDE"` が入る。
@@ -984,13 +984,13 @@ ACCEPT A.         ← //SYSIN DD *
 
 TOの左側に書いたエリアの内容が右側のエリアに足し込まれて、右側のエリアの値が結果と置き換わる。
 
-```
-05 A PIC 9(3)V9(4).   ... 83.235
-05 B PIC 9(4)V9(2).   ... 11.46
+```cobol
+05  A                   PIC           9(3)V9(4).  ... 83.235
+05  B                   PIC           9(4)V9(2).  ... 11.46
 ```
 
-```
-ADD A B TO (B) ROUNDED.
+```cobol
+ADD  A B TO (B) ROUNDED.
   結果 B = 106.（小数第3位四捨五入）
 ```
 
@@ -998,30 +998,30 @@ ADD A B TO (B) ROUNDED.
 
 GIVINGの左側のエリアの内容が全て加算されて、右側のエリアへストアされる。
 
-```
-05 A PIC 9(2).      ... 10
-05 B PIC 9(3).      ... 30
-05 C PIC 9(4).      ... 0
+```cobol
+05  A                   PIC           9(2).  ... 10
+05  B                   PIC           9(3).  ... 30
+05  C                   PIC           9(4).  ... 0
 ```
 
-```
-ADD A B GIVING C.
+```cobol
+ADD  A B GIVING C.
   結果 C = 40（A, Bは保存）
 ```
 
-```
-ADD A B GIVING B.  ← 同じ結果が得られる
-ADD A TO B.        ←
+```cobol
+ADD  A B GIVING B.  ← 同じ結果が得られる
+ADD  A TO B.        ←
 ```
 
-```
-ADD A B C TO D E F.
+```cobol
+ADD  A B C TO D E F.
 ```
 
 この命令を行うと、A+B+CがD、E、Fにそれぞれ加算される。
 
-```
-ADD 1 TO IN-CTR.
+```cobol
+ADD  1 TO IN-CTR.
 ```
 
 インプット件数、ライン数をカウントする時にこの形式を使う。
@@ -1032,14 +1032,14 @@ ADD 1 TO IN-CTR.
 
 FROMの左側のエリアの内容を全て加算して、右側のエリアの値から減算し、右側のエリアの内容が結果と置き換わる。
 
-```
-05 A PIC 9(2).      ... 10
-05 B PIC 9(3).      ... 15
-05 C PIC 9(4).      ... 100
+```cobol
+05  A                   PIC           9(2).  ... 10
+05  B                   PIC           9(3).  ... 15
+05  C                   PIC           9(4).  ... 100
 ```
 
-```
-SUBTRACT A B FROM C.
+```cobol
+SUBTRACT  A B FROM C.
   結果 C = 75（A, Bは保存）
 ```
 
@@ -1047,14 +1047,14 @@ SUBTRACT A B FROM C.
 
 FROMの左側のエリアの内容を全て加算し、右側のエリアから減算して、結果はGIVINGで指定しているエリアへストアされる。
 
-```
-05 A PIC 9(2)V9(2).   ... 10.01
-05 B PIC 9(3)V9(2).   ... 33.25
-05 C PIC 9(4)V9(1).   ... 100.0
+```cobol
+05  A                   PIC           9(2)V9(2).  ... 10.01
+05  B                   PIC           9(3)V9(2).  ... 33.25
+05  C                   PIC           9(4)V9(1).  ... 100.0
 ```
 
-```
-SUBTRACT A FROM B GIVING C ROUNDED.
+```cobol
+SUBTRACT  A FROM B GIVING C ROUNDED.
   結果 C = 23.2（小数第2位四捨五入）
 ```
 
@@ -1066,13 +1066,13 @@ SUBTRACT A FROM B GIVING C ROUNDED.
 
 BYの左側に書いたエリアの内容が右側のエリアに乗算され、結果が置き換わる。
 
-```
-05 A PIC 9(2)V9(1).   ... 3.1
-05 B PIC 9(3)V9(1).   ... 24.1
+```cobol
+05  A                   PIC           9(2)V9(1).  ... 3.1
+05  B                   PIC           9(3)V9(1).  ... 24.1
 ```
 
-```
-MULTIPLY A BY B ROUNDED.
+```cobol
+MULTIPLY  A BY B ROUNDED.
   結果 B = 74.7（小数第2位四捨五入）
 ```
 
@@ -1080,23 +1080,23 @@ MULTIPLY A BY B ROUNDED.
 
 この形式を用いると、ADDやSUBTRACTと同様に結果はGIVINGの後に指定したエリアへストアされ、乗数・被乗数共に保存される。
 
-```
-05 A PIC 9(2).       ... 10
-05 B PIC 9(2).       ... 22
-05 C PIC 9(4).       ... 0
+```cobol
+05  A                   PIC           9(2).  ... 10
+05  B                   PIC           9(2).  ... 22
+05  C                   PIC           9(4).  ... 0
 ```
 
-```
-MULTIPLY A BY B GIVING C.
+```cobol
+MULTIPLY  A BY B GIVING C.
   結果 C = 220（A, Bは保存）
 ```
 
 GIVINGのエリアは数字編集項目でもよい。
 
-```
-05 A PIC 9(2).       ... 10
-05 B PIC 9(2).       ... 22
-05 C PIC Z(4).
+```cobol
+05  A                   PIC           9(2).  ... 10
+05  B                   PIC           9(2).  ... 22
+05  C                   PIC           Z(4).
 ```
 
 ```
@@ -1110,13 +1110,13 @@ MULTIPLY A BY B GIVING C.
 
 INTOの右側のエリアの内容が左側のエリアで除算され、右側のエリアの値が結果と置き換わる。
 
-```
-05 A PIC 9(2)V9(1).     ... 2.9
-05 B PIC 9(3)V9(2).     ... 32.28
+```cobol
+05  A                   PIC           9(2)V9(1).  ... 2.9
+05  B                   PIC           9(3)V9(2).  ... 32.28
 ```
 
-```
-DIVIDE A INTO B ROUNDED.
+```cobol
+DIVIDE  A INTO B ROUNDED.
   結果 B = 11.13（小数第3位四捨五入）
 ```
 
@@ -1124,15 +1124,15 @@ DIVIDE A INTO B ROUNDED.
 
 REMAINDERは余りを求めるオプションである。INTOの左側のエリアの値で右側のエリアの値を除算し、結果をGIVING句のエリアへストア、REMAINDER句のエリアへ余りをストアする。
 
-```
-05 A PIC 9(2).       ... 13
-05 B PIC 9(3).       ... 100
-05 C PIC 9(2).
-05 D PIC 9(2).
+```cobol
+05  A                   PIC           9(2).  ... 13
+05  B                   PIC           9(3).  ... 100
+05  C                   PIC           9(2).
+05  D                   PIC           9(2).
 ```
 
-```
-DIVIDE A INTO B GIVING C REMAINDER D.
+```cobol
+DIVIDE  A INTO B GIVING C REMAINDER D.
   結果 C = 7、D = 9
 ```
 
@@ -1150,14 +1150,14 @@ COMPUTE 識別名-1 [ROUNDED] = 算術演算式
 
 例えば `C = (A + B) / (B - E) * D` と書きたい場合:
 
-```
-COMPUTE C = ((A + B) / (B - E)) * D.
+```cobol
+COMPUTE  C = ((A + B) / (B - E)) * D.
 ```
 
 ただしCOMPUTE命令には余りを求めるオプションはない。余りを必要とする時にはDIVIDE命令を使用しなければならない。
 
-```
-COMPUTE A = 20.
+```cobol
+COMPUTE  A = 20.
 ```
 
 上記は `MOVE 20 TO A.` と同じ結果。ただしCOMPUTE命令のAのエリアは9-TYPEでなければならない。受項目（`=` の左側）は数字編集項目であってもかまわない。
@@ -1166,24 +1166,24 @@ COMPUTE A = 20.
 
 **比較:** `A = B × C × D⁶ + 6 - E` を2通りの方法で書いた場合:
 
-```
+```cobol
 COMPUTE:
-COMPUTE A = B * C * D ** 6 + 6 - E.
+COMPUTE   A = B * C * D ** 6 + 6 - E.
 
 個別命令:
-MULTIPLY D BY D GIVING A.
-MULTIPLY D BY A.    （4回繰り返す）
-MULTIPLY B BY A.
-MULTIPLY C BY A.
-ADD 6 TO A.
-SUBTRACT E FROM A.
+MULTIPLY  D BY D GIVING A.
+MULTIPLY  D BY A.                      （4回繰り返す）
+MULTIPLY  B BY A.
+MULTIPLY  C BY A.
+ADD       6 TO A.
+SUBTRACT  E FROM A.
 ```
 
 **ON SIZE ERROR オプション（算術命令共通）:**
 
-```
-MULTIPLY A BY B
-  ON SIZE ERROR GO TO ERR-SHORI.
+```cobol
+MULTIPLY         A BY B
+  ON SIZE ERROR  GO TO ERR-SHORI.
 ```
 
 AまたはBのエリアでオーバーフローが発生したらERR-SHORIというルーチンへ飛んでいく。ADD・SUBTRACT・MULTIPLY・DIVIDE・COMPUTEの各算術命令でこのオプションが使える。
@@ -1197,9 +1197,9 @@ IF 条件  ステートメント-1  NEXT SENTENCE
 ELSE     ステートメント-2  NEXT SENTENCE
 ```
 
-```
-IF A = B
-  PERFORM S03-EQUAL-SHORI THRU S03-EXIT
+```cobol
+IF               A = B
+  PERFORM        S03-EQUAL-SHORI THRU S03-EXIT
 ELSE
   NEXT SENTENCE.
 ```
@@ -1208,10 +1208,10 @@ AとBのエリアの内容が等しければS03-EQUAL-SHORIからS03-EXITまで�
 
 **ネスティング（入れ子方式）:**
 
-```
-IF A = B
-  IF B NOT = C          → ネスティング
-    IF C = D
+```cobol
+IF        A = B
+  IF      B NOT = C  → ネスティング
+    IF    C = D
       命令
     ELSE
 ```
@@ -1225,11 +1225,11 @@ READ ファイル名 [INTO データ名]
   AT END 命令ステートメント.
 ```
 
-```
-READ INFL1 INTO IN-DATA
+```cobol
+READ       INFL1 INTO IN-DATA
   AT END
-    MOVE '1' TO SW-EOF
-    GO TO READ-END.
+    MOVE   '1' TO SW-EOF
+    GO TO  READ-END.
 ```
 
 INTOを使わないとFILE SECTIONで定義した01レベルのエリア内にデータは読み込まれる。INTOオプションは READ + MOVE に相当する。
@@ -1240,9 +1240,9 @@ INTOを使わないとFILE SECTIONで定義した01レベルのエリア内に�
 MOVE 識別名-1 TO 識別名-2...(n)
 ```
 
-```
-MOVE ZERO TO A B C.    ← A, B, Cがゼロクリアされる
-MOVE A TO B.           ← Aの内容がBに移される
+```cobol
+MOVE  ZERO TO A B C.  ← A, B, Cがゼロクリアされる
+MOVE  A TO B.         ← Aの内容がBに移される
 ```
 
 MOVEステートメントはインデックスには使えない。インデックスにはSET命令を使う。
@@ -1251,16 +1251,16 @@ MOVEステートメントはインデックスには使えない。インデッ�
 
 インデックスに値をセットしたり、加算・減算をするものである。
 
-```
-SET インデックス名 TO   識別名
-SET    〃              UP BY   識別名
-SET    〃              DOWN BY 識別名
+```cobol
+SET インデックス名 TO       識別名
+SET  〃              UP BY  識別名
+SET  〃                     DOWN BY 識別名
 ```
 
-```
-SET IDX1 TO 1.       ← IDX1に1がセットされる
-SET IDX1 UP BY 1.    ← IDX1が+1される
-SET IDX1 DOWN BY 3.  ← IDX1が-3される
+```cobol
+SET  IDX1 TO 1.       ← IDX1に1がセットされる
+SET  IDX1 UP BY 1.    ← IDX1が+1される
+SET  IDX1 DOWN BY 3.  ← IDX1が-3される
 ```
 
 右側のものが左側へセットされる（MOVEとは逆）。
@@ -1276,10 +1276,10 @@ PERFORM 処理手順名-1 [THRU 処理手順名-2]
 
 これは、処理手順名-1から処理手順名-2までを識別名-1回繰り返すという意味である。処理手順名-2を指定していないと、次の処理手順名が出てくるまでの処理を行う。
 
-```
-PERFORM S03-READ THRU S03-EXIT.
+```cobol
+  PERFORM  S03-READ THRU S03-EXIT.
 
-S03-READ.         ← このブロックの処理を実行
+S03-READ.                           ← このブロックの処理を実行
   ...
 S03-EXIT.
   EXIT.
@@ -1287,15 +1287,15 @@ S03-EXIT.
 
 **UNTILオプション:**
 
-```
-PERFORM S04-SHORI THRU S04-EXIT
-  UNTIL SW-END = 'E'.
+```cobol
+  PERFORM      S04-SHORI THRU S04-EXIT
+    UNTIL      SW-END = 'E'.
 
 S04-SHORI.
-  READ INFL
-    AT END
-      MOVE 'E' TO SW-END
-      GO TO S04-EXIT.
+    READ       INFL
+      AT END
+        MOVE   'E' TO SW-END
+        GO TO  S04-EXIT.
 S04-EXIT.
   EXIT.
 ```
@@ -1316,12 +1316,12 @@ PERFORM 処理手順名-1 THRU 処理手順名-2
   BY 識別名-9 UNTIL 条件-3 ]]]
 ```
 
-```
-PERFORM S05-SHORI THRU S05-EXIT
-  VARYING IDX1 FROM 1
-    BY 10 UNTIL A > B
-  AFTER IDX2 FROM 1
-    BY 10 UNTIL B > C.
+```cobol
+PERFORM    S05-SHORI THRU S05-EXIT
+  VARYING  IDX1 FROM 1
+    BY     10 UNTIL A > B
+  AFTER    IDX2 FROM 1
+    BY     10 UNTIL B > C.
 ```
 
 2次元テーブル処理に向いている。
@@ -1341,9 +1341,9 @@ PERFORM S05-SHORI THRU S05-EXIT
 
 **注意:** 一般にメイン処理はPERFORM命令とIF文で組み立てられる事が多い。PERFORMした先から別のセグメントへブランチすることは望ましくない（後からの解析がやりにくくなる）。
 
-```
-S04-SHORI.          左のようなプログラムの組み立ては
-  GO TO S05-SUB.    望ましくない。GO TO文はそのセグメント
+```cobol
+S04-SHORI.   左のようなプログラムの組み立ては
+    GO TO  S05-SUB.   望ましくない。GO TO文はそのセグメント
                     内にとどまる方が望ましい。
 S04-EXIT.
   EXIT.
@@ -1358,13 +1358,13 @@ S05-EXIT.
 GO TO 処理手順名
 ```
 
-```
+```cobol
 S04-SHORI.
-  GO TO S04-02.
+    GO TO  S04-02.
 S04-01.
-  GO TO S04-03.
+    GO TO  S04-03.
 S04-02.
-  GO TO S04-01.
+    GO TO  S04-01.
 S04-03.
 S04-EXIT.
   EXIT.
@@ -1380,9 +1380,9 @@ GO TO 処理手順名-1
      処理手順名-n DEPENDING ON 識別名
 ```
 
-```
-MOVE A TO WK-DEP.
-GO TO S03-01
+```cobol
+MOVE   A TO WK-DEP.
+GO TO  S03-01
      S03-02
      S03-03 DEPENDING ON WK-DEP.
 ```
@@ -1411,8 +1411,8 @@ OPEN I-O    ファイル名-3...(n)     ← 両方
 CLOSE ファイル名-1...(n)
 ```
 
-```
-CLOSE INFL OUTFL.
+```cobol
+CLOSE  INFL OUTFL.
 ```
 
 INPUT/OUTPUTの指定はいらない。CLOSEした後、ファイルのREAD/WRITEを行う時は再度OPENを実行しなければならない。
@@ -1429,24 +1429,24 @@ WRITE レコード名 [FROM 識別名]
 
 FROMを使うと識別名の内容がレコード名へMOVEされてからWRITEされる（READ～INTOと同じ考え方: MOVE + WRITE）。
 
-```
+```cobol
 FILE SECTION.
-FD OUTFL.
-01 OUT-REC PIC X(100).
+FD  OUTFL.
+01  OUT-REC             PIC           X(100).
 
 WORKING-STORAGE SECTION.
-01 OUT-DATA.
-  05 OUT-KEY.
+01  OUT-DATA.
+  05  OUT-KEY.
 
 PROCEDURE DIVISION.
-WRITE OUT-REC FROM OUT-DATA.
+WRITE  OUT-REC FROM OUT-DATA.
 ```
 
 これは以下と同じ:
 
-```
-MOVE OUT-DATA TO OUT-REC.
-WRITE OUT-REC.
+```cobol
+MOVE   OUT-DATA TO OUT-REC.
+WRITE  OUT-REC.
 ```
 
 **リスト出力のWRITE:**
@@ -1498,8 +1498,8 @@ UPON句が省略されるとSYSOUTとみなされる。
 | CONSOLE | 100桁 |
 | SYSPUNCH | 72桁 |
 
-```
-DISPLAY "*** PROGRAM ERR ***" UPON CONSOLE.
+```cobol
+DISPLAY  "*** PROGRAM ERR ***" UPON CONSOLE.
 ```
 
 ```
@@ -1520,38 +1520,38 @@ SEARCH テーブル名 [AT END 命令ステートメント-1]
 
 テーブル名は、エリアの上でOCCURS句が付いている項目である。SEARCHを使わずにIFでLOOPさせるやり方もある。
 
-```
-05 A-OCCUR OCCURS 100 TIMES
-  INDEXED BY A-X1.
-  10 A-KEY      PIC X(3).
-  10 A-NAIYO    PIC X(25).
-05 WK-KEY      PIC X(3).
-05 WK-DATA     PIC X(25).
+```cobol
+05  A-OCCUR             OCCURS        100 TIMES
+                        INDEXED BY    A-X1.
+  10  A-KEY             PIC           X(3).
+  10  A-NAIYO           PIC           X(25).
+05  WK-KEY              PIC           X(3).
+05  WK-DATA             PIC           X(25).
 ```
 
-```
-SET A-X1 TO 1.
-SEARCH A-OCCUR
-  AT END GO TO SEARCH-END
-WHEN WK-KEY = A-KEY (A-X1)
-  MOVE A-NAIYO (A-X1) TO WK-DATA.
+```cobol
+SET       A-X1 TO 1.
+SEARCH    A-OCCUR
+  AT END  GO TO SEARCH-END
+WHEN      WK-KEY = A-KEY (A-X1)
+  MOVE    A-NAIYO (A-X1) TO WK-DATA.
 ```
 
 SEARCH命令を実行する前に必ずインデックスに値をセットしなければならない。このサーチ命令は、A-OCCURというエリアのA-KEYのn番目がWK-KEYと等しいものを探し出して、そのn番目のA-NAIYOをWK-DATAへ移す。テーブル上に条件に合うものが無ければ、SEARCH-ENDという処理手順名の所へブランチする。
 
 **IF文のLOOPでも同等の処理:**
 
-```
-SET A-X1 TO 1.
+```cobol
+  SET        A-X1 TO 1.
 S03-SEARCH.
-IF A-X1 > 100
-  GO TO S03-SEARCH-END
-ELSE
-  IF A-KEY (A-X1) = WK-KEY
-    MOVE A-NAIYO (A-X1) TO WK-DATA
+  IF         A-X1 > 100
+    GO TO    S03-SEARCH-END
   ELSE
-    SET A-X1 UP BY 1
-    GO TO S03-SEARCH.
+    IF       A-KEY (A-X1) = WK-KEY
+      MOVE   A-NAIYO (A-X1) TO WK-DATA
+    ELSE
+      SET    A-X1 UP BY 1
+      GO TO  S03-SEARCH.
 ```
 
 SEARCHの方がステートメント数が少なく、S03-SEARCHという処理手順名をとる必要が無い。どちらを使うかはケースバイケースで使い分けて欲しい。
@@ -1763,15 +1763,15 @@ flowchart TD
 
 ブレークキーの定義:
 
-```
-05 KEY.
-  10 KEY1 PIC X(3).    READ時のKEY
-  10 KEY2 PIC X(3).
-  10 KEY3 PIC X(3).
-05 STR.
-  10 STR1 PIC X(3).    1件前のKEY
-  10 STR2 PIC X(3).
-  10 STR3 PIC X(3).
+```cobol
+05  KEY.
+  10  KEY1              PIC           X(3).  READ時のKEY
+  10  KEY2              PIC           X(3).
+  10  KEY3              PIC           X(3).
+05  STR.
+  10  STR1              PIC           X(3).  1件前のKEY
+  10  STR2              PIC           X(3).
+  10  STR3              PIC           X(3).
 ```
 
 KEY1・KEY2・KEY3はそれぞれ大項目・中項目・小項目のKEYを表わす（支社・営業部・支部の関係と同じ）。STRの方は、違うKEYが入った時と1件目のREADの時に入れる（READ時点の1件前のデータの値）。
@@ -1815,40 +1815,40 @@ flowchart TD
 
 ### コーディング例（MAIN）
 
-| 文番号 | A | B |
-|--------|---|---|
-| 10 | S01-START. | |
-| 20 |   PERFORM S02-INITIAL THRU S02-EXIT. | |
-| 30 | S01-01. | |
-| 40 |   PERFORM S03-READ THRU S03-EXIT. | |
-| 50 |   IF SW-END = '1' | |
-| 60 |     GO TO S01-02 | |
-| 70 |   ELSE | |
-| 80 |     IF KEY = STR | |
-| 90 |       NEXT SENTENCE | |
-| 100 |   ELSE | |
-| 110 |     IF KEY1 = STR1 | |
-| 120 |       IF KEY2 = STR2 | |
-| 130 |         PERFORM S06-SHOKEI THRU S06-EXIT | |
-| 140 | | |
-| 150 |       ELSE | |
-| 160 |         PERFORM S06-SHOKEI THRU S06-EXIT | |
-| 170 |         PERFORM S07-CHUKEI THRU S07-EXIT | |
-| 180 | | |
-| 190 |     ELSE | |
-| 200 |       PERFORM S06-SHOKEI THRU S06-EXIT | |
-| 210 |       PERFORM S07-CHUKEI THRU S07-EXIT | |
-| 220 |       PERFORM S08-GOKEI THRU S08-EXIT. | |
-| 270 |   PERFORM S04-MEISAI THRU S04-EXIT. | |
-| 280 |   PERFORM S05-SHUKEI THRU S05-EXIT. | |
-| 290 |   GO TO S01-01. | |
-| 300 | S01-02. | |
-| 310 |   PERFORM S06-SHOKEI THRU S06-EXIT. | |
-| 320 |   PERFORM S07-CHUKEI THRU S07-EXIT. | |
-| 330 |   PERFORM S08-GOKEI THRU S08-EXIT. | |
-| 340 |   PERFORM S09-KENSUHYO THRU S09-EXIT. | |
-| 350 |   PERFORM S10-CLOSE THRU S10-EXIT. | |
-| 360 |   STOP RUN. | |
+```cobol
+10     S01-START.
+20         PERFORM            S02-INITIAL THRU S02-EXIT.
+30     S01-01.
+40         PERFORM            S03-READ THRU S03-EXIT.
+50         IF                 SW-END = '1'
+60           GO TO            S01-02
+70         ELSE
+80           IF               KEY = STR
+90             NEXT SENTENCE
+100        ELSE
+110          IF               KEY1 = STR1
+120            IF             KEY2 = STR2
+130              PERFORM      S06-SHOKEI THRU S06-EXIT
+140
+150            ELSE
+160              PERFORM      S06-SHOKEI THRU S06-EXIT
+170              PERFORM      S07-CHUKEI THRU S07-EXIT
+180
+190          ELSE
+200            PERFORM        S06-SHOKEI THRU S06-EXIT
+210            PERFORM        S07-CHUKEI THRU S07-EXIT
+220            PERFORM        S08-GOKEI THRU S08-EXIT.
+270        PERFORM            S04-MEISAI THRU S04-EXIT.
+280        PERFORM            S05-SHUKEI THRU S05-EXIT.
+290        GO TO              S01-01.
+300    S01-02.
+310        PERFORM            S06-SHOKEI THRU S06-EXIT.
+320        PERFORM            S07-CHUKEI THRU S07-EXIT.
+330        PERFORM            S08-GOKEI THRU S08-EXIT.
+340        PERFORM            S09-KENSUHYO THRU S09-EXIT.
+350        PERFORM            S10-CLOSE THRU S10-EXIT.
+360        STOP RUN.
+```
 
 マッチング処理中にコントロールブレイク処理が入るというような処理は非常に多い。マッチング処理とコントロールブレイク処理は、単純なTAPE TO PRINTのような処理以外は入っているとみて良いだろう。それだけに、この2つの処理はしっかりと身につけておいて欲しい。
 
@@ -2212,4 +2212,23 @@ flowchart TD
 - **原文の表記どおり**に写した箇所: 第三章 (5) FILE-CONTROL の形式一覧の「ATCUAL KEY 文節」（ACTUAL KEY の誤記）、第八章 PAD図中の「HIGT VALUE」「GLOSE」など。旧式のタイプライター打ちのため、この種の誤記が原文に存在する。
 - **PICTURE句の通貨記号**は原文どおり `¥` とした（原文のタイプライターは `¥` キー）。
 - **2進数の指定**「COMP-8」は原文表記のまま。IBM COBOLでは2進（バイナリ）は `COMP`（`COMP-2`）である。
+### COBOLコードの整桁規約
+
+本書のCOBOLコードは、下記の規約で整桁している（語句そのものは原文のまま。追加したのは空白のみ）。
+
+| 欄 | 開始位置 | 内容 |
+|---|---|---|
+| レベル欄 | 入れ子1段につき+2桁 | 2桁のレベル番号 + 2空白 |
+| 項目名欄 | レベル欄+4桁目 | 項目名・FD名 |
+| **句欄** | **25桁目に固定** | `PIC` `OCCURS` `INDEXED BY` `VALUE` `REDEFINES` `RECORDING MODE` などの句 |
+| **値欄** | **句欄+14桁（39桁目）** | 句の直後の値・項目名・リテラル |
+| 3列目以降 | 固定なし（2空白） | `TIMES` `BY` `MODE IS F` など |
+| 注釈（`←` `→`） | 本文の最大幅+3桁 | ブロック内で同じ列に揃える |
+
+- 手続き部は、命令欄＝段落名より2桁インデント（入れ子でさらに+2桁）、値欄＝「最長の命令欄+句+2桁」でブロック内に一律
+- 項目名が25桁目に達する場合は、そのブロックの句欄を（名前の末尾+3桁）まで押し下げ、句欄・値欄はブロック内で同一位置に揃える
+- 句欄幅は標準14桁。`RECORDING MODE`（15桁）などを超えるブロックでは（最長句+2）に拡張
+- フィールド間は必ず半角2つ以上。タブは使用しない。コードブロック内の行は表示幅72桁以内
+- **対象外**: 構文の「形式」ブロック（`{ }` `[ ]` を含む）、JCL・TSOコマンド・CLIST・端末出力例・図解
+
 - 第五章の命令一覧、第七章 TSOのファイル関係図・モード関係図、第八章のPAD図は、原文の図をMermaidのフローチャートで再現したものである。PAD図そのものはN-S図（ボックス図）の表記であり、条件分岐を示す三角記号は「条件が真の時に右側（後続）の処理を実行する」と読み替えている。
