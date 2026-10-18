@@ -480,7 +480,7 @@ FD  ファイル名
 
 ```cobol
 BLOCK CONTAINS [整数-1 TO] { CHARACTERS }
-                         { RECORDS    }
+                           { RECORDS    }
 ```
 
 1レコード1ブロックのデータには、この文節を指定する必要はない。データがFIXの時は整数-2だけを指定する。データがVARIABLEの時は、整数-2はMAXのレコード長を指定し、整数-1を指定する時はMINのレコード長を記入する。例えば、`BLOCK CONTAINS 1 TO 3 RECORDS` と指定すると、最小1レコード・最大3レコードであることを意味している。
@@ -532,7 +532,7 @@ LABEL { RECORD IS  } { OMITTED       }
 
 ```cobol
 VALUE OF データ名-1 IS { データ名-2  }
-                   { リテラル-1  }
+                       { リテラル-1  }
 ```
 
 **⑥ DATA RECORD文節**
@@ -552,7 +552,7 @@ DATA { RECORD IS  } データ名-1...n
 
 ```cobol
 レベル番号 { データ名 } PICTURE句
-      { FILLER   }
+           { FILLER   }
 ```
 
 レベル番号はデータの内容にレベル付けをするもので、01〜49まで指定できる。通常、01、05、10... の順で付けていく事が多い。ファイルの項目のDATA RECORD文節で指定したDATA名を、ここで01レベルで定義しなければならない。
@@ -965,8 +965,8 @@ COBOL命令中、主な命令:
 
 ```cobol
 ACCEPT データ名 [FROM { SYSIN   }
-                  { CONSOLE }
-                  { 記憶名  }]
+                      { CONSOLE }
+                      { 記憶名  }]
 ```
 
 データ名はWORKING-STORAGE SECTIONで定義済みのエリア。FROMを書かないとSYSINからの入力とみなされる。
@@ -1307,13 +1307,13 @@ S04-EXIT.
 条件付PERFORM命令でもっと複雑な処理もできる。ある値をアップしながら条件を1〜3個調べ、全ての条件を満たすまでPERFORM命令が繰り返されるというものである。処理を件数でブレイクしたり、年令でブレイクしたり、テーブルで持っているデータのブレイクをしたりする時に非常に便利である。
 
 ```cobol
-PERFORM  処理手順名-1  THRU  処理手順名-2
-  VARYING指標名-1 FROM 識別名-2 UNTIL 条件-1
-  BY     識別名-3
-  [AFTER 指標名-4 FROM 識別名-5
-  BY     識別名-6 UNTIL 条件-2
-  [AFTER 指標名-7 FROM 識別名-8
-  BY     識別名-9 UNTIL 条件-3 ]]]
+PERFORM    処理手順名-1  THRU  処理手順名-2
+  VARYING  指標名-1 FROM 識別名-2 UNTIL 条件-1
+  BY       識別名-3
+  [AFTER   指標名-4 FROM 識別名-5
+  BY       識別名-6 UNTIL 条件-2
+  [AFTER   指標名-7 FROM 識別名-8
+  BY       識別名-9 UNTIL 条件-3 ]]]
 ```
 
 ```cobol
@@ -1485,9 +1485,9 @@ AFTER 2 の場合:
 
 ```cobol
 DISPLAY 識別名-1...(n) [UPON { CONSOLE  }
-                          { SYSOUT   }
-                          { SYSPUNCH }
-                          { SYSPCH   }]
+                             { SYSOUT   }
+                             { SYSPUNCH }
+                             { SYSPCH   }]
 ```
 
 UPON句が省略されるとSYSOUTとみなされる。
