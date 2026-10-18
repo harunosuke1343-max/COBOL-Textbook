@@ -280,8 +280,8 @@ ASSIGN  TO システム名
 コンパイラーが割り当てられる入出力域（BUFF）の数をユーザーが修正できるようにするものである。
 
 ```cobol
-RESERVE { NO   } ALTERNATE [ AREA  ]
-        { 整数 }           [ AREAS ]
+RESERVE  { NO   } ALTERNATE  [ AREA  ]
+         { 整数 }            [ AREAS ]
 ```
 
 整数で示される偶数だけBUFFが確保される。ただし、順次アクセスにのみ有効。
@@ -290,8 +290,8 @@ RESERVE { NO   } ALTERNATE [ AREA  ]
 
 コメントとして扱われるので省略する。
 
-```
-FILE-LIMIT IS リテラル-1 THRU リテラル-2
+```cobol
+FILE-LIMIT IS  リテラル-1  THRU  リテラル-2
 ```
 
 **⑤ ACCESS MODE文節**
@@ -299,8 +299,8 @@ FILE-LIMIT IS リテラル-1 THRU リテラル-2
 ファイルのレコードをアクセスする方法を規定する。
 
 ```cobol
-ACCESS MODE IS { SEQUENTIAL }
-               { RANDOM     }
+ACCESS MODE IS  { SEQUENTIAL }
+                { RANDOM     }
 ```
 
 省略時は `SEQUENTIAL` とみなされる。
@@ -348,8 +348,8 @@ RECORD KEY  IS データ名
 索引ファイルに対し、ランダム・アクセス方式でレコードを追加する場合に使用される。この文節を使用するとレコード追加の効率がよくなる。
 
 ```cobol
-TRACK-AREA IS { データ名 }
-              { 整数     }
+TRACK-AREA IS  { データ名 }
+               { 整数     }
 ```
 
 定義される区域は8の倍数で、32760バイト以内。
@@ -380,9 +380,9 @@ I-O-CONTROL.
 
 ```cobol
 RERUN ON  システム名
-EVERY { 整数       RECORD }
-      { [END OF] { REEL } }
-      {          { UNIT } }
+EVERY  { 整数       RECORD }
+       { [END OF] { REEL } }
+       {          { UNIT } }
 ```
 
 - システム名: チェックポイント・レコードが**書き出される**ファイル
@@ -393,8 +393,8 @@ EVERY { 整数       RECORD }
 処理中に2つ以上のファイルが同じコア記憶域を使用することを指定する。
 
 ```cobol
-SAME  [ SORT      ] AREA FOR ファイル名-1...n
-      [ RECORD ]
+SAME    [ SORT   ]  AREA FOR ファイル名-1...n
+        [ RECORD ]
 ```
 
 **③ MULTIPLE FILE TAPE文節**
@@ -479,8 +479,8 @@ FD  ファイル名
 物理レコードのブロック長を指定する。
 
 ```cobol
-BLOCK CONTAINS [整数-1 TO] { CHARACTERS }
-                           { RECORDS    }
+BLOCK CONTAINS  [整数-1 TO]  { CHARACTERS }
+                             { RECORDS    }
 ```
 
 1レコード1ブロックのデータには、この文節を指定する必要はない。データがFIXの時は整数-2だけを指定する。データがVARIABLEの時は、整数-2はMAXのレコード長を指定し、整数-1を指定する時はMINのレコード長を記入する。例えば、`BLOCK CONTAINS 1 TO 3 RECORDS` と指定すると、最小1レコード・最大3レコードであることを意味している。
@@ -517,9 +517,9 @@ U、Vモードは索引付編成及び相対編成のファイルには指定で
 ラベルの有無を指定する。
 
 ```cobol
-LABEL { RECORD IS  } { OMITTED       }
-      { RECORD ARE } { STANDARD      }
-      { データ名-1...n }
+LABEL  { RECORD IS  }  { OMITTED       }
+       { RECORD ARE }  { STANDARD      }
+       { データ名-1...n }
 ```
 
 - `OMITTED` — ユニット・レコード装置に割り当てられているファイルに対して必ず指定しなければならない（ただしIBMではSTANDARDで処理できる）
@@ -531,8 +531,8 @@ LABEL { RECORD IS  } { OMITTED       }
 コメントとして扱われるので指定する必要はない。
 
 ```cobol
-VALUE OF データ名-1 IS { データ名-2  }
-                       { リテラル-1  }
+VALUE OF  データ名-1 IS  { データ名-2  }
+                         { リテラル-1  }
 ```
 
 **⑥ DATA RECORD文節**
@@ -540,8 +540,8 @@ VALUE OF データ名-1 IS { データ名-2  }
 FD文の後で書くデータレコードの名前を指定する。
 
 ```cobol
-DATA { RECORD IS  } データ名-1...n
-     { RECORD ARE }
+DATA  { RECORD IS  } データ名-1...n
+      { RECORD ARE }
 ```
 
 データ名を複数指定する時は、01レベルでその分をとらなければならない。
@@ -551,8 +551,8 @@ DATA { RECORD IS  } データ名-1...n
 データ記述項目は、後で述べるWORKING-STORAGE SECTIONでの説明と重なる部分が多いので、簡単に述べる。
 
 ```cobol
-レベル番号 { データ名 } PICTURE句
-           { FILLER   }
+レベル番号  { データ名 } PICTURE句
+            { FILLER   }
 ```
 
 レベル番号はデータの内容にレベル付けをするもので、01〜49まで指定できる。通常、01、05、10... の順で付けていく事が多い。ファイルの項目のDATA RECORD文節で指定したDATA名を、ここで01レベルで定義しなければならない。
@@ -964,9 +964,9 @@ COBOL命令中、主な命令:
 ### 1. ACCEPT 命令
 
 ```cobol
-ACCEPT データ名 [FROM { SYSIN   }
-                      { CONSOLE }
-                      { 記憶名  }]
+ACCEPT  データ名  [FROM { SYSIN   }
+                        { CONSOLE }
+                        { 記憶名  }]
 ```
 
 データ名はWORKING-STORAGE SECTIONで定義済みのエリア。FROMを書かないとSYSINからの入力とみなされる。
@@ -1145,7 +1145,7 @@ ADD、SUBTRACT、MULTIPLY、DIVIDEなどの機能を算術文を用いて指定�
 **記号:** `=`（イコール）、`*`（乗算）、`/`（除算）、`()`（優先度）、`+`（加算）、`-`（減算）、`**`（べき乗）
 
 ```cobol
-COMPUTE  識別名-1 [ROUNDED] = 算術演算式
+COMPUTE  識別名-1  [ROUNDED] = 算術演算式
 ```
 
 例えば `C = (A + B) / (B - E) * D` と書きたい場合:
@@ -1220,9 +1220,9 @@ IF        A = B
 
 ファイルを実際にプログラム内に読み込んでくる命令。READ命令を実行する前にOPEN命令が実行されていなければならない。実行されていないと、ABEND=U3706などでプログラムは異常終了する。
 
-```
-READ ファイル名 [INTO データ名]
-  AT END 命令ステートメント.
+```cobol
+READ   ファイル名  [INTO データ名]
+  AT END  命令ステートメント.
 ```
 
 ```cobol
@@ -1269,9 +1269,9 @@ SET  IDX1  DOWN BY  3.  ← IDX1が-3される
 
 プログラムを処理別にセグメント化すると見やすくなるだけでなく、修正・デバッグも容易になる。このセグメント化した処理を連結する時に、このPERFORM命令を使用する。
 
-```
-PERFORM 処理手順名-1 [THRU 処理手順名-2]
-                 [識別名-1 TIMES]
+```cobol
+PERFORM  処理手順名-1  [THRU 処理手順名-2]
+                       [識別名-1 TIMES]
 ```
 
 これは、処理手順名-1から処理手順名-2までを識別名-1回繰り返すという意味である。処理手順名-2を指定していないと、次の処理手順名が出てくるまでの処理を行う。
@@ -1374,10 +1374,10 @@ GO TO文は1つの処理内で使うのが望ましい。他の処理へブラ�
 
 **DEPENDING ONオプション:**
 
-```
-GO TO 処理手順名-1
-     処理手順名-2
-     処理手順名-n DEPENDING ON 識別名
+```cobol
+GO TO     処理手順名-1
+          処理手順名-2
+          処理手順名-n  DEPENDING ON  識別名
 ```
 
 ```cobol
@@ -1423,8 +1423,8 @@ INPUT/OUTPUTの指定はいらない。CLOSEした後、ファイルのREAD/WRIT
 
 この命令は、OUTPUTもしくはI-Oで開かれたファイルへ書き出しを行う命令である。（形式はリスト以外のファイル）
 
-```
-WRITE レコード名 [FROM 識別名]
+```cobol
+WRITE  レコード名  [FROM 識別名]
 ```
 
 FROMを使うと識別名の内容がレコード名へMOVEされてからWRITEされる（READ～INTOと同じ考え方: MOVE + WRITE）。
@@ -1453,10 +1453,10 @@ WRITE  OUT-REC.
 
 リストにWRITEする方法は、大きく分けて2種類ある。1つは1ラインプリントした後で改行を行う（BEFORE）方法、もう1つは改行を行った後プリントする（AFTER）方法である。
 
-```
-WRITE レコード名 [FROM 識別名]
-  [BEFORE  ADVANCING 識別名 LINES]
-  [AFTER   ADVANCING 識別名 LINES]
+```cobol
+WRITE  レコード名  [FROM 識別名]
+                   [BEFORE  ADVANCING 識別名 LINES]
+                   [AFTER   ADVANCING 識別名 LINES]
 ```
 
 識別名の中に入っている数の分だけラインを飛ばす。ここにSPECIAL-NAMESで指定した `C01 IS 〜` の名前を使うと、改頁されてプリントできる行の最初の行を指す。通常、ADVANCINGとLINESという語は省略して使う。
@@ -1484,10 +1484,10 @@ AFTER 2 の場合:
 ### 16. DISPLAY 命令
 
 ```cobol
-DISPLAY 識別名-1...(n) [UPON { CONSOLE  }
-                             { SYSOUT   }
-                             { SYSPUNCH }
-                             { SYSPCH   }]
+DISPLAY  識別名-1...(n)  [UPON { CONSOLE  }
+                               { SYSOUT   }
+                               { SYSPUNCH }
+                               { SYSPCH   }]
 ```
 
 UPON句が省略されるとSYSOUTとみなされる。
@@ -1514,7 +1514,7 @@ CONSOLE以外は、JCL上でDDカードを指定しておかなければなら�
 テーブルで取られたエリア内から、あるKEYに基づいて必要なデータを探し出す命令。
 
 ```cobol
-SEARCH  テーブル名 [AT END 命令ステートメント-1]
+SEARCH  テーブル名  [AT END 命令ステートメント-1]
   WHEN  条件 命令ステートメント-2
 ```
 
@@ -2256,7 +2256,7 @@ ADD   A B   TO     (B) ROUNDED.
 - 項目名が25桁目に達するブロックでは、句欄を（名前の末尾+3桁）まで押し下げ、句欄・値欄はブロック内で同一位置に揃える
 - 句欄幅は標準14桁。`RECORDING MODE`（15桁）などを超えるブロックは（最長句+2桁）に拡張
 - 注釈（`←` `→`）は本文の最大幅+3桁に揃え、72桁を超える場合は直後3空白に置く
-- 構文の「形式」ブロックも同じ列に揃える。ただし `{ }` `[ ]` の選択肢-group は構造を保ち、継続行は直前行の同じ括弧の桁に揃える
+- 構文の「形式」ブロックも同じ列に揃える。ただし `{ }` `[ ]` の選択肢-group は構造を保ち、継続行は直前行の同じ括弧の桁に揃える。桁計算は全角=2桁の表示幅で行う（半角のみで数えると全角ぶんだけずれる）。選択肢-group の開き括弧の前も 2空白あける
 - フィールド間は必ず半角2つ以上。タブは使用しない。コードブロック内の行は表示幅72桁以内（実測 最大64桁）
 - 手続き部は段落名のあるブロックで命令欄を+2桁とし、入れ子関係は相対インデントで保つ（整形の再実行でインデントが増えない）
 - **対象外**: JCL・TSOコマンド・CLIST・端末出力例・図解（矢印・枠線を含むブロック）、および「…文節」の列挙のみからなる一覧ブロック
