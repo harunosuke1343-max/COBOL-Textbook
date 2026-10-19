@@ -100,7 +100,13 @@ blockquote{
 ul,ol{margin:0 0 1.2em; padding-left:1.6em}
 li{margin:.25em 0}
 
-/* 目次セクション（本文内の "## 目次" の直下リスト） */
+/* ===== 図（mermaid） ===== */
+.mermaid{
+  background:var(--paper); border:1px solid var(--line-soft); border-top:3px solid var(--accent);
+  padding:24px 16px; margin:1.4em 0 2em; text-align:center; overflow-x:auto;
+}
+.mermaid:not([data-processed]){font-family:monospace; white-space:pre; text-align:left; font-size:13px; color:var(--ink-soft)}
+
 /* ===== フッター ===== */
 footer{
   padding:24px 64px; border-top:1px solid var(--line);
@@ -1478,51 +1484,51 @@ S03-SEARCH.
 <p>ファイル中のあるKEYが変化した時点で、それまでとは違った処理を行う事をコントロールブレイクと呼ぶ。明細を出しながら支社・営業部・支部のトータルを出力するのような処理である。</p>
 <hr />
 <h3 id="1-マッチング処理のフロー例-1-1—スイッチを使用する場合">1. マッチング処理のフロー例（1:1）— スイッチを使用する場合</h3>
-<pre><code class="language-mermaid">flowchart TD
-  START([START]) --&gt; INITIAL[INITIAL&lt;br/&gt;ファイルのOPEN]
-  INITIAL --&gt; SET_SW1[SW1 = '1']
-  SET_SW1 --&gt; SET_SW2[SW2 = '1']
-  SET_SW2 --&gt; READ1[INFL1 READ&lt;br/&gt;AT END: KEY1→HIGH-VALUE]
-  READ1 --&gt; READ2[INFL2 READ&lt;br/&gt;AT END: KEY2→HIGH-VALUE]
-  READ2 --&gt; CHECK_KEY{KEY1 = KEY2&lt;br/&gt;AND&lt;br/&gt;KEY1 = HIGH-VALUE}
-  CHECK_KEY --&gt;|YES| CLOSE[CLOSE]
-  CLOSE --&gt; END_([END])
-  CHECK_KEY --&gt;|NO| CMP{KEY1 : KEY2}
-  CMP --&gt;|KEY1 &lt; KEY2| INFL1_ONLY[INFL1 ONLY処理]
-  CMP --&gt;|KEY1 &gt; KEY2| INFL2_ONLY[INFL2 ONLY処理]
-  CMP --&gt;|KEY1 = KEY2| MATCH[マッチング処理]
-  INFL1_ONLY --&gt; SET_A[SW1←'1'&lt;br/&gt;SW2←'0']
-  INFL2_ONLY --&gt; SET_B[SW1←'0'&lt;br/&gt;SW2←'1']
-  MATCH --&gt; SET_C[SW1←'1'&lt;br/&gt;SW2←'1']
-  SET_A --&gt; READ1
-  SET_B --&gt; READ1
-  SET_C --&gt; READ1
-</code></pre>
+<div class="mermaid">flowchart TD
+  START([START]) --> INITIAL[INITIAL<br/>ファイルのOPEN]
+  INITIAL --> SET_SW1[SW1 = '1']
+  SET_SW1 --> SET_SW2[SW2 = '1']
+  SET_SW2 --> READ1[INFL1 READ<br/>AT END: KEY1→HIGH-VALUE]
+  READ1 --> READ2[INFL2 READ<br/>AT END: KEY2→HIGH-VALUE]
+  READ2 --> CHECK_KEY{KEY1 = KEY2<br/>AND<br/>KEY1 = HIGH-VALUE}
+  CHECK_KEY -->|YES| CLOSE[CLOSE]
+  CLOSE --> END_([END])
+  CHECK_KEY -->|NO| CMP{KEY1 : KEY2}
+  CMP -->|KEY1 < KEY2| INFL1_ONLY[INFL1 ONLY処理]
+  CMP -->|KEY1 > KEY2| INFL2_ONLY[INFL2 ONLY処理]
+  CMP -->|KEY1 = KEY2| MATCH[マッチング処理]
+  INFL1_ONLY --> SET_A[SW1←'1'<br/>SW2←'0']
+  INFL2_ONLY --> SET_B[SW1←'0'<br/>SW2←'1']
+  MATCH --> SET_C[SW1←'1'<br/>SW2←'1']
+  SET_A --> READ1
+  SET_B --> READ1
+  SET_C --> READ1
+</div>
 <p><strong>前提条件:</strong>
 - INFL1、INFL2の各KEYは昇順にSORTされている
 - 同一のKEYは同一ファイル上には存在しない
 - KEY1はINFL1のKEY、KEY2はINFL2のKEY</p>
 <hr />
 <h3 id="2-マッチング処理のフロー例-1-1—スイッチを使用しない場合">2. マッチング処理のフロー例（1:1）— スイッチを使用しない場合</h3>
-<pre><code class="language-mermaid">flowchart TD
-  START([START]) --&gt; INITIAL[INITIAL&lt;br/&gt;ファイルのOPEN]
-  INITIAL --&gt; READ1[INFL1 READ]
-  READ1 --&gt; READ2[INFL2 READ]
-  READ2 --&gt; CHECK_KEY{KEY1 = KEY2&lt;br/&gt;AND&lt;br/&gt;KEY1 = HIGH-VALUE}
-  CHECK_KEY --&gt;|YES| CLOSE[CLOSE]
-  CLOSE --&gt; END_([END])
-  CHECK_KEY --&gt;|NO| CMP{KEY1 : KEY2}
-  CMP --&gt;|KEY1 &lt; KEY2| INFL1_ONLY[INFL1 ONLY処理]
-  CMP --&gt;|KEY1 &gt; KEY2| INFL2_ONLY[INFL2 ONLY処理]
-  CMP --&gt;|KEY1 = KEY2| MATCH[マッチング処理]
-  INFL1_ONLY --&gt; R1[INFL1 READ]
-  INFL2_ONLY --&gt; R2[INFL2 READ]
-  MATCH --&gt; R3[INFL1 READ]
-  R3 --&gt; R4[INFL2 READ]
-  R1 --&gt; CHECK_KEY
-  R2 --&gt; CHECK_KEY
-  R4 --&gt; CHECK_KEY
-</code></pre>
+<div class="mermaid">flowchart TD
+  START([START]) --> INITIAL[INITIAL<br/>ファイルのOPEN]
+  INITIAL --> READ1[INFL1 READ]
+  READ1 --> READ2[INFL2 READ]
+  READ2 --> CHECK_KEY{KEY1 = KEY2<br/>AND<br/>KEY1 = HIGH-VALUE}
+  CHECK_KEY -->|YES| CLOSE[CLOSE]
+  CLOSE --> END_([END])
+  CHECK_KEY -->|NO| CMP{KEY1 : KEY2}
+  CMP -->|KEY1 < KEY2| INFL1_ONLY[INFL1 ONLY処理]
+  CMP -->|KEY1 > KEY2| INFL2_ONLY[INFL2 ONLY処理]
+  CMP -->|KEY1 = KEY2| MATCH[マッチング処理]
+  INFL1_ONLY --> R1[INFL1 READ]
+  INFL2_ONLY --> R2[INFL2 READ]
+  MATCH --> R3[INFL1 READ]
+  R3 --> R4[INFL2 READ]
+  R1 --> CHECK_KEY
+  R2 --> CHECK_KEY
+  R4 --> CHECK_KEY
+</div>
 <p><strong>《説明》</strong></p>
 <p>スイッチを使用する場合も使用しない場合も基本的には同一である。この「マッチング処理」という所で、ファイル（INFL2）を更新しPUTする。このINFL1はマスターファイル、INFL2はトランザクションファイルを意味している。</p>
 <p>マッチング処理で注意しなければならないのは、前提条件（ソート順、KEYの存在など）と、ファイルREADするタイミングとPUTするタイミングである。これはKEYが1:1、1:N、N:Nともに共通している。</p>
@@ -1531,59 +1537,59 @@ S03-SEARCH.
 <blockquote>
 <p>INFL1…1（マスター）、INFL2…N（トランザクション）</p>
 </blockquote>
-<pre><code class="language-mermaid">flowchart TD
-  START([START]) --&gt; INITIAL[INITIAL&lt;br/&gt;ファイルのOPEN]
-  INITIAL --&gt; READ1[INFL1 READ]
-  READ1 --&gt; READ2[INFL2 READ]
-  READ2 --&gt; CHECK_KEY{KEY1 = KEY2&lt;br/&gt;AND&lt;br/&gt;KEY1 = HIGH-VALUE}
-  CHECK_KEY --&gt;|YES| CLOSE[CLOSE]
-  CLOSE --&gt; END_([END])
-  CHECK_KEY --&gt;|NO| CMP{KEY1 : KEY2}
-  CMP --&gt;|KEY1 &lt; KEY2| SW_CHECK{SW1 = '1'？}
-  SW_CHECK --&gt;|YES| OUT[OUT処理]
-  SW_CHECK --&gt;|NO| INFL1_ONLY[INFL1 ONLY処理]
-  OUT --&gt; READ1B[INFL1 READ]
-  INFL1_ONLY --&gt; READ1B
-  CMP --&gt;|KEY1 &gt; KEY2| INFL2_ONLY[INFL2 ONLY処理]
-  INFL2_ONLY --&gt; READ2B[INFL2 READ]
-  CMP --&gt;|KEY1 = KEY2| MATCH[マッチング処理]
-  MATCH --&gt; READ2C[INFL2 READ]
-  READ1B --&gt; CHECK_KEY
-  READ2B --&gt; CHECK_KEY
-  READ2C --&gt; CHECK_KEY
-</code></pre>
+<div class="mermaid">flowchart TD
+  START([START]) --> INITIAL[INITIAL<br/>ファイルのOPEN]
+  INITIAL --> READ1[INFL1 READ]
+  READ1 --> READ2[INFL2 READ]
+  READ2 --> CHECK_KEY{KEY1 = KEY2<br/>AND<br/>KEY1 = HIGH-VALUE}
+  CHECK_KEY -->|YES| CLOSE[CLOSE]
+  CLOSE --> END_([END])
+  CHECK_KEY -->|NO| CMP{KEY1 : KEY2}
+  CMP -->|KEY1 < KEY2| SW_CHECK{SW1 = '1'？}
+  SW_CHECK -->|YES| OUT[OUT処理]
+  SW_CHECK -->|NO| INFL1_ONLY[INFL1 ONLY処理]
+  OUT --> READ1B[INFL1 READ]
+  INFL1_ONLY --> READ1B
+  CMP -->|KEY1 > KEY2| INFL2_ONLY[INFL2 ONLY処理]
+  INFL2_ONLY --> READ2B[INFL2 READ]
+  CMP -->|KEY1 = KEY2| MATCH[マッチング処理]
+  MATCH --> READ2C[INFL2 READ]
+  READ1B --> CHECK_KEY
+  READ2B --> CHECK_KEY
+  READ2C --> CHECK_KEY
+</div>
 <p><strong>説明:</strong> マッチング処理ではファイルのPUTは行わず、SW1に<code>'1'</code>を立てる。このスイッチは更新処理を行ったことを示す。OUT処理でファイルのPUT処理を行う。ただし、このフローはINFL1がマスターで、マスターに更新をかけて新マスターを作成するフローである。マスターがINFL2の場合、OUT処理は不要となる。しかし、通常マスターには同一KEYが複数存在することは少ないので、このフロー処理で良い。SW1のクリアはOUT処理で行う。</p>
 <hr />
 <h3 id="4-スイッチを使用しない場合-n-n—同一keyのmaxが全く予想できない場合">4. スイッチを使用しない場合（N:N）— 同一KEYのMAXが全く予想できない場合</h3>
-<pre><code class="language-mermaid">flowchart TD
-  START([START]) --&gt; INITIAL[INITIAL]
-  INITIAL --&gt; READ1[INFL1 READ]
-  READ1 --&gt; READ2[INFL2 READ]
-  READ2 --&gt; CHECK1{KEY1 = KEY2&lt;br/&gt;AND&lt;br/&gt;KEY1 = HIGH-VALUE}
-  CHECK1 --&gt;|YES| CLOSE[CLOSE]
-  CLOSE --&gt; END_([END])
-  CHECK1 --&gt;|NO| CMP1{KEY1 : KEY2}
-  CMP1 --&gt;|KEY1 &lt; KEY2| INFL1_ONLY[INFL1 ONLY処理]
-  CMP1 --&gt;|KEY1 &gt; KEY2| INFL2_ONLY[INFL2 ONLY処理]
-  CMP1 --&gt;|KEY1 = KEY2| STORE[STR1←KEY1&lt;br/&gt;STR2←KEY2]
-  INFL1_ONLY --&gt; READ1A[INFL1 READ] --&gt; CHECK1
-  INFL2_ONLY --&gt; READ2A[INFL2 READ] --&gt; CHECK1
-  STORE --&gt; LOOP2{&quot;(2) KEY1 : KEY2&quot;}
-  LOOP2 --&gt;|KEY1 ≠ KEY2| OUT[OUT処理]
-  LOOP2 --&gt;|KEY1 = KEY2| MATCH[マッチング処理]
-  OUT --&gt; READ1B[INFL1 READ]
-  MATCH --&gt; READ2B[INFL2 READ]
-  READ1B --&gt; HV_CHECK{KEY1 OR KEY2&lt;br/&gt;= HIGH-VALUE？}
-  READ2B --&gt; HV_CHECK
-  HV_CHECK --&gt;|YES| LOOP2
-  HV_CHECK --&gt;|NO| CHECK3{KEY1 : STR1}
-  CHECK3 --&gt;|NO| CHECK1
-  CHECK3 --&gt;|YES| REOPEN[INFL2 CLOSE&lt;br/&gt;再オープン]
-  REOPEN --&gt; READ2C[INFL2 READ]
-  READ2C --&gt; KEY2_CMP{KEY2 : STR2}
-  KEY2_CMP --&gt;|≠| READ2C
-  KEY2_CMP --&gt;|=| CHECK1
-</code></pre>
+<div class="mermaid">flowchart TD
+  START([START]) --> INITIAL[INITIAL]
+  INITIAL --> READ1[INFL1 READ]
+  READ1 --> READ2[INFL2 READ]
+  READ2 --> CHECK1{KEY1 = KEY2<br/>AND<br/>KEY1 = HIGH-VALUE}
+  CHECK1 -->|YES| CLOSE[CLOSE]
+  CLOSE --> END_([END])
+  CHECK1 -->|NO| CMP1{KEY1 : KEY2}
+  CMP1 -->|KEY1 < KEY2| INFL1_ONLY[INFL1 ONLY処理]
+  CMP1 -->|KEY1 > KEY2| INFL2_ONLY[INFL2 ONLY処理]
+  CMP1 -->|KEY1 = KEY2| STORE[STR1←KEY1<br/>STR2←KEY2]
+  INFL1_ONLY --> READ1A[INFL1 READ] --> CHECK1
+  INFL2_ONLY --> READ2A[INFL2 READ] --> CHECK1
+  STORE --> LOOP2{"(2) KEY1 : KEY2"}
+  LOOP2 -->|KEY1 ≠ KEY2| OUT[OUT処理]
+  LOOP2 -->|KEY1 = KEY2| MATCH[マッチング処理]
+  OUT --> READ1B[INFL1 READ]
+  MATCH --> READ2B[INFL2 READ]
+  READ1B --> HV_CHECK{KEY1 OR KEY2<br/>= HIGH-VALUE？}
+  READ2B --> HV_CHECK
+  HV_CHECK -->|YES| LOOP2
+  HV_CHECK -->|NO| CHECK3{KEY1 : STR1}
+  CHECK3 -->|NO| CHECK1
+  CHECK3 -->|YES| REOPEN[INFL2 CLOSE<br/>再オープン]
+  REOPEN --> READ2C[INFL2 READ]
+  READ2C --> KEY2_CMP{KEY2 : STR2}
+  KEY2_CMP -->|≠| READ2C
+  KEY2_CMP -->|=| CHECK1
+</div>
 <hr />
 <h3 id="5-マッチング処理の説明">5. マッチング処理の説明</h3>
 <blockquote>
@@ -1663,13 +1669,13 @@ S03-SEARCH.
 <hr />
 <h3 id="6-コントロールブレイクのフロー例">6. コントロールブレイクのフロー例</h3>
 <p><strong>プリントルーチン（53ラインを超えたら見出しを打つ）:</strong></p>
-<pre><code class="language-mermaid">flowchart TD
-  A{ライン数&lt;br/&gt;53オーバー？} --&gt;|YES| HEADER[見出し処理]
-  A --&gt;|NO| B[データセット処理]
-  HEADER --&gt; B
-  B --&gt; PRINT[PRINT処理]
-  PRINT --&gt; EXIT([EXIT])
-</code></pre>
+<div class="mermaid">flowchart TD
+  A{ライン数<br/>53オーバー？} -->|YES| HEADER[見出し処理]
+  A -->|NO| B[データセット処理]
+  HEADER --> B
+  B --> PRINT[PRINT処理]
+  PRINT --> EXIT([EXIT])
+</div>
 <p>ライン数をカウントして53ラインを超えたら改頁して見出しを打ち、ラインカウンターを初期値化する。データセット処理でプリントするエリアへデータを移送する。PRINT処理でWRITEし、ラインカウンターへ1を加える。その後、プリントエリアをクリアする。</p>
 <p>この形がコントロールブレイクの基本である。非常に簡単だが、様々な処理が入ってくると改頁のタイミングというものは難しくなってくる。次項から複雑なコントロールブレイクの例を示す。</p>
 <p><strong>複雑なコントロールブレイク:</strong></p>
@@ -1684,19 +1690,19 @@ S03-SEARCH.
   10  STR3              PIC           X(3).
 </code></pre>
 <p>KEY1・KEY2・KEY3はそれぞれ大項目・中項目・小項目のKEYを表わす（支社・営業部・支部の関係と同じ）。STRの方は、違うKEYが入った時と1件目のREADの時に入れる（READ時点の1件前のデータの値）。</p>
-<pre><code class="language-mermaid">flowchart TD
-  START([START]) --&gt; READ[1件READ]
-  READ --&gt; FILE_END{FILE END？}
-  FILE_END --&gt;|YES| PRINT_ALL[小計プリント&lt;br/&gt;中計プリント&lt;br/&gt;合計プリント&lt;br/&gt;件数表プリント]
-  PRINT_ALL --&gt; END_([END])
-  FILE_END --&gt;|NO| CMP_KEY{KEY = STR？}
-  CMP_KEY --&gt;|YES| PRINT_DETAIL[明細プリント&lt;br/&gt;集計処理] --&gt; READ
-  CMP_KEY --&gt;|NO| CMP1{KEY1 = STR1？}
-  CMP1 --&gt;|NO| PRINT_GO[小計・中計・&lt;br/&gt;合計プリント] --&gt; PRINT_DETAIL
-  CMP1 --&gt;|YES| CMP2{KEY2 = STR2？}
-  CMP2 --&gt;|NO| PRINT_CHU[小計・中計プリント] --&gt; PRINT_DETAIL
-  CMP2 --&gt;|YES| PRINT_SHO[小計プリント] --&gt; PRINT_DETAIL
-</code></pre>
+<div class="mermaid">flowchart TD
+  START([START]) --> READ[1件READ]
+  READ --> FILE_END{FILE END？}
+  FILE_END -->|YES| PRINT_ALL[小計プリント<br/>中計プリント<br/>合計プリント<br/>件数表プリント]
+  PRINT_ALL --> END_([END])
+  FILE_END -->|NO| CMP_KEY{KEY = STR？}
+  CMP_KEY -->|YES| PRINT_DETAIL[明細プリント<br/>集計処理] --> READ
+  CMP_KEY -->|NO| CMP1{KEY1 = STR1？}
+  CMP1 -->|NO| PRINT_GO[小計・中計・<br/>合計プリント] --> PRINT_DETAIL
+  CMP1 -->|YES| CMP2{KEY2 = STR2？}
+  CMP2 -->|NO| PRINT_CHU[小計・中計プリント] --> PRINT_DETAIL
+  CMP2 -->|YES| PRINT_SHO[小計プリント] --> PRINT_DETAIL
+</div>
 <p><strong>処理の流れ:</strong></p>
 <p>このコントロールブレイクは、小計・中計・合計をコントロールする処理である。</p>
 <p>① <strong>1件目のREAD時</strong> にデータ中のKEYをワークエリアで取ったKEYとSTRにMOVEする。1件目以外はKEYへ入れる。</p>
@@ -1757,35 +1763,35 @@ S03-SEARCH.
 </code></pre>
 <p>このコマンドを入れるとTSOの画面はREADYになり使用可能となる。</p>
 <h3 id="1-tso周辺のファイル関係図">1. TSO周辺のファイル関係図</h3>
-<pre><code class="language-mermaid">flowchart TD
+<div class="mermaid">flowchart TD
   TSO[TSO]
-  MASTRLIB[(MASTER&lt;br/&gt;MASTRLIB)]
-  SOURCLIB[(SOURCE&lt;br/&gt;SOURCLIB)]
+  MASTRLIB[(MASTER<br/>MASTRLIB)]
+  SOURCLIB[(SOURCE<br/>SOURCLIB)]
   PDSLIB[(PDSLIB)]
   TESTCPY[(TEST.CPYLIB)]
   DASDCPY[(DASD.CPYLIB)]
   TESTLIB1[(TESTLIB1)]
   TESTLIB2[(TESTLIB2)]
-  DASDLIB[(DASDLIB1&lt;br/&gt;DASDLIB2&lt;br/&gt;D1LIB1 etc)]
-  TSOWK[(TSOWKx&lt;br/&gt;ユーザー用 WORK)]
+  DASDLIB[(DASDLIB1<br/>DASDLIB2<br/>D1LIB1 etc)]
+  TSOWK[(TSOWKx<br/>ユーザー用 WORK)]
   TSTPROC[(TSTPROC)]
   DCMD[(DCMD)]
 
-  MASTRLIB --&gt;|LIBCM| SOURCLIB
-  SOURCLIB --&gt;|LIBA / LIBC| TSO
-  TSO --&gt;|LS| SOURCLIB
-  PDSLIB --&gt;|LIBGP| TSO
-  TSO --&gt;|LS| PDSLIB
-  TSO --&gt;|SUBCOPY| TESTCPY
-  TESTCPY --&gt; DASDCPY
-  TSO --&gt;|COMPILE&lt;br/&gt;SUBASHW / SUBCB2W| TESTLIB1
-  TESTLIB1 --&gt;|LINK&lt;br/&gt;SUBLKED| TESTLIB2
-  TESTLIB2 --&gt;|LOAD MODULE| DASDLIB
-  TESTLIB2 -.-&gt;|TEST| TSO
+  MASTRLIB -->|LIBCM| SOURCLIB
+  SOURCLIB -->|LIBA / LIBC| TSO
+  TSO -->|LS| SOURCLIB
+  PDSLIB -->|LIBGP| TSO
+  TSO -->|LS| PDSLIB
+  TSO -->|SUBCOPY| TESTCPY
+  TESTCPY --> DASDCPY
+  TSO -->|COMPILE<br/>SUBASHW / SUBCB2W| TESTLIB1
+  TESTLIB1 -->|LINK<br/>SUBLKED| TESTLIB2
+  TESTLIB2 -->|LOAD MODULE| DASDLIB
+  TESTLIB2 -.->|TEST| TSO
   TSO --- TSOWK
-  TSTPROC -.-&gt;|コマンド| TSO
-  DCMD -.-&gt;|コマンド| TSO
-</code></pre>
+  TSTPROC -.->|コマンド| TSO
+  DCMD -.->|コマンド| TSO
+</div>
 <p>TSTPROC・DCMDはコマンドプロシジャーを登録しておくライブラリで、ここからTSOへコマンドが提供される。TSOワークはTSOWKxとして確保される。</p>
 <h3 id="2-ファイル説明">2. ファイル説明</h3>
 <table>
@@ -1863,15 +1869,15 @@ TEST 'TESTLIB2(SAMPLE)' '8106'
 </code></pre>
 <p>これだけKEYINするとTSO画面上にTESTという文字が出てくる。ここでGOというコマンドを入れるとプログラムは作動する。テストがうまく行くと結果が画面に現れる。</p>
 <h3 id="5-tsoモード関係図">5. TSOモード関係図</h3>
-<pre><code class="language-mermaid">flowchart TD
+<div class="mermaid">flowchart TD
   READY[[READY]]
-  READY --&gt; L1A[&quot;ASM | COB | LINK&quot;]
-  READY --&gt; L1B[&quot;CALL | ALLOC | FREE&quot;]
-  L1A --&gt; L2A[&quot;LIST | DEL | EDIT&quot;]
-  L1B --&gt; L2B[&quot;TEST | TESTCOB | HELP&quot;]
-  L2A --&gt; L3[&quot;SAVE | INPUT | DEL | CHANGE | END | LIST | SET&quot;]
-  L2B --&gt; L3
-</code></pre>
+  READY --> L1A["ASM | COB | LINK"]
+  READY --> L1B["CALL | ALLOC | FREE"]
+  L1A --> L2A["LIST | DEL | EDIT"]
+  L1B --> L2B["TEST | TESTCOB | HELP"]
+  L2A --> L3["SAVE | INPUT | DEL | CHANGE | END | LIST | SET"]
+  L2B --> L3
+</div>
 <p>左側はコンパイル・リンク系のモード、右側はファイル制御・テスト系のモードで、どちらも最下層のモード群を支える上下関係になっている。</p>
 <h3 id="6-clistの作り方">6. CLISTの作り方</h3>
 <p>TSO画面上に <code>READY</code> と出たら何もやっていないという状態である。まずコマンドプロシジャーを作る。</p>
@@ -1928,123 +1934,123 @@ KLKED     ******
 <h2 id="第八章-pad図_1">第八章 PAD図</h2>
 <h3 id="1-pad図-1-1マッチング-スイッチ使用">1. PAD図（1:1マッチング、スイッチ使用）</h3>
 <p><em>原見出し: 1、36ページのPAD図（1:1マッチング、スウィッチ使用）</em></p>
-<pre><code class="language-mermaid">flowchart TD
-  START([START]) --&gt; INITIAL[INITIAL]
-  INITIAL --&gt; SW1{SW1=1}
-  SW1 --&gt;|YES| READ1[INFL1 READ]
-  READ1 --&gt; SW2{SW2=1}
-  SW2 --&gt;|YES| READ2[INFL2 READ]
-  READ2 --&gt; CHECK{KEY1 = KEY2&lt;br/&gt;AND&lt;br/&gt;KEY1 = HIGH-VALUE}
-  CHECK --&gt;|等しい| CLOSE[CLOSE]
-  CLOSE --&gt; END_([STOP RUN])
-  CHECK --&gt;|等しくない| COMP{KEY1 : KEY2}
-  COMP --&gt;|KEY1 &lt; KEY2| INFL1_ONLY[INFL1 ONLY処理]
-  COMP --&gt;|KEY1 &gt; KEY2| INFL2_ONLY[INFL2 ONLY処理]
-  COMP --&gt;|KEY1 = KEY2| MATCH_PROC[マッチング処理]
-  INFL1_ONLY --&gt; SET_A[&quot;'1'→SW1&lt;br/&gt;'0'→SW2&quot;]
-  INFL2_ONLY --&gt; SET_B[&quot;'0'→SW1&lt;br/&gt;'1'→SW2&quot;]
-  MATCH_PROC --&gt; SET_C[&quot;'1'→SW1&lt;br/&gt;'1'→SW2&quot;]
-  SET_A --&gt; SW1
-  SET_B --&gt; SW1
-  SET_C --&gt; SW1
-</code></pre>
+<div class="mermaid">flowchart TD
+  START([START]) --> INITIAL[INITIAL]
+  INITIAL --> SW1{SW1=1}
+  SW1 -->|YES| READ1[INFL1 READ]
+  READ1 --> SW2{SW2=1}
+  SW2 -->|YES| READ2[INFL2 READ]
+  READ2 --> CHECK{KEY1 = KEY2<br/>AND<br/>KEY1 = HIGH-VALUE}
+  CHECK -->|等しい| CLOSE[CLOSE]
+  CLOSE --> END_([STOP RUN])
+  CHECK -->|等しくない| COMP{KEY1 : KEY2}
+  COMP -->|KEY1 < KEY2| INFL1_ONLY[INFL1 ONLY処理]
+  COMP -->|KEY1 > KEY2| INFL2_ONLY[INFL2 ONLY処理]
+  COMP -->|KEY1 = KEY2| MATCH_PROC[マッチング処理]
+  INFL1_ONLY --> SET_A["'1'→SW1<br/>'0'→SW2"]
+  INFL2_ONLY --> SET_B["'0'→SW1<br/>'1'→SW2"]
+  MATCH_PROC --> SET_C["'1'→SW1<br/>'1'→SW2"]
+  SET_A --> SW1
+  SET_B --> SW1
+  SET_C --> SW1
+</div>
 <h3 id="2-pad図-1-1マッチング-スイッチ不使用">2. PAD図（1:1マッチング、スイッチ不使用）</h3>
 <p><em>原見出し: 2、38ページのPAD図（1:1マッチング、スウィッチ不使用）</em></p>
-<pre><code class="language-mermaid">flowchart TD
-  START([START]) --&gt; INITIAL[INITIAL]
-  INITIAL --&gt; READ1[INFL1 READ]
-  READ1 --&gt; READ2[INFL2 READ]
-  READ2 --&gt; CHECK{KEY1 = KEY2&lt;br/&gt;AND&lt;br/&gt;KEY1 = HIGH-VALUE}
-  CHECK --&gt;|等しくない| COMP{KEY1 : KEY2}
-  COMP --&gt;|KEY1 &lt; KEY2| INFL1_ONLY[INFL1 ONLY処理]
-  COMP --&gt;|KEY1 &gt; KEY2| INFL2_ONLY[INFL2 ONLY処理]
-  COMP --&gt;|KEY1 = KEY2| MATCH[マッチング処理]
-  INFL1_ONLY --&gt; R1[INFL1 READ]
-  INFL2_ONLY --&gt; R2[INFL2 READ]
-  MATCH --&gt; R3[INFL1 READ]
-  R3 --&gt; R4[INFL2 READ]
-  R1 --&gt; CHECK
-  R2 --&gt; CHECK
-  R4 --&gt; CHECK
-  CHECK --&gt;|等しい| CLOSE[CLOSE]
-  CLOSE --&gt; END_([STOP RUN])
-</code></pre>
+<div class="mermaid">flowchart TD
+  START([START]) --> INITIAL[INITIAL]
+  INITIAL --> READ1[INFL1 READ]
+  READ1 --> READ2[INFL2 READ]
+  READ2 --> CHECK{KEY1 = KEY2<br/>AND<br/>KEY1 = HIGH-VALUE}
+  CHECK -->|等しくない| COMP{KEY1 : KEY2}
+  COMP -->|KEY1 < KEY2| INFL1_ONLY[INFL1 ONLY処理]
+  COMP -->|KEY1 > KEY2| INFL2_ONLY[INFL2 ONLY処理]
+  COMP -->|KEY1 = KEY2| MATCH[マッチング処理]
+  INFL1_ONLY --> R1[INFL1 READ]
+  INFL2_ONLY --> R2[INFL2 READ]
+  MATCH --> R3[INFL1 READ]
+  R3 --> R4[INFL2 READ]
+  R1 --> CHECK
+  R2 --> CHECK
+  R4 --> CHECK
+  CHECK -->|等しい| CLOSE[CLOSE]
+  CLOSE --> END_([STOP RUN])
+</div>
 <h3 id="3-pad図-1-nマッチング-スイッチ不使用">3. PAD図（1:Nマッチング、スイッチ不使用）</h3>
 <p><em>原見出し: 3、39ページのPAD図（1:Nマッチング、スウィッチ不使用）</em></p>
-<pre><code class="language-mermaid">flowchart TD
-  START([START]) --&gt; INITIAL[INITIAL]
-  INITIAL --&gt; READ1[INFL1 READ]
-  READ1 --&gt; READ2[INFL2 READ]
-  READ2 --&gt; CHECK{KEY1 = KEY2&lt;br/&gt;AND&lt;br/&gt;KEY1 = HIGH-VALUE}
-  CHECK --&gt;|等しくない| COMP{KEY1 : KEY2}
-  COMP --&gt;|KEY1 &lt; KEY2| SW_CHECK{SW1 = '1'？}
-  SW_CHECK --&gt;|YES| OUT_PROC[OUT処理]
-  SW_CHECK --&gt;|NO| INFL1_ONLY[INFL1 ONLY処理]
-  OUT_PROC --&gt; R1[INFL1 READ]
-  INFL1_ONLY --&gt; R1
-  COMP --&gt;|KEY1 &gt; KEY2| INFL2_ONLY[INFL2 ONLY処理]
-  INFL2_ONLY --&gt; R2[INFL2 READ]
-  COMP --&gt;|KEY1 = KEY2| MATCH[マッチング処理]
-  MATCH --&gt; R3[INFL2 READ]
-  R1 --&gt; CHECK
-  R2 --&gt; CHECK
-  R3 --&gt; CHECK
-  CHECK --&gt;|等しい| CLOSE[CLOSE]
-  CLOSE --&gt; END_([STOP RUN])
-</code></pre>
+<div class="mermaid">flowchart TD
+  START([START]) --> INITIAL[INITIAL]
+  INITIAL --> READ1[INFL1 READ]
+  READ1 --> READ2[INFL2 READ]
+  READ2 --> CHECK{KEY1 = KEY2<br/>AND<br/>KEY1 = HIGH-VALUE}
+  CHECK -->|等しくない| COMP{KEY1 : KEY2}
+  COMP -->|KEY1 < KEY2| SW_CHECK{SW1 = '1'？}
+  SW_CHECK -->|YES| OUT_PROC[OUT処理]
+  SW_CHECK -->|NO| INFL1_ONLY[INFL1 ONLY処理]
+  OUT_PROC --> R1[INFL1 READ]
+  INFL1_ONLY --> R1
+  COMP -->|KEY1 > KEY2| INFL2_ONLY[INFL2 ONLY処理]
+  INFL2_ONLY --> R2[INFL2 READ]
+  COMP -->|KEY1 = KEY2| MATCH[マッチング処理]
+  MATCH --> R3[INFL2 READ]
+  R1 --> CHECK
+  R2 --> CHECK
+  R3 --> CHECK
+  CHECK -->|等しい| CLOSE[CLOSE]
+  CLOSE --> END_([STOP RUN])
+</div>
 <h3 id="4-pad図-n-nマッチング">4. PAD図（N:Nマッチング）</h3>
 <p><em>原見出し: 4、40ページのPAD図（N:Nマッチング）</em></p>
-<pre><code class="language-mermaid">flowchart TD
-  START([START]) --&gt; INITIAL[INITIAL]
-  INITIAL --&gt; READ1[INFL1 READ]
-  READ1 --&gt; READ2[INFL2 READ]
-  READ2 --&gt; CHECK1{KEY1 = KEY2&lt;br/&gt;AND&lt;br/&gt;KEY1 = HIGH-VALUE}
-  CHECK1 --&gt;|等しい| CLOSE[CLOSE]
-  CLOSE --&gt; END_([STOP RUN])
-  CHECK1 --&gt;|等しくない| COMP1{KEY1 : KEY2}
-  COMP1 --&gt;|KEY1 &lt; KEY2| INFL1_ONLY[INFL1 ONLY処理]
-  COMP1 --&gt;|KEY1 &gt; KEY2| INFL2_ONLY[INFL2 ONLY処理]
-  COMP1 --&gt;|KEY1 = KEY2| STORE[KEY1→STR1&lt;br/&gt;KEY2→STR2]
-  INFL1_ONLY --&gt; R1[INFL1 READ] --&gt; CHECK1
-  INFL2_ONLY --&gt; R2[INFL2 READ] --&gt; CHECK1
-  STORE --&gt; LOOP2{&quot;(2) KEY1 : KEY2&quot;}
-  LOOP2 --&gt;|等しくない| OUT[OUT処理]
-  LOOP2 --&gt;|等しい| MATCH[マッチング処理]
-  OUT --&gt; R3[INFL1 READ]
-  MATCH --&gt; R4[INFL2 READ]
-  R3 --&gt; HV{KEY1 OR KEY2&lt;br/&gt;= HIGH-VALUE？}
-  R4 --&gt; HV
-  HV --&gt;|YES| LOOP2
-  HV --&gt;|NO| CMP_STR{KEY1 : STR1}
-  CMP_STR --&gt;|等しくない| CHECK1
-  CMP_STR --&gt;|等しい| REOPEN[INFL2 CLOSE&lt;br/&gt;AND 再OPEN]
-  REOPEN --&gt; R5{&quot;(3) INFL2 READ&quot;}
-  R5 --&gt; CMP_KEY2{KEY2 : STR2}
-  CMP_KEY2 --&gt;|等しくない| R5
-  CMP_KEY2 --&gt;|等しい| CHECK1
-</code></pre>
+<div class="mermaid">flowchart TD
+  START([START]) --> INITIAL[INITIAL]
+  INITIAL --> READ1[INFL1 READ]
+  READ1 --> READ2[INFL2 READ]
+  READ2 --> CHECK1{KEY1 = KEY2<br/>AND<br/>KEY1 = HIGH-VALUE}
+  CHECK1 -->|等しい| CLOSE[CLOSE]
+  CLOSE --> END_([STOP RUN])
+  CHECK1 -->|等しくない| COMP1{KEY1 : KEY2}
+  COMP1 -->|KEY1 < KEY2| INFL1_ONLY[INFL1 ONLY処理]
+  COMP1 -->|KEY1 > KEY2| INFL2_ONLY[INFL2 ONLY処理]
+  COMP1 -->|KEY1 = KEY2| STORE[KEY1→STR1<br/>KEY2→STR2]
+  INFL1_ONLY --> R1[INFL1 READ] --> CHECK1
+  INFL2_ONLY --> R2[INFL2 READ] --> CHECK1
+  STORE --> LOOP2{"(2) KEY1 : KEY2"}
+  LOOP2 -->|等しくない| OUT[OUT処理]
+  LOOP2 -->|等しい| MATCH[マッチング処理]
+  OUT --> R3[INFL1 READ]
+  MATCH --> R4[INFL2 READ]
+  R3 --> HV{KEY1 OR KEY2<br/>= HIGH-VALUE？}
+  R4 --> HV
+  HV -->|YES| LOOP2
+  HV -->|NO| CMP_STR{KEY1 : STR1}
+  CMP_STR -->|等しくない| CHECK1
+  CMP_STR -->|等しい| REOPEN[INFL2 CLOSE<br/>AND 再OPEN]
+  REOPEN --> R5{"(3) INFL2 READ"}
+  R5 --> CMP_KEY2{KEY2 : STR2}
+  CMP_KEY2 -->|等しくない| R5
+  CMP_KEY2 -->|等しい| CHECK1
+</div>
 <h3 id="5-pad図-コントロールブレイク">5. PAD図（コントロールブレイク）</h3>
 <p><em>原見出し: 5、43ページのPAD図（コントロールブレイク）</em></p>
-<pre><code class="language-mermaid">flowchart TD
-  START([START]) --&gt; INITIAL[INITIAL]
-  INITIAL --&gt; READ[INFL1 READ]
-  READ --&gt; EOF{EOF？}
-  EOF --&gt;|YES| PRINT_SHO[小計プリント]
-  PRINT_SHO --&gt; PRINT_CHU[中計プリント]
-  PRINT_CHU --&gt; PRINT_GOU[合計プリント]
-  PRINT_GOU --&gt; KENSU[件数表]
-  KENSU --&gt; CLOSE[CLOSE]
-  CLOSE --&gt; END_([STOP RUN])
-  EOF --&gt;|NO| CMP{KEY : STR}
-  CMP --&gt;|等しい| DETAIL[明細] --&gt; SHUKEI[集計] --&gt; READ
-  CMP --&gt;|違う| CMP1{KEY1 = STR1？}
-  CMP1 --&gt;|違う&lt;br/&gt;大項目変化| PRINT_SHO2[小計プリント] --&gt; PRINT_CHU2[中計プリント] --&gt; PRINT_GOU2[合計プリント] --&gt; STEP7
-  CMP1 --&gt;|同じ| CMP2{KEY2 = STR2？}
-  CMP2 --&gt;|違う&lt;br/&gt;中項目変化| PRINT_SHO3[小計プリント] --&gt; PRINT_CHU3[中計プリント] --&gt; STEP7
-  CMP2 --&gt;|同じ| PRINT_SHO4[小計プリント&lt;br/&gt;小項目変化] --&gt; STEP7
-  STEP7[④⑤⑥終了後] --&gt; DETAIL
-</code></pre>
-<h2 id="_1">---</h2>
+<div class="mermaid">flowchart TD
+  START([START]) --> INITIAL[INITIAL]
+  INITIAL --> READ[INFL1 READ]
+  READ --> EOF{EOF？}
+  EOF -->|YES| PRINT_SHO[小計プリント]
+  PRINT_SHO --> PRINT_CHU[中計プリント]
+  PRINT_CHU --> PRINT_GOU[合計プリント]
+  PRINT_GOU --> KENSU[件数表]
+  KENSU --> CLOSE[CLOSE]
+  CLOSE --> END_([STOP RUN])
+  EOF -->|NO| CMP{KEY : STR}
+  CMP -->|等しい| DETAIL[明細] --> SHUKEI[集計] --> READ
+  CMP -->|違う| CMP1{KEY1 = STR1？}
+  CMP1 -->|違う<br/>大項目変化| PRINT_SHO2[小計プリント] --> PRINT_CHU2[中計プリント] --> PRINT_GOU2[合計プリント] --> STEP7
+  CMP1 -->|同じ| CMP2{KEY2 = STR2？}
+  CMP2 -->|違う<br/>中項目変化| PRINT_SHO3[小計プリント] --> PRINT_CHU3[中計プリント] --> STEP7
+  CMP2 -->|同じ| PRINT_SHO4[小計プリント<br/>小項目変化] --> STEP7
+  STEP7[④⑤⑥終了後] --> DETAIL
+</div>
+<hr />
 <h2 id="付記-デジタル化に際して">付記（デジタル化に際して）</h2>
 <ul>
 <li><strong>ページ対応</strong>: 原PDFのページ番号と本文の印刷ページ番号は「印刷ページ ＝ PDFページ − 3」の関係にある（PDF 5ページ目 = 本文 − 2 −）。第八章のPAD図のページ（印刷 − 58 −〜 − 62 −）は横向きにスキャンされている。</li>
@@ -2156,12 +2162,27 @@ ADD   A B   TO     (B) ROUNDED.
 </ul>
 </main>
 <script>
-// 本文内「目次」の見出し直下リンクはサイドバーへ（重複ナビ防止ではなくそのまま表示維持）
+// 本文内のアンカーリンクはスムーズスクロール
 document.querySelectorAll('main a[href^="#"]').forEach(a=>{
   a.addEventListener('click',e=>{
     const t=document.getElementById(decodeURIComponent(a.hash.slice(1)));
     if(t){e.preventDefault(); t.scrollIntoView({behavior:'smooth'}); history.replaceState(null,'',a.hash);}
   });
+});
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>
+mermaid.initialize({
+  startOnLoad: true, securityLevel: 'loose', theme: 'base',
+  themeVariables: {
+    fontFamily: '"Noto Serif JP","Yu Mincho",serif',
+    background: '#FDFBF4',
+    primaryColor: '#F1ECDD', primaryTextColor: '#232A33', primaryBorderColor: '#1D3A5F',
+    secondaryColor: '#E7DFC9', tertiaryColor: '#FDFBF4',
+    lineColor: '#3E5C82',
+    titleColor: '#152B47', edgeLabelBackground: '#F7F3E8'
+  },
+  flowchart: { curve: 'basis', padding: 12 }
 });
 </script>
 </body>
