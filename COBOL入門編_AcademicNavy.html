@@ -1,0 +1,2277 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>COBOL入門編</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#F7F3E8; --cream-2:#F1ECDD; --paper:#FDFBF4;
+  --ink:#232A33; --ink-soft:#4A5260;
+  --navy:#1D3A5F; --navy-deep:#152B47; --navy-soft:#3E5C82;
+  --line:#CFC7B2; --line-soft:#E0D9C6; --accent:#8C6A2F;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0; background:var(--cream); color:var(--ink);
+  font-family:"Noto Serif JP","Shippori Mincho","Yu Mincho",serif;
+  font-size:16px; line-height:1.9;
+}
+a{color:var(--navy-soft); text-decoration:none}
+a:hover{color:var(--navy-deep); text-decoration:underline}
+
+/* ===== サイドバー（目次） ===== */
+nav.sidebar{
+  position:fixed; top:0; left:0; bottom:0; width:300px; overflow-y:auto;
+  background:var(--navy-deep); color:#EFEAD9;
+  padding:28px 0 40px; border-right:4px solid var(--accent);
+}
+nav.sidebar .brand{
+  padding:0 24px 18px; border-bottom:1px solid rgba(255,255,255,.18); margin-bottom:14px;
+}
+nav.sidebar .brand .t{
+  font-size:19px; font-weight:700; letter-spacing:.06em; color:#F5F0DF;
+}
+nav.sidebar .brand .s{
+  font-size:11px; letter-spacing:.22em; color:#A8B8CC; margin-top:4px; text-transform:uppercase;
+}
+nav.sidebar ul{list-style:none; margin:0; padding:0}
+nav.sidebar .toc>ul{padding:0 10px}
+nav.sidebar li a{display:block; padding:6px 16px; color:#D8D2BF; border-left:3px solid transparent; line-height:1.5}
+nav.sidebar li a:hover{background:rgba(255,255,255,.07); color:#fff; text-decoration:none}
+nav.sidebar li ul li a{font-size:13px; padding-left:34px; color:#AEB9C6}
+nav.sidebar .toc ul ul{}
+
+/* ===== 本文（幅制限なし） ===== */
+main{
+  margin-left:300px; padding:56px 64px 120px; min-width:0;
+}
+main>h1:first-of-type{
+  margin:0 0 8px; font-size:42px; letter-spacing:.08em; color:var(--navy-deep); font-weight:700;
+}
+.subtitle{
+  font-size:13px; letter-spacing:.25em; color:var(--accent);
+  text-transform:uppercase; margin-bottom:10px;
+}
+h1{border-bottom:3px double var(--navy); padding-bottom:18px}
+
+/* 章（h2）: ネイビーの帯 */
+main h2{
+  margin:3.4em 0 1.2em; padding:16px 22px;
+  background:var(--navy); color:#F5F0DF;
+  font-size:26px; letter-spacing:.05em; font-weight:600;
+  border-left:8px solid var(--accent);
+  scroll-margin-top:20px;
+}
+main h2 .toc-link, main h3 .toc-link, main h4 .toc-link{color:inherit; text-decoration:none}
+
+/* 節（h3）: 左ボーダー */
+main h3{
+  margin:2.6em 0 1em; padding:2px 0 8px 16px;
+  border-left:5px solid var(--navy); border-bottom:1px solid var(--line);
+  font-size:21px; color:var(--navy-deep); font-weight:700;
+  scroll-margin-top:20px;
+}
+/* 小節（h4）: 弱い帯 */
+main h4{
+  margin:2.2em 0 .8em; padding:8px 14px;
+  background:var(--cream-2); border:1px solid var(--line-soft); border-left:4px solid var(--navy-soft);
+  font-size:17px; color:var(--navy); font-weight:700;
+  scroll-margin-top:20px;
+}
+main h5{margin:1.8em 0 .6em; font-size:16px; color:var(--navy-deep)}
+
+p{margin:0 0 1em}
+strong{color:var(--navy-deep)}
+hr{border:0; border-top:1px solid var(--line); margin:2.5em 0}
+
+/* ===== コード ===== */
+code{
+  font-family:"Sarasa Mono SC","Consolas","Courier New",monospace;
+  background:var(--cream-2); color:var(--navy-deep);
+  padding:.12em .45em; border:1px solid var(--line-soft); font-size:.92em;
+}
+pre{
+  background:var(--navy-deep); color:#E9E4D3;
+  padding:18px 24px; overflow-x:auto; line-height:1.7;
+  border-top:3px solid var(--accent);
+  box-shadow:0 2px 10px rgba(21,43,71,.15);
+}
+pre code{
+  background:transparent; color:inherit; border:0; padding:0; font-size:14px;
+  white-space:pre;
+}
+
+/* ===== テーブル ===== */
+table{
+  border-collapse:collapse; width:100%; margin:1.4em 0 2em;
+  background:var(--paper); font-size:14.5px; line-height:1.7;
+}
+th,td{border:1px solid var(--line); padding:9px 14px; vertical-align:top; text-align:left}
+thead th{background:var(--navy); color:#F5F0DF; font-weight:600; letter-spacing:.04em; border-color:var(--navy-deep)}
+tbody tr:nth-child(even){background:var(--cream-2)}
+caption{caption-side:top; text-align:left; color:var(--ink-soft); font-size:13px; padding-bottom:6px}
+
+blockquote{
+  margin:1.4em 0; padding:12px 22px; background:var(--paper);
+  border-left:5px solid var(--accent); color:var(--ink-soft);
+}
+ul,ol{margin:0 0 1.2em; padding-left:1.6em}
+li{margin:.25em 0}
+
+/* 目次セクション（本文内の "## 目次" の直下リスト） */
+/* ===== フッター ===== */
+footer{
+  margin-left:300px; padding:24px 64px; border-top:1px solid var(--line);
+  color:var(--ink-soft); font-size:12px; letter-spacing:.08em;
+}
+@media print{ nav.sidebar{display:none} main,footer{margin-left:0} pre{box-shadow:none} }
+</style>
+</head>
+<body>
+<nav class="sidebar">
+  <div class="brand">
+    <div class="t">COBOL入門編</div>
+    <div class="s">Academic Edition</div>
+  </div>
+<div class="toc">
+<ul>
+<li><a href="#第一章-cobolの概説_1">第一章 COBOLの概説</a><ul>
+<li><a href="#1-cobolの単位">1. COBOLの単位</a></li>
+<li><a href="#2-4つのdivision">2. 4つのDIVISION</a></li>
+<li><a href="#3-文字セット">3. 文字セット</a></li>
+</ul>
+</li>
+<li><a href="#第二章-identification-division-見出し部_1">第二章 IDENTIFICATION DIVISION（見出し部）</a><ul>
+<li><a href="#1-形式">1. 形式</a></li>
+</ul>
+</li>
+<li><a href="#第三章-environment-division-環境部_1">第三章 ENVIRONMENT DIVISION（環境部）</a><ul>
+<li><a href="#1-形式_1">1. 形式</a></li>
+</ul>
+</li>
+<li><a href="#第四章-data-division-データ部_1">第四章 DATA DIVISION（データ部）</a><ul>
+<li><a href="#1-形式_2">1. 形式</a></li>
+<li><a href="#息抜き">☆ 息抜き ☆</a></li>
+</ul>
+</li>
+<li><a href="#第五章-procedure-division-手続き部_1">第五章 PROCEDURE DIVISION（手続き部）</a><ul>
+<li><a href="#1-accept-命令">1. ACCEPT 命令</a></li>
+<li><a href="#2-add-命令-加算">2. ADD 命令（加算）</a></li>
+<li><a href="#3-subtract-命令-減算">3. SUBTRACT 命令（減算）</a></li>
+<li><a href="#4-multiply-命令-乗算">4. MULTIPLY 命令（乗算）</a></li>
+<li><a href="#5-divide-命令-除算">5. DIVIDE 命令（除算）</a></li>
+<li><a href="#6-compute-命令">6. COMPUTE 命令</a></li>
+<li><a href="#7-if-命令">7. IF 命令</a></li>
+<li><a href="#8-read-命令">8. READ 命令</a></li>
+<li><a href="#9-move-命令">9. MOVE 命令</a></li>
+<li><a href="#10-set-命令">10. SET 命令</a></li>
+<li><a href="#11-perform-命令">11. PERFORM 命令</a></li>
+<li><a href="#12-go-to-命令">12. GO TO 命令</a></li>
+<li><a href="#13-open-命令">13. OPEN 命令</a></li>
+<li><a href="#14-close-命令">14. CLOSE 命令</a></li>
+<li><a href="#15-write-命令">15. WRITE 命令</a></li>
+<li><a href="#16-display-命令">16. DISPLAY 命令</a></li>
+<li><a href="#17-search-命令">17. SEARCH 命令</a></li>
+<li><a href="#18-stop-run-goback">18. STOP RUN、GOBACK</a></li>
+</ul>
+</li>
+<li><a href="#第六章-フロー例とコーディング例_1">第六章 フロー例とコーディング例</a><ul>
+<li><a href="#マッチング処理とは">マッチング処理とは</a></li>
+<li><a href="#コントロールブレイク処理とは">コントロールブレイク処理とは</a></li>
+<li><a href="#1-マッチング処理のフロー例-1-1—スイッチを使用する場合">1. マッチング処理のフロー例（1:1）— スイッチを使用する場合</a></li>
+<li><a href="#2-マッチング処理のフロー例-1-1—スイッチを使用しない場合">2. マッチング処理のフロー例（1:1）— スイッチを使用しない場合</a></li>
+<li><a href="#3-スイッチを使用しない場合-1-n">3. スイッチを使用しない場合（1:N）</a></li>
+<li><a href="#4-スイッチを使用しない場合-n-n—同一keyのmaxが全く予想できない場合">4. スイッチを使用しない場合（N:N）— 同一KEYのMAXが全く予想できない場合</a></li>
+<li><a href="#5-マッチング処理の説明">5. マッチング処理の説明</a></li>
+<li><a href="#6-コントロールブレイクのフロー例">6. コントロールブレイクのフロー例</a></li>
+<li><a href="#コーディング例-main">コーディング例（MAIN）</a></li>
+</ul>
+</li>
+<li><a href="#第七章-tso_1">第七章 TSO</a><ul>
+<li><a href="#tsoのlogon">TSOのLOGON</a></li>
+<li><a href="#1-tso周辺のファイル関係図">1. TSO周辺のファイル関係図</a></li>
+<li><a href="#2-ファイル説明">2. ファイル説明</a></li>
+<li><a href="#3-ソースからロードモジュールまで">3. ソースからロードモジュールまで</a></li>
+<li><a href="#4-jclとtsoのテストの違い">4. JCLとTSOのテストの違い</a></li>
+<li><a href="#5-tsoモード関係図">5. TSOモード関係図</a></li>
+<li><a href="#6-clistの作り方">6. CLISTの作り方</a></li>
+<li><a href="#7-tsoの主なコマンド">7. TSOの主なコマンド</a></li>
+</ul>
+</li>
+<li><a href="#第八章-pad図_1">第八章 PAD図</a><ul>
+<li><a href="#1-pad図-1-1マッチング-スイッチ使用">1. PAD図（1:1マッチング、スイッチ使用）</a></li>
+<li><a href="#2-pad図-1-1マッチング-スイッチ不使用">2. PAD図（1:1マッチング、スイッチ不使用）</a></li>
+<li><a href="#3-pad図-1-nマッチング-スイッチ不使用">3. PAD図（1:Nマッチング、スイッチ不使用）</a></li>
+<li><a href="#4-pad図-n-nマッチング">4. PAD図（N:Nマッチング）</a></li>
+<li><a href="#5-pad図-コントロールブレイク">5. PAD図（コントロールブレイク）</a></li>
+</ul>
+</li>
+<li><a href="#_1">---</a></li>
+<li><a href="#付記-デジタル化に際して">付記（デジタル化に際して）</a><ul>
+<li><a href="#cobolコードの整桁規約">COBOLコードの整桁規約</a></li>
+</ul>
+</li>
+</ul>
+</div>
+
+</nav>
+<main>
+<h1 id="cobol入門編">COBOL入門編</h1>
+<p><strong>東京システム営業5部1課</strong>
+<strong>大井駐在オペレーター</strong>
+<strong>1999年11月18日 再編成</strong></p>
+<hr />
+<h2 id="目次">目次</h2>
+<h3 id="第一章-cobolの概説">第一章 COBOLの概説</h3>
+<ol>
+<li><a href="#1-cobolの単位">COBOLの単位</a></li>
+<li><a href="#2-4つのdivision">4つのDIVISION</a></li>
+<li><a href="#3-文字セット">文字セット</a></li>
+</ol>
+<h3 id="第二章-identification-division-見出し部">第二章 IDENTIFICATION DIVISION（見出し部）</h3>
+<ol>
+<li><a href="#1-形式">形式（記入例）</a></li>
+</ol>
+<h3 id="第三章-environment-division-環境部">第三章 ENVIRONMENT DIVISION（環境部）</h3>
+<ol>
+<li><a href="#1-%E5%BD%A2%E5%BC%8F_1">形式（記入例）</a>
+   - (1) <a href="#1-special-names">SPECIAL-NAMES</a>
+   - (2) <a href="#2-source-computer">SOURCE-COMPUTER</a>
+   - (3) <a href="#3-object-computer">OBJECT-COMPUTER</a>
+   - (4) <a href="#4-input-output-section-%E3%82%B3%E3%83%B3%E3%83%88%E3%83%AD%E3%83%BC%E3%83%AB%E3%82%BB%E3%82%AF%E3%82%B7%E3%83%A7%E3%83%B3">INPUT-OUTPUT SECTION</a>
+   - (5) <a href="#5-file-control">FILE-CONTROL</a><ul>
+<li>① SELECT文節 ② ASSIGN文節 ③ RESERVE文節 ④ FILE-LIMIT文節 ⑤ ACCESS MODE文節 ⑥ PROCESSING MODE文節 ⑦ ACTUAL KEY文節 ⑧ NOMINAL KEY文節 ⑨ RECORD KEY文節 ⑩ TRACK-AREA文節 ⑪ TRACK-LIMIT文節</li>
+<li>(6) <a href="#6-i-o-control">I-O-CONTROL</a></li>
+<li>① RERUN文節 ② SAME文節 ③ MULTIPLE FILE TAPE文節 ④ APPLY文節</li>
+</ul>
+</li>
+</ol>
+<h3 id="第四章-data-division-データ部">第四章 DATA DIVISION（データ部）</h3>
+<ol>
+<li><a href="#1-%E5%BD%A2%E5%BC%8F_2">形式（記入例）</a>
+   - (1) <a href="#1-file-section">FILE SECTION</a><ul>
+<li>① BLOCK CONTAINS ② RECORD CONTAINS ③ RECORDING MODE ④ LABEL RECORD ⑤ VALUE OF ⑥ DATA RECORD</li>
+<li>(2) <a href="#2-データ記述項目">データ記述項目</a></li>
+<li>① WORKING-STORAGE SECTION（77・88・66レベル）</li>
+<li>② PICTURE句（9・A・X・編集-TYPE）</li>
+<li>③ VALUE文節 ④ JUST RIGHT句 ⑤ REDEFINE文節 ⑥ OCCURS文節</li>
+<li>(3) <a href="#3-linkage-section">LINKAGE SECTION</a></li>
+</ul>
+</li>
+</ol>
+<h3 id="第五章-procedure-division-手続き部">第五章 PROCEDURE DIVISION（手続き部）</h3>
+<ol>
+<li><a href="#1-accept-命令">ACCEPT</a> 2. <a href="#2-add-%E5%91%BD%E4%BB%A4-%E5%8A%A0%E7%AE%97">ADD</a> 3. <a href="#3-subtract-%E5%91%BD%E4%BB%A4-%E6%B8%9B%E7%AE%97">SUBTRACT</a> 4. <a href="#4-multiply-%E5%91%BD%E4%BB%A4-%E4%B9%97%E7%AE%97">MULTIPLY</a> 5. <a href="#5-divide-%E5%91%BD%E4%BB%A4-%E9%99%A4%E7%AE%97">DIVIDE</a> 6. <a href="#6-compute-命令">COMPUTE</a> 7. <a href="#7-if-命令">IF</a> 8. <a href="#8-read-命令">READ</a> 9. <a href="#9-move-命令">MOVE</a> 10. <a href="#10-set-命令">SET</a> 11. <a href="#11-perform-命令">PERFORM</a> 12. <a href="#12-go-to-命令">GO TO</a> 13. <a href="#13-open-命令">OPEN</a> 14. <a href="#14-close-命令">CLOSE</a> 15. <a href="#15-write-命令">WRITE</a> 16. <a href="#16-display-命令">DISPLAY</a> 17. <a href="#17-search-命令">SEARCH</a> 18. <a href="#18-stop-run-goback">STOP RUN・GOBACK</a></li>
+</ol>
+<h3 id="第六章-フロー例とコーディング例">第六章 フロー例とコーディング例</h3>
+<ol>
+<li><a href="#1-%E3%83%9E%E3%83%83%E3%83%81%E3%83%B3%E3%82%B0%E5%87%A6%E7%90%86%E3%81%AE%E3%83%95%E3%83%AD%E3%83%BC%E4%BE%8B-1-1%E2%80%94%E3%82%B9%E3%82%A4%E3%83%83%E3%83%81%E3%82%92%E4%BD%BF%E7%94%A8%E3%81%99%E3%82%8B%E5%A0%B4%E5%90%88">マッチング（1:1）スイッチ使用</a></li>
+<li><a href="#2-%E3%83%9E%E3%83%83%E3%83%81%E3%83%B3%E3%82%B0%E5%87%A6%E7%90%86%E3%81%AE%E3%83%95%E3%83%AD%E3%83%BC%E4%BE%8B-1-1%E2%80%94%E3%82%B9%E3%82%A4%E3%83%83%E3%83%81%E3%82%92%E4%BD%BF%E7%94%A8%E3%81%97%E3%81%AA%E3%81%84%E5%A0%B4%E5%90%88">マッチング（1:1）スイッチ不使用</a></li>
+<li><a href="#3-%E3%82%B9%E3%82%A4%E3%83%83%E3%83%81%E3%82%92%E4%BD%BF%E7%94%A8%E3%81%97%E3%81%AA%E3%81%84%E5%A0%B4%E5%90%88-1-n">マッチング（1:N）スイッチ不使用</a></li>
+<li><a href="#4-%E3%82%B9%E3%82%A4%E3%83%83%E3%83%81%E3%82%92%E4%BD%BF%E7%94%A8%E3%81%97%E3%81%AA%E3%81%84%E5%A0%B4%E5%90%88-n-n%E2%80%94%E5%90%8C%E4%B8%80key%E3%81%AEmax%E3%81%8C%E5%85%A8%E3%81%8F%E4%BA%88%E6%83%B3%E3%81%A7%E3%81%8D%E3%81%AA%E3%81%84%E5%A0%B4%E5%90%88">マッチング（N:N）</a></li>
+<li><a href="#5-マッチング処理の説明">マッチングの説明</a></li>
+<li><a href="#6-コントロールブレイクのフロー例">コントロールブレイク</a></li>
+</ol>
+<h3 id="第七章-tso">第七章 TSO</h3>
+<ol>
+<li><a href="#1-tso周辺のファイル関係図">ファイル関係図</a></li>
+<li><a href="#2-ファイル説明">ファイル説明</a></li>
+<li><a href="#3-ソースからロードモジュールまで">ソースからロードモジュールまで</a></li>
+<li><a href="#4-jclとtsoのテストの違い">JCLとTSOのテスト</a></li>
+<li><a href="#5-tsoモード関係図">TSOモード関係図</a></li>
+<li><a href="#6-clistの作り方">CLISTの作り方</a></li>
+<li><a href="#7-tsoの主なコマンド">TSOの主なコマンド</a></li>
+</ol>
+<h3 id="第八章-pad図">第八章 PAD図</h3>
+<ol>
+<li><a href="#1-pad%E5%9B%B3-1-1%E3%83%9E%E3%83%83%E3%83%81%E3%83%B3%E3%82%B0-%E3%82%B9%E3%82%A4%E3%83%83%E3%83%81%E4%BD%BF%E7%94%A8">PAD図（1:1マッチング、スイッチ使用）</a></li>
+<li><a href="#2-pad%E5%9B%B3-1-1%E3%83%9E%E3%83%83%E3%83%81%E3%83%B3%E3%82%B0-%E3%82%B9%E3%82%A4%E3%83%83%E3%83%81%E4%B8%8D%E4%BD%BF%E7%94%A8">PAD図（1:1マッチング、スイッチ不使用）</a></li>
+<li><a href="#3-pad%E5%9B%B3-1-n%E3%83%9E%E3%83%83%E3%83%81%E3%83%B3%E3%82%B0-%E3%82%B9%E3%82%A4%E3%83%83%E3%83%81%E4%B8%8D%E4%BD%BF%E7%94%A8">PAD図（1:Nマッチング、スイッチ不使用）</a></li>
+<li><a href="#4-pad%E5%9B%B3-n-n%E3%83%9E%E3%83%83%E3%83%81%E3%83%B3%E3%82%B0">PAD図（N:Nマッチング）</a></li>
+<li><a href="#5-pad%E5%9B%B3-%E3%82%B3%E3%83%B3%E3%83%88%E3%83%AD%E3%83%BC%E3%83%AB%E3%83%96%E3%83%AC%E3%82%A4%E3%82%AF">PAD図（コントロールブレイク）</a></li>
+</ol>
+<hr />
+<h2 id="第一章-cobolの概説_1">第一章 COBOLの概説</h2>
+<h3 id="1-cobolの単位">1. COBOLの単位</h3>
+<p>語はCOBOL予約語、あるいはプログラマーによって定義される語のいずれかである。予約語はCOBOLコンパイラーに対し、特定の統語上意味を持っている。</p>
+<p>プログラマーによって定義される語は、データ名やプログラム名などの項目で名前を付ける際はCOBOLの規則に従わなければならない。</p>
+<h3 id="2-4つのdivision">2. 4つのDIVISION</h3>
+<p>各DIVISIONは、論理的な順序に配置される。DIVISIONのコーディングの順序は下記のとおりである。</p>
+<pre><code class="language-cobol">IDENTIFICATION  DIVISION.    （見出し部）
+ENVIRONMENT     DIVISION.    （環境部）
+DATA            DIVISION.    （データ部）
+PROCEDURE       DIVISION.    （手続き部）
+</code></pre>
+<ul>
+<li><strong>IDENTIFICATION DIVISION</strong> では、プログラム名、プログラム作成者、作成日などを記入する。</li>
+<li><strong>ENVIRONMENT DIVISION</strong> では、プログラムを処理する具体的な計算機の構成に関する情報、JCLのDD名とDCB名の対応づけなどを記入する。</li>
+<li><strong>DATA DIVISION</strong> では、プログラムで扱う全てのデータの形式・性質、及び作業用エリアとして使用するエリアの定義などを記入する。</li>
+<li><strong>PROCEDURE DIVISION</strong> では、計算機に実行させたい処理をCOBOLの命令により記入する。</li>
+</ul>
+<h3 id="3-文字セット">3. 文字セット</h3>
+<p>51種類の文字から構成される。</p>
+<table>
+<thead>
+<tr>
+<th>文字</th>
+<th>意味</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>0</code>, <code>1</code>〜<code>9</code></td>
+<td>数字</td>
+</tr>
+<tr>
+<td><code>A</code>, <code>B</code>〜<code>Z</code></td>
+<td>英字</td>
+</tr>
+<tr>
+<td><code>△</code></td>
+<td>スペース（空白）</td>
+</tr>
+<tr>
+<td><code>+</code></td>
+<td>正の符号</td>
+</tr>
+<tr>
+<td><code>-</code></td>
+<td>負の符号（ハイフン）</td>
+</tr>
+<tr>
+<td><code>*</code></td>
+<td>星印（アスタリスク）</td>
+</tr>
+<tr>
+<td><code>/</code></td>
+<td>斜線（スラッシュ）</td>
+</tr>
+<tr>
+<td><code>=</code></td>
+<td>等号</td>
+</tr>
+<tr>
+<td><code>¥</code></td>
+<td>通貨記号</td>
+</tr>
+<tr>
+<td><code>:</code></td>
+<td>コロン</td>
+</tr>
+<tr>
+<td><code>;</code></td>
+<td>セミコロン</td>
+</tr>
+<tr>
+<td><code>.</code></td>
+<td>ピリオド（小数点）</td>
+</tr>
+<tr>
+<td><code>"</code> または <code>'</code></td>
+<td>引用符（IBMでは <code>'</code>）</td>
+</tr>
+<tr>
+<td><code>(</code></td>
+<td>左括弧</td>
+</tr>
+<tr>
+<td><code>)</code></td>
+<td>右括弧</td>
+</tr>
+<tr>
+<td><code>&gt;</code></td>
+<td>不等号（より大きい）</td>
+</tr>
+<tr>
+<td><code>&lt;</code></td>
+<td>不等号（より小さい）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>語の中で使用される文字</strong></p>
+<p><code>0</code>〜<code>9</code>、<code>A</code>〜<code>Z</code>、<code>-</code>（ハイフン）は、語の始めと終わりには使用できない。なお、桁数は30桁以内である。</p>
+<p><strong>例:</strong></p>
+<pre><code>S02-INITIAL
+WK-FROM.
+COUNTER-AREA  など
+</code></pre>
+<hr />
+<h2 id="第二章-identification-division-見出し部_1">第二章 IDENTIFICATION DIVISION（見出し部）</h2>
+<h3 id="1-形式">1. 形式</h3>
+<pre><code class="language-cobol">*IDENTIFICATION DIVISION.
+*PROGRAM-ID.               プログラム名．
+  AUTHOR.                  プログラム作成者
+  DATE-COMPILED.           コンパイル日付
+  DATE-WRITTEN.            プログラム作成日
+  INSTALLATION.            会社名、課名、など
+  SECURITY.                情報の極秘等
+  REMARKS.                 プログラムの概要処理
+</code></pre>
+<p><code>*</code>の2つ（<code>IDENTIFICATION DIVISION</code>、<code>PROGRAM-ID</code>）は省略不可。他は省略可能。</p>
+<p>コンパイル日付は機械の方でコンパイル時に入れてくれるので、プログラマーが記入する必要はない。記入した時には、機械の方の日付は無視される。</p>
+<p><strong>記入例:</strong></p>
+<pre><code class="language-cobol">IDENTIFICATION    DIVISION.
+PROGRAM-ID.       SS001601.
+DATE-COMPILED.
+REMARKS.          MIX DUMP.
+</code></pre>
+<p>なお、REMARKSは、項目中にスペースがあっても、2行になっても、全くプログラムに差し支えない。</p>
+<hr />
+<h2 id="第三章-environment-division-環境部_1">第三章 ENVIRONMENT DIVISION（環境部）</h2>
+<h3 id="1-形式_1">1. 形式</h3>
+<pre><code class="language-cobol">*ENVIRONMENT DIVISION.
+*CONFIGURATION SECTION.
+*SOURCE-COMPUTER.
+*OBJECT-COMPUTER.
+  SPECIAL-NAMES.
+  INPUT-OUTPUT SECTION.
+  FILE-CONTROL.
+  I-O-CONTROL.
+</code></pre>
+<p><code>*</code>の4つは指定しなければならない。<code>*</code>のない4つは、プログラム上あるいはファイルの都合上、指定せねばならないものもある。</p>
+<p><strong>記入例:</strong></p>
+<pre><code class="language-cobol">ENVIRONMENT       DIVISION.
+CONFIGURATION     SECTION.
+SOURCE-COMPUTER.  IBM-370.
+OBJECT-COMPUTER.  IBM-370.
+SPECIAL-NAMES.    C01 IS F-FILE.
+INPUT-OUTPUT      SECTION.
+FILE-CONTROL.
+  SELECT INFL ASSIGN TO UT-S-INFL.
+  SELECT OTFL ASSIGN TO UT-S-OTFL.
+I-O-CONTROL.
+  APPLY WRITE-ONLY ON OTFL.
+</code></pre>
+<h4 id="1-special-names">(1) SPECIAL-NAMES</h4>
+<p>プリントなどでファーストラインに名前を付けるものである（C01のみ使用）。</p>
+<p>例えば、<code>C01 IS FIRST-LINE</code> と記入すると、チャネル01（C01）の名前を FIRST-LINE と定義することである。これは、プロシージャーディビジョンでプリントファイルにWRITEする際に使用される。<code>BEFORE</code> もしくは <code>AFTER</code> で FIRST-LINE と書くと、命令が実行された後、または前にプリンタのポインタがTOPを指す。詳細はWRITE命令を参照。</p>
+<h4 id="2-source-computer">(2) SOURCE-COMPUTER</h4>
+<p>この段落は文書化の働きしかしない。コンパイルする電子計算機について記述する。通常、<code>IBM-9790.</code> などの様に記述する。</p>
+<h4 id="3-object-computer">(3) OBJECT-COMPUTER</h4>
+<p>SOURCE-COMPUTERと同じで、実行する計算機について記述する。MEMORY SIZE や SEGMENT-LIMIT などのOPTIONがあるが、ここでは省略する。</p>
+<h4 id="4-input-output-section-コントロールセクション">(4) INPUT-OUTPUT SECTION（コントロールセクション）</h4>
+<p>個々のファイルの定義。ファイルを入れる外部記憶媒体の識別（JCLのDDとの関連付け）。1つ、又は2つ以上の入出力装置へのファイルの割り当てなどを定義するセクションで、FILE-CONTROL段落とI-O-CONTROL段落がある。</p>
+<h4 id="5-file-control">(5) FILE-CONTROL</h4>
+<p>ファイルを入出力装置に割り当てる。</p>
+<p><strong>形式で使える文節:</strong></p>
+<table>
+<thead>
+<tr>
+<th>文節</th>
+<th>説明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SELECT文節</td>
+<td>ファイルに名前を与える</td>
+</tr>
+<tr>
+<td>ASSIGN文節</td>
+<td>外部媒体（JCL上のDD名）に割り当てる</td>
+</tr>
+<tr>
+<td>RESERVE文節</td>
+<td>バッファの数を指定</td>
+</tr>
+<tr>
+<td>FILE-LIMIT文節</td>
+<td>コメントとして扱われる</td>
+</tr>
+<tr>
+<td>ACCESS MODE文節</td>
+<td>アクセス方法（順次/ランダム）を規定</td>
+</tr>
+<tr>
+<td>PROCESSING MODE文節</td>
+<td>指定してもコメントとして扱われる</td>
+</tr>
+<tr>
+<td>ACTUAL KEY文節</td>
+<td>ランダム・アクセス時に必須</td>
+</tr>
+<tr>
+<td>NOMINAL KEY文節</td>
+<td>索引付/相対ファイルのランダム・アクセス時に必須</td>
+</tr>
+<tr>
+<td>RECORD KEY文節</td>
+<td>索引ファイルのアクセスに使用</td>
+</tr>
+<tr>
+<td>TRACK-AREA文節</td>
+<td>索引ファイルへのランダム追加で効率化</td>
+</tr>
+<tr>
+<td>TRACK-LIMIT文節</td>
+<td>直接編成ファイル作成時の最終トラック番号</td>
+</tr>
+</tbody>
+</table>
+<p><strong>① SELECT文節</strong></p>
+<p>SELECT文節は、プログラム中の個々のファイルに名前を与えるために使用される。</p>
+<pre><code class="language-cobol">SELECT  ファイル名 ASSIGN TO 外部名.
+</code></pre>
+<p>このファイル名で書いた名前は、DATA DIVISION中のFD又はSD項目を有していなければならない。</p>
+<p><strong>② ASSIGN文節</strong></p>
+<p>ASSIGN文節は、ファイルを外部媒体（JCL上のDD名）に割り当てるものである。</p>
+<pre><code class="language-cobol">ASSIGN  TO システム名
+</code></pre>
+<p>システム名の構成: <code>クラス（装置）－編成－名前</code></p>
+<ul>
+<li><strong>クラス:</strong> <code>DA</code>（大容量記憶装置）、<code>UT</code>（ユーティリティ）、<code>UR</code>（ユニットレコード）—— IBMではほとんどUTを使用する</li>
+</ul>
+<p>UT又はURに割り当てられるファイルは標準順次編成でなければならない。DAは順次編成又は直接編成のいずれでもよい。</p>
+<ul>
+<li><strong>装置:</strong> 通常指定しない</li>
+<li><code>UT</code> … 2301、2302、2303、2311、2321、2314など</li>
+<li><code>UT</code> … 同上＋2400など（原文もこの行は <code>UT</code> 表記。1行目は <code>DA</code> の疑いあり）</li>
+<li><code>UR</code> … 1403、1404、1443など</li>
+<li><strong>編成:</strong> 1文字のフィールド</li>
+<li><code>S</code> — 標準順次編成</li>
+<li><code>D</code> — 直接編成</li>
+<li><code>W</code> — REWRITEを使用時の直接編成</li>
+<li><code>R</code> — 相対編成</li>
+<li><code>I</code> — 索引編成</li>
+<li><strong>名前:</strong> 1〜8文字までで示すDD名である</li>
+</ul>
+<p><strong>③ RESERVE文節</strong></p>
+<p>コンパイラーが割り当てられる入出力域（BUFF）の数をユーザーが修正できるようにするものである。</p>
+<pre><code class="language-cobol">RESERVE  { NO   } ALTERNATE  [ AREA  ]
+         { 整数 }            [ AREAS ]
+</code></pre>
+<p>整数で示される偶数だけBUFFが確保される。ただし、順次アクセスにのみ有効。</p>
+<p><strong>④ FILE-LIMIT文節</strong></p>
+<p>コメントとして扱われるので省略する。</p>
+<pre><code class="language-cobol">FILE-LIMIT IS  リテラル-1  THRU  リテラル-2
+</code></pre>
+<p><strong>⑤ ACCESS MODE文節</strong></p>
+<p>ファイルのレコードをアクセスする方法を規定する。</p>
+<pre><code class="language-cobol">ACCESS MODE IS  { SEQUENTIAL }
+                { RANDOM     }
+</code></pre>
+<p>省略時は <code>SEQUENTIAL</code> とみなされる。</p>
+<p><strong>⑥ PROCESSING MODE文節</strong></p>
+<p>指定してもコメントとして扱われる。</p>
+<pre><code class="language-cobol">PROCESSING MODE  IS SEQUENTIAL
+</code></pre>
+<p><strong>⑦ ACTUAL KEY文節</strong></p>
+<p>ランダム・アクセスの時には指定しなければならない。</p>
+<pre><code class="language-cobol">ACTUAL KEY  IS データ名
+</code></pre>
+<p>データ名は5〜259バイトの長さの固定長項目であり、DATA DIVISIONで指定しなければならない。</p>
+<p><strong>⑧ NOMINAL KEY文節</strong></p>
+<p>索引付ファイル及び相対ファイルをランダム・アクセスする時に指定しなければならない。</p>
+<pre><code class="language-cobol">NOMINAL KEY  IS データ名
+</code></pre>
+<p>データ名は1〜255バイトの長さの固定長項目で、WORKING-STORAGE SECTIONで指定できる。</p>
+<p><strong>⑨ RECORD KEY文節</strong></p>
+<p>索引ファイルをアクセスするために使用する。</p>
+<pre><code class="language-cobol">RECORD KEY  IS データ名
+</code></pre>
+<p>データ名は255バイト以下の固定長項目でなければならない。</p>
+<p><strong>⑩ TRACK-AREA文節</strong></p>
+<p>索引ファイルに対し、ランダム・アクセス方式でレコードを追加する場合に使用される。この文節を使用するとレコード追加の効率がよくなる。</p>
+<pre><code class="language-cobol">TRACK-AREA IS  { データ名 }
+               { 整数     }
+</code></pre>
+<p>定義される区域は8の倍数で、32760バイト以内。</p>
+<p><strong>⑪ TRACK-LIMIT文節</strong></p>
+<p>直接編成ファイルの作成時、初期値化すべき最後のトラックの相対番号を示すものである。</p>
+<pre><code>TRACK-LIMIT IS 整数 TRACK(S)
+</code></pre>
+<h4 id="6-i-o-control">(6) I-O-CONTROL</h4>
+<p><strong>形式:</strong></p>
+<pre><code>I-O-CONTROL.
+  RERUN 文節
+  SAME AREA 文節
+  MULTIPLE FILE TAPE 文節
+  APPLY 文節
+</code></pre>
+<p><strong>① RERUN文節</strong></p>
+<p>チェックポイント・レコードをとることを指定するものである。</p>
+<pre><code class="language-cobol">RERUN ON  システム名
+EVERY  { 整数       RECORD }
+       { [END OF] { REEL } }
+       {          { UNIT } }
+</code></pre>
+<ul>
+<li>システム名: チェックポイント・レコードが<strong>書き出される</strong>ファイル</li>
+<li>ファイル名: チェックポイントの対象となる<strong>目的の</strong>ファイル。DATA部で定義されていなければならない</li>
+</ul>
+<p><strong>② SAME文節</strong></p>
+<p>処理中に2つ以上のファイルが同じコア記憶域を使用することを指定する。</p>
+<pre><code class="language-cobol">SAME    [ SORT   ]  AREA FOR ファイル名-1...n
+        [ RECORD ]
+</code></pre>
+<p><strong>③ MULTIPLE FILE TAPE文節</strong></p>
+<p>文書化のために使用する。</p>
+<pre><code class="language-cobol">MULTIPLE FILE TAPE CONTAINS ファイル名-1...n
+POSITION  整数-1...n
+</code></pre>
+<p><strong>④ APPLY文節</strong></p>
+<p><strong>ア.</strong> <code>APPLY WRITE-ONLY ON ファイル名-1...n</code>
+- Vモードのレコードをもつファイルをアウトファイルに対して使用する。この指定をした時のWRITE文は <code>WRITE レコード名 FROM エリア名</code> の形をとらなければならない。指定しないとブロッキングの使用効率が非常に悪くなる。</p>
+<p><strong>イ.</strong> <code>APPLY CORE-INDEX ON ファイル名-1...n</code>
+- ランダム・アクセスの索引付ファイルに対してのみ指定できる。</p>
+<hr />
+<h2 id="第四章-data-division-データ部_1">第四章 DATA DIVISION（データ部）</h2>
+<h3 id="1-形式_2">1. 形式</h3>
+<pre><code class="language-cobol">*DATA DIVISION.
+FILE SECTION.
+WORKING-STORAGE SECTION.
+LINKAGE SECTION.
+REPORT SECTION.
+</code></pre>
+<p><strong>記入例:</strong></p>
+<pre><code class="language-cobol">DATA            DIVISION.
+FILE            SECTION.
+FD  INFL                RECORDING MODE  IS F
+                        RECORD          CONTAINS 20 CHARACTERS
+                        LABEL           RECORD IS STANDARD
+                        DATA            RECORD IS IN-REC.
+01  IN-REC              PIC             X(20).
+WORKING-STORAGE SECTION.
+77  COUNTER             PIC             99.
+01  IN-DATA.
+  05  IN-KBN            PIC             X(5).
+  05  IN-NAIYO          PIC             X(15).
+LINKAGE       SECTION.
+01  PARM.
+  05  PARM-LL           PIC             9(3) COMP.
+  05  PARM-YMD          PIC             X(6).
+</code></pre>
+<h4 id="1-file-section">(1) FILE SECTION</h4>
+<p>ここでは、プログラム中で使用される外部データのDCBなどを記述する。</p>
+<pre><code class="language-cobol">FILE SECTION.
+{ファイル記述項目}
+{レコード記述項目}
+</code></pre>
+<p><strong>A. ファイル記述項目</strong></p>
+<pre><code>FD  ファイル名
+  BLOCK CONTAINS 文節
+  RECORD CONTAINS 文節
+  RECORDING MODE 文節
+  LABEL RECORD 文節
+  VALUE OF 文節
+  DATA RECORD 文節
+  REPORT 文節
+</code></pre>
+<p>1つのプログラム中で25個以内のファイル記述項目を書くことができる。</p>
+<p><strong>① BLOCK CONTAINS文節</strong></p>
+<p>物理レコードのブロック長を指定する。</p>
+<pre><code class="language-cobol">BLOCK CONTAINS  [整数-1 TO]  { CHARACTERS }
+                             { RECORDS    }
+</code></pre>
+<p>1レコード1ブロックのデータには、この文節を指定する必要はない。データがFIXの時は整数-2だけを指定する。データがVARIABLEの時は、整数-2はMAXのレコード長を指定し、整数-1を指定する時はMINのレコード長を記入する。例えば、<code>BLOCK CONTAINS 1 TO 3 RECORDS</code> と指定すると、最小1レコード・最大3レコードであることを意味している。</p>
+<p><strong>② RECORD CONTAINS文節</strong></p>
+<p>データ・レコードの大きさを指定する。</p>
+<pre><code class="language-cobol">RECORD CONTAINS  [整数-1 TO] 整数-2 CHARACTERS
+</code></pre>
+<p>通常、整数-2を指定する。整数-2はMAXのレコードの大きさ。整数-1を指定する時は、データがVARIABLEの時で、レコードの最小値を指定する。記入例はBLOCK CONTAINS文節と同じである。</p>
+<p><strong>③ RECORDING MODE文節</strong></p>
+<p><code>F</code>、<code>U</code>、<code>V</code>、<code>S</code> を指定することができる。</p>
+<pre><code class="language-cobol">RECORDING MODE  IS モード
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>モード</th>
+<th>説明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>F</td>
+<td>全てのレコードが同じ長さ。通常、各ブロックに入るレコード数は固定</td>
+</tr>
+<tr>
+<td>U</td>
+<td>レコードの長さは固定/可変どちらでもよいが、各ブロックには1レコードしか入らない</td>
+</tr>
+<tr>
+<td>V</td>
+<td>レコードの長さは固定/可変どちらでもよく、1ブロックに1〜n個のレコードが収まる</td>
+</tr>
+<tr>
+<td>S</td>
+<td>レコードの長さは固定/可変どちらでもよく、1レコードが1ブロックより大きくてもよい</td>
+</tr>
+</tbody>
+</table>
+<p>U、Vモードは索引付編成及び相対編成のファイルには指定できない。Sモードは標準順次ファイル、または直接ファイルに対して指定できる。</p>
+<p><strong>④ LABEL RECORD文節</strong></p>
+<p>ラベルの有無を指定する。</p>
+<pre><code class="language-cobol">LABEL  { RECORD IS  }  { OMITTED       }
+       { RECORD ARE }  { STANDARD      }
+       { データ名-1...n }
+</code></pre>
+<ul>
+<li><code>OMITTED</code> — ユニット・レコード装置に割り当てられているファイルに対して必ず指定しなければならない（ただしIBMではSTANDARDで処理できる）</li>
+<li><code>STANDARD</code> — ファイルに数個のラベルがついており、システム仕様に従っていることを指定。索引付編成はSTANDARDを指定しなければならない</li>
+<li><code>データ名</code> — ユーザーラベルで標準外ラベル</li>
+</ul>
+<p><strong>⑤ VALUE OF文節</strong></p>
+<p>コメントとして扱われるので指定する必要はない。</p>
+<pre><code class="language-cobol">VALUE OF  データ名-1 IS  { データ名-2  }
+                         { リテラル-1  }
+</code></pre>
+<p><strong>⑥ DATA RECORD文節</strong></p>
+<p>FD文の後で書くデータレコードの名前を指定する。</p>
+<pre><code class="language-cobol">DATA  { RECORD IS  } データ名-1...n
+      { RECORD ARE }
+</code></pre>
+<p>データ名を複数指定する時は、01レベルでその分をとらなければならない。</p>
+<h4 id="2-データ記述項目">(2) データ記述項目</h4>
+<p>データ記述項目は、後で述べるWORKING-STORAGE SECTIONでの説明と重なる部分が多いので、簡単に述べる。</p>
+<pre><code class="language-cobol">レベル番号  { データ名 } PICTURE句
+            { FILLER   }
+</code></pre>
+<p>レベル番号はデータの内容にレベル付けをするもので、01〜49まで指定できる。通常、01、05、10... の順で付けていく事が多い。ファイルの項目のDATA RECORD文節で指定したDATA名を、ここで01レベルで定義しなければならない。</p>
+<pre><code class="language-cobol">                        DATA RECORD   IS IN-REC と定義済み
+01  IN-REC.
+  05  IN-KUBUN          PIC           X(2).
+  05  IN-NAIYO.
+    10  IN-NAIYO-1      PIC           X(5).
+    10  IN-NAIYO-2      PIC           X(10).
+    10  FILLER          PIC           X(20).
+</code></pre>
+<p>これは、IN-RECという名前のレコードがあり、37バイトであることを示している。その内訳は、IN-KUBUNという名前のエリアが2バイトで、IN-NAIYOというエリアの中にIN-NAIYO-1というエリアが5バイト、IN-NAIYO-2というエリアが10バイトあるということである。</p>
+<p>PICTURE句及びその他の事は後で述べる事にする。通常は、レコード名は01レベルでとり、PICTURE句を付け、内訳は書かない。実際の内訳は、WORKING-STORAGE SECTIONで記述する形が多く使用されている。</p>
+<p><strong>① WORKING-STORAGE SECTION</strong></p>
+<p>プログラム中でワークとして使用するエリア、INPUT/OUTPUTのエリアをコピーしたり設定したりするエリア、カウンターやスイッチのエリアを定義するセクションである。記述の方法はデータ記述項目と同じであるが、レベルに特別な物がある。66、77、88である。</p>
+<p>特別なレベル: <strong>66、77、88</strong></p>
+<blockquote>
+<p><strong>ア. 77レベル（独立項目）</strong>
+下位レベルをもたない。ゆえに独立項目と呼ばれる（88レベルを除く）。77レベルは、記述する時はこのセクションの最初で定義しなければならない。</p>
+<p><strong>イ. 88レベル（条件項目）</strong>
+このレベルの項目はエリアをもたない。上位レベルでエリアを定義し、88レベルでその条件を示す。</p>
+<p><strong>ウ. 66レベル（再編成項目）</strong>
+このレベルの項目はデータ項目のグループを再編成する項目であるが、ここでは説明を省略する。66レベルはREDEFINESの高度な用法で、レコードの再編成に使用される。</p>
+</blockquote>
+<p><strong>88レベルの使用例:</strong></p>
+<pre><code class="language-cobol">77  FILE-SIGN           PIC           X.
+  88  EOF-SIGN          VALUE         &quot;E&quot;.
+</code></pre>
+<p>上記のように定義して、<code>"E"</code> という文字を FILE-SIGN へ移送する。通常このエリアに <code>"E"</code> が入ったかどうかを聞くためには <code>IF FILE-SIGN="E"</code> と記述するが、88レベルを記述しているため、<code>IF EOF-SIGN</code> と書くだけでよい。<code>="E"</code> という部分は書く必要がない。なぜなら <code>VALUE "E"</code> と定義しているため、PIC Xのエリアに <code>"E"</code> という文字が入った時だけ条件が満たされるからである。これは、各自で実際にやってみると納得できるのだが……。</p>
+<p><strong>② PICTURE句</strong></p>
+<p>エリアの長さ・TYPEなどを指定する句である。尚、PICTUREはPICと省略できる。</p>
+<p>PICTUREのTYPEには <strong>9-TYPE</strong>、<strong>A-TYPE</strong>、<strong>X-TYPE</strong>、及び <strong>編集-TYPE</strong> がある。</p>
+<blockquote>
+<p><strong>ア. 9-TYPE（数字項目）</strong></p>
+</blockquote>
+<pre><code class="language-cobol">PIC  99.   または   PIC 9(2).
+</code></pre>
+<p>0〜9の数字のみを移送できる。英数字は不可（COMPUTATIONAL＝計算のみ）。長さを（）で囲んで指定する事もできるが、これはどのTYPEでも同じである。</p>
+<pre><code>PIC X(5).          PIC 9(5).
+ABC△△  →×  →  △△△△△
+12345   →○  →  12345
+</code></pre>
+<p>X-TYPEからの移送には十分注意しなければならない。</p>
+<p><strong>小数点の指定:</strong></p>
+<p>計算を行う上で小数点は必要である。2種類あり、エリアをとらない「仮想小数点」とエリア1バイトを必要とする「実小数点」がある。</p>
+<table>
+<thead>
+<tr>
+<th>種類</th>
+<th>指定</th>
+<th>サイズ</th>
+<th>例</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>仮想小数点</td>
+<td><code>PIC 999V99.</code></td>
+<td>5バイト</td>
+<td><code>00000</code></td>
+</tr>
+<tr>
+<td>実小数点</td>
+<td><code>PIC 999.99.</code></td>
+<td>6バイト</td>
+<td><code>000.00</code></td>
+</tr>
+</tbody>
+</table>
+<p>仮想小数点は小数点があるものとみなされる（エリアを確保しない）。実小数点はエリアが1バイト確保される。</p>
+<p><strong>サイン（符号）の指定:</strong></p>
+<p>計算上で＋、−のサインが必要な時がある。<code>S</code> という文字をつけて表わす。</p>
+<pre><code class="language-cobol">PIC  S99.
+</code></pre>
+<p>これは1バイトのエリアがとられる。</p>
+<p><strong>ゾーン形式、パック形式、2進数の違い:</strong></p>
+<pre><code>  &quot;11&quot; を2バイトエリアに移した結果:
+
+  ゾーン    F1 F1
+  パック    01 1C
+  2進      00 0B
+          ←1バイト→
+</code></pre>
+<ul>
+<li><strong>ゾーン形式:</strong> 上位4ビットがF（ゾーン）となる。2バイトでは最大99までしか入らない</li>
+<li><strong>パック形式:</strong> ゾーンが除かれた形。最後の4ビットが符号を表わす（C/F=プラス、D=マイナス）</li>
+<li><strong>2進数:</strong> 16進数表示。最上位ビットが符号（1=マイナス、0=プラス）</li>
+</ul>
+<p>ゾーンのデータにおいてサイン（＋、−）は最後の1バイトの上位4ビットで表わされ、その4ビットはパックに準ずる。</p>
+<pre><code>ゾーン    PIC 9(2).
+パック    PIC S9(3) COMP-3.
+2進       PIC S9(3) COMP-8.   （プラス・マイナスの情報）
+          PIC S9(3) COMP SYNC.
+</code></pre>
+<p>※「COMP-8」は原文表記のまま。2進数の指定としては <code>COMP</code>（<code>COMP-2</code>）が一般的。</p>
+<p>COMPという指定で2進のエリアであることを示すが、SYNCと指定すると境界が合わせられる。</p>
+<pre><code>  エリア
+アドレス  0 1 2 3 4 5 6 7 8 9 10 11
+  ①ハーフワード境界   ← 2バイト単位
+  ②フルワード境界     ← 4バイト単位
+  ③ダブルワード境界   ← 8バイト単位
+</code></pre>
+<p>2バイト単位のエリアの境界をハーフワード境界、4バイト単位をフルワード境界、8バイト単位をダブルワード境界と呼ぶ。この境界はCOBOLではあまり考える必要はないが、アセンブラだと必要になるので覚えておいてほしい。</p>
+<p>カウンターなど、2進で指定した方が効率が良く、サイズ（桁数）が大きいものはパックの方が良い。ゾーンは数字コードのような演算をあまり必要としないエリアに向いている。</p>
+<pre><code>① 05 CTR-IN    PIC S9(7) COMP SYNC.
+または
+② 01 CTR-AREA          COMP SYNC.
+    05 CTR-IN    PIC S9(7).
+    05 CTR-OUT   PIC S9(7).
+</code></pre>
+<p>②の方で指定するとクリアが楽なので、通常②のような使い方をする。クリアーの方法は、プロシジャーの章で説明する。</p>
+<blockquote>
+<p><strong>イ. A-TYPE（アルファベット項目）</strong></p>
+</blockquote>
+<pre><code class="language-cobol">PIC  AA.
+</code></pre>
+<p>アルファベットとブランクの27文字のみを移送できる。ほとんど使われない。X-TYPEで代用できるからである。</p>
+<blockquote>
+<p><strong>ウ. X-TYPE（英数字項目）</strong></p>
+</blockquote>
+<pre><code class="language-cobol">PIC  XX.
+</code></pre>
+<p>COBOLで使用できる全ての文字を移送できる。したがって通常、数字が入っているがその他の文字が時折入ってくるとか、FILLERで定義されるエリアをX-TYPEで定義する。グループ項目（PIC句をもたないレベル項目）は全てX-TYPEとして扱われる。</p>
+<pre><code class="language-cobol">01  IN-REC.
+  05  IN-1              PIC           S9(3) COMP-3.
+  05  IN-2              PIC           A(3).
+  05  IN-3              PIC           X(5).
+</code></pre>
+<p>上記のようなエリアが定義されている時、<code>MOVE SPACE TO IN-1</code> は使えないが <code>MOVE SPACE TO IN-REC</code> は使える。ただしSPACEを送ったあとIN-1を使用すると ABEND OC7（データエラー）となる。</p>
+<blockquote>
+<p><strong>エ. 編集-TYPE</strong></p>
+</blockquote>
+<p>編集用文字として、前述の9、A、Xに加えて <code>B</code>、<code>P</code>、<code>－</code>、<code>＋</code>、<code>¥</code>、<code>Z</code>、<code>＊</code>、<code>V</code>、<code>0</code>、<code>、</code>、<code>．</code>、<code>CR</code>、<code>DB</code> がある。</p>
+<table>
+<thead>
+<tr>
+<th>文字</th>
+<th>意味</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>B</td>
+<td>ブランク、挿入を表す</td>
+</tr>
+<tr>
+<td>P</td>
+<td>小数点以下の桁数を表す</td>
+</tr>
+<tr>
+<td>－</td>
+<td>マイナス表示（符号表示）</td>
+</tr>
+<tr>
+<td>＋</td>
+<td>プラス表示（プラスの時は明示、マイナスは－が優先）</td>
+</tr>
+<tr>
+<td>¥</td>
+<td>通貨記号表示</td>
+</tr>
+<tr>
+<td>Z</td>
+<td>ZERO消去</td>
+</tr>
+<tr>
+<td>＊</td>
+<td>チェック保護</td>
+</tr>
+<tr>
+<td>V</td>
+<td>仮想小数点</td>
+</tr>
+<tr>
+<td>0</td>
+<td>ZERO表示</td>
+</tr>
+<tr>
+<td>、</td>
+<td>カンマ表示</td>
+</tr>
+<tr>
+<td>．</td>
+<td>ピリオド表示</td>
+</tr>
+<tr>
+<td>CR</td>
+<td>データの値が<code>－</code>の時、CRが表示される</td>
+</tr>
+<tr>
+<td>DB</td>
+<td>データの値が<code>－</code>の時、DBが表示される</td>
+</tr>
+</tbody>
+</table>
+<p><strong>使用例:</strong></p>
+<table>
+<thead>
+<tr>
+<th>指定</th>
+<th>データの値</th>
+<th>結果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>PIC 99BB99BB99.</code></td>
+<td><code>123456</code></td>
+<td><code>12△△34△△56</code></td>
+</tr>
+<tr>
+<td><code>PIC ZZZZZZ.</code></td>
+<td><code>001234</code></td>
+<td><code>△△1234</code></td>
+</tr>
+<tr>
+<td><code>PIC Z,ZZZ,ZZ9.</code></td>
+<td><code>001234</code></td>
+<td><code>△△1,234</code></td>
+</tr>
+<tr>
+<td><code>PIC -,---,--.</code></td>
+<td><code>-001234</code></td>
+<td><code>△△-1,234</code></td>
+</tr>
+<tr>
+<td><code>PIC +,+++,+++.</code></td>
+<td><code>-001234</code></td>
+<td><code>△△-1,234</code></td>
+</tr>
+<tr>
+<td><code>PIC +,+++,+++.</code></td>
+<td><code>+001234</code></td>
+<td><code>△△+1,234</code></td>
+</tr>
+<tr>
+<td><code>PIC ¥,¥¥¥,¥¥¥.</code></td>
+<td><code>12345</code></td>
+<td><code>¥12,345</code></td>
+</tr>
+<tr>
+<td><code>PIC ********.</code></td>
+<td><code>12345</code></td>
+<td><code>****12345</code></td>
+</tr>
+</tbody>
+</table>
+<p>編集した値は計算に使用することはできない。ただし、受け項目としては使用できる。</p>
+<p><strong>リスト出力例:</strong></p>
+<pre><code>¥1,283      -6,888,543    ***123    1△2△3△4
+¥23,881      6,231      ****10    A△B△C△D
+¥56        -31        ***990    E△F△3△4
+</code></pre>
+<p>上記のようなリストを出力したい時は、下記のように定義する:</p>
+<pre><code class="language-cobol">01  PRINT.
+  05  PR-GAKU           PIC           ¥¥¥,¥¥¥,¥¥¥,¥¥¥.
+  05  FILLER            PIC           X(3).
+  05  PR-KASHI          PIC           --,---,---.
+  05  FILLER            PIC           X(3).
+  05  PR-CHECK          PIC           *****9.
+  05  FILLER            PIC           X(5).
+  05  PR-EDIT           PIC           XBXBXBX.
+</code></pre>
+<p>それぞれの項目にデータを移送して、PRINTをWRITEする。</p>
+<p>編集項目は主にプリントエリアの編集時に用いられる。<code>Z</code>、<code>¥</code>、<code>、</code>、<code>－</code>、<code>．</code> は通常よく使用するので慣れておいてもらいたい。</p>
+<p>DB、CRについては:</p>
+<pre><code class="language-cobol">PIC  9(5) DB.
+PIC  9(5) CR.
+</code></pre>
+<p>マイナスの時のみ右端にDB、CRという文字が出力される。</p>
+<pre><code>-999 → 999DB    999CR
++999 → 999△△    999△△
+</code></pre>
+<p><strong>③ VALUE文節</strong></p>
+<pre><code class="language-cobol">VALUE  IS &quot;リテラル&quot;
+</code></pre>
+<pre><code class="language-cobol">05  A                   PIC           X(11).
+                        VALUE         &quot;** START **&quot;.
+</code></pre>
+<p><code>VALUE IS</code> の <code>IS</code> は省略できる。この時、Aというエリアには <code>"** START **"</code> というリテラルをMOVEした結果と同じになる。VALUEは、実行時にデータ名にMOVEせず、コンパイル時に初期値として定義しておきたい場合（テーブル作成など）によく使用される。</p>
+<p><strong>④ JUST RIGHT句</strong></p>
+<p>通常、X-TYPE・A-TYPEで定義されているエリア内にデータを移送する時は左詰めとなる。これを右詰めに処理させようというのがこの定義である。</p>
+<pre><code class="language-cobol">05  A  PIC  X(10) JUST RIGHT.
+</code></pre>
+<pre><code>PIC X(8)              :  A B C △ △ △ △
+PIC X(8) JUST RIGHT   :  △ △ △ △ A B C
+</code></pre>
+<p>この項目は基本項目に対してだけ指定できる。</p>
+<p><strong>⑤ REDEFINE文節</strong></p>
+<p>一度定義したエリアに対して違った形で定義し直すものであり、新たにエリアは取れない。あくまでも同じエリアである。</p>
+<pre><code class="language-cobol">05  A                   PIC           X(10).
+05  A-R                 REDEFINES     A.
+  10  B                 PIC           9(5).
+  10  C                 PIC           S9(5).
+  10  D                 PIC           X(1).
+05  A-RR                REDEFINES     A.
+  10  E                 PIC           X(3).
+</code></pre>
+<p>何度でも再定義してかまわない。再定義するバイト数が再定義されるエリアのバイト数よりも大きくすることはできないが、小さい分には構わない。</p>
+<p>上記の例では、エリアを使用する時にA、B、Cなど、どれを参照するかによって、エリアのもつTYPEが決定される。</p>
+<p>このREDEFINES文節は日付によく使われる:</p>
+<pre><code class="language-cobol">05  A-YYMMDD.
+  10  A-YYMM.
+    15  A-YY            PIC           X(2).
+    15  A-MM            PIC           X(2).
+  10  A-DD              PIC           X(2).
+05  A-YYMMDD-R          REDEFINES     A-YYMMDD.
+  10  A-YY-R            PIC           9(2).
+  10  A-MMDD.
+    15  A-MM-R          PIC           9(2).
+    15  A-DD-R          PIC           9(2).
+</code></pre>
+<p>上記のように指定すると、同じエリアをX-TYPEでも9-TYPEでも使用できる。（YYMMDD＝年月日）</p>
+<p><strong>⑥ OCCURS文節（テーブル）</strong></p>
+<p>反復するデータを定義するものである。</p>
+<pre><code class="language-cobol">OCCURS  整数 TIMES
+  (DEPENDING ON データ名-1)
+  { ASCENDING  } KEY IS データ名-2
+  { DESCENDING }
+INDEXED BY  指標名
+</code></pre>
+<p><strong>例1:</strong></p>
+<pre><code class="language-cobol">05  A                   OCCURS        30 TIMES
+                        INDEXED BY    A-X1.
+  10  B                 PIC           X(1).
+</code></pre>
+<p>Bというエリアが30個あり、A-X1というインデックスで参照できる。実際にBのエリアを参照する時は <code>B(1)</code>、<code>B(2)</code> または <code>B(A-X1)</code> のような使い方をする。</p>
+<p><strong>例2:</strong></p>
+<pre><code class="language-cobol">05  A                   OCCURS         30 TIMES
+                        ASCENDING KEY  IS A-KEY
+                        INDEXED BY     A-X1.
+  10  A-KEY             PIC            X(3).
+  10  A-NAIYO           PIC            X(10).
+</code></pre>
+<p>A-KEYが1番目から30番目まで昇順であると定義している。これはSEARCH命令に関連してくる。</p>
+<p><strong>DEPENDING ON:</strong> この句を指定する必要が生じるのは、テーブルの長さが実行時までわからない場合（VBデータなど）である。</p>
+<p>OCCURS項目で作成されるテーブルは3次元まで許される。</p>
+<p><strong>例3:</strong></p>
+<pre><code class="language-cobol">05  A                   OCCURS        3 TIMES
+                        INDEXED BY    A-X1.
+  10  B                 OCCURS        5 TIMES
+                        INDEXED BY    B-X1.
+    15  C               OCCURS        2 TIMES
+                        INDEXED BY    C-X1.
+      20  D             PIC           X(20).
+</code></pre>
+<p>Dという20バイトのエリアが3×5×2=30個、すなわち600バイトのエリアがとられる。参照は <code>D(1, 1, 1)</code> または <code>D(A-X1, B-X1, C-X1)</code> のようにする。</p>
+<p>このようなテーブルは、VALUE句をもっているエリアをREDEFINEしてテーブルにしたり、集計用のエリアとして定義する事が多い。</p>
+<p><strong>例4:</strong></p>
+<pre><code class="language-cobol">05  A                   PIC           X(10)
+                        VALUE         &quot;ABCDEFGHIJ&quot;.
+05  A-R                 REDEFINES     A.
+  10  B                 OCCURS        10 TIMES
+                        INDEXED BY    B-X1.
+    15  C               PIC           X(1).
+</code></pre>
+<p>このように定義すると、B-X1の値を変えることによりAの中の任意の1文字を参照できる。例えば <code>C(3)</code> は <code>"C"</code> であり、<code>B-X1</code> に5をSETすれば <code>C(B-X1)</code> は <code>"E"</code> である。</p>
+<h4 id="3-linkage-section">(3) LINKAGE SECTION</h4>
+<p>外部から渡されてくるデータ（パラメータ）、上位モジュールから渡されてくるデータを定義する場所である。基本的にはWORKING-STORAGE SECTIONの定義方法と同じである。</p>
+<p>パラメータとして渡ってくるエリアを定義する時は、DATAの他にそのDATAの長さが入ってくるエリア2バイトを定義しなければならない。</p>
+<pre><code class="language-cobol">01  PARM.
+  05  PARM-LL           PIC           9(3) COMP.
+  05  PARM-YMD          PIC           X(6).
+</code></pre>
+<p>これは、パラメータとして入ってくるのはPARM-YMDで6バイトである。この6バイトという長さがPARM-LLへ付加されてプログラム中へ入ってくる。LLのエリアは名前を付ける必要はなく <code>FILLER PIC X(2).</code> でもよい。</p>
+<hr />
+<blockquote>
+<h3 id="息抜き">☆ 息抜き ☆</h3>
+<p><strong>《太ったゼロとやせたゼロ》</strong></p>
+<p>プログラム中には太ったゼロ（O）とやせたゼロ（0）がある。文法のミスはないはずなのに、コンパイルが通らない。よくよく見てみると、何と……<code>MOVE</code> が <code>M0VE</code> となっているではないか。いやはや、やせたゼロがじゃまをしていたのか！</p>
+<p>こんな事はJCLでもあるんじゃないかな？ このミスをなくすように、コーディングの際はOと0をわかりやすく書こう。</p>
+</blockquote>
+<hr />
+<h2 id="第五章-procedure-division-手続き部_1">第五章 PROCEDURE DIVISION（手続き部）</h2>
+<p>このDIVISIONでは、実際にやる処理をCOBOLの命令を使って定義する場所である。</p>
+<p>COBOL命令中、主な命令:</p>
+<table>
+<thead>
+<tr>
+<th>算術命令</th>
+<th>文字列命令</th>
+<th>ファイル命令</th>
+<th>制御命令</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ADD</td>
+<td>MOVE</td>
+<td>READ</td>
+<td>IF</td>
+</tr>
+<tr>
+<td>SUBTRACT</td>
+<td>EXAMINE</td>
+<td>WRITE</td>
+<td>ELSE</td>
+</tr>
+<tr>
+<td>MULTIPLY</td>
+<td>DISPLAY</td>
+<td>OPEN</td>
+<td>PERFORM</td>
+</tr>
+<tr>
+<td>DIVIDE</td>
+<td>ACCEPT</td>
+<td>CLOSE</td>
+<td>GO TO</td>
+</tr>
+<tr>
+<td>COMPUTE</td>
+<td>REMAINDER</td>
+<td>SEARCH</td>
+<td>STOP RUN</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>AT END</td>
+<td>GOBACK</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>BEFORE</td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>AFTER</td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>CALL</td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="1-accept-命令">1. ACCEPT 命令</h3>
+<pre><code class="language-cobol">ACCEPT  データ名  [FROM { SYSIN   }
+                        { CONSOLE }
+                        { 記憶名  }]
+</code></pre>
+<p>データ名はWORKING-STORAGE SECTIONで定義済みのエリア。FROMを書かないとSYSINからの入力とみなされる。</p>
+<pre><code class="language-cobol">05  A                   PIC           X(5).  ← ABCDE（カード）
+ACCEPT  A.                                   ← //SYSIN DD *
+</code></pre>
+<p>この命令でAというエリアには <code>"ABCDE"</code> が入る。</p>
+<h3 id="2-add-命令-加算">2. ADD 命令（加算）</h3>
+<p><strong>ア. <code>ADD 識別名-1...(n) TO 識別名-2...(n) [ROUNDED]</code></strong></p>
+<p>TOの左側に書いたエリアの内容が右側のエリアに足し込まれて、右側のエリアの値が結果と置き換わる。</p>
+<pre><code class="language-cobol">05  A                   PIC           9(3)V9(4).  ... 83.235
+05  B                   PIC           9(4)V9(2).  ... 11.46
+</code></pre>
+<pre><code class="language-cobol">ADD  A B  TO  (B) ROUNDED.
+  結果 B = 106.（小数第3位四捨五入）
+</code></pre>
+<p><strong>イ. <code>ADD 識別名-1...(n) GIVING 識別名-2...(n) [ROUNDED]</code></strong></p>
+<p>GIVINGの左側のエリアの内容が全て加算されて、右側のエリアへストアされる。</p>
+<pre><code class="language-cobol">05  A                   PIC           9(2).  ... 10
+05  B                   PIC           9(3).  ... 30
+05  C                   PIC           9(4).  ... 0
+</code></pre>
+<pre><code class="language-cobol">ADD  A B  GIVING  C.
+  結果 C = 40（A, Bは保存）
+</code></pre>
+<pre><code class="language-cobol">ADD  A B  GIVING  B.  ← 同じ結果が得られる
+ADD  A    TO      B.  ←
+</code></pre>
+<pre><code class="language-cobol">ADD  A B C  TO  D E F.
+</code></pre>
+<p>この命令を行うと、A+B+CがD、E、Fにそれぞれ加算される。</p>
+<pre><code class="language-cobol">ADD  1  TO  IN-CTR.
+</code></pre>
+<p>インプット件数、ライン数をカウントする時にこの形式を使う。</p>
+<h3 id="3-subtract-命令-減算">3. SUBTRACT 命令（減算）</h3>
+<p><strong>ア. <code>SUBTRACT 識別名-1...(n) FROM 識別名-2...(n) [ROUNDED]</code></strong></p>
+<p>FROMの左側のエリアの内容を全て加算して、右側のエリアの値から減算し、右側のエリアの内容が結果と置き換わる。</p>
+<pre><code class="language-cobol">05  A                   PIC           9(2).  ... 10
+05  B                   PIC           9(3).  ... 15
+05  C                   PIC           9(4).  ... 100
+</code></pre>
+<pre><code class="language-cobol">SUBTRACT  A B  FROM  C.
+  結果 C = 75（A, Bは保存）
+</code></pre>
+<p><strong>イ. <code>SUBTRACT 識別名-1...(n) FROM 識別名-2...(n) GIVING 識別名-3 [ROUNDED]</code></strong></p>
+<p>FROMの左側のエリアの内容を全て加算し、右側のエリアから減算して、結果はGIVINGで指定しているエリアへストアされる。</p>
+<pre><code class="language-cobol">05  A                   PIC           9(2)V9(2).  ... 10.01
+05  B                   PIC           9(3)V9(2).  ... 33.25
+05  C                   PIC           9(4)V9(1).  ... 100.0
+</code></pre>
+<pre><code class="language-cobol">SUBTRACT  A  FROM  B GIVING C ROUNDED.
+  結果 C = 23.2（小数第2位四捨五入）
+</code></pre>
+<p>通常、ADDもSUBTRACTもGIVINGオプションを使うような時は、便利なCOMPUTE命令を使用する事が多い。</p>
+<h3 id="4-multiply-命令-乗算">4. MULTIPLY 命令（乗算）</h3>
+<p><strong>ア. <code>MULTIPLY 識別名-1 BY 識別名-2 [ROUNDED]</code></strong></p>
+<p>BYの左側に書いたエリアの内容が右側のエリアに乗算され、結果が置き換わる。</p>
+<pre><code class="language-cobol">05  A                   PIC           9(2)V9(1).  ... 3.1
+05  B                   PIC           9(3)V9(1).  ... 24.1
+</code></pre>
+<pre><code class="language-cobol">MULTIPLY  A  BY  B ROUNDED.
+  結果 B = 74.7（小数第2位四捨五入）
+</code></pre>
+<p><strong>イ. <code>MULTIPLY 識別名-1 BY 識別名-2 GIVING 識別名-3 [ROUNDED]</code></strong></p>
+<p>この形式を用いると、ADDやSUBTRACTと同様に結果はGIVINGの後に指定したエリアへストアされ、乗数・被乗数共に保存される。</p>
+<pre><code class="language-cobol">05  A                   PIC           9(2).  ... 10
+05  B                   PIC           9(2).  ... 22
+05  C                   PIC           9(4).  ... 0
+</code></pre>
+<pre><code class="language-cobol">MULTIPLY  A BY B  GIVING  C.
+  結果 C = 220（A, Bは保存）
+</code></pre>
+<p>GIVINGのエリアは数字編集項目でもよい。</p>
+<pre><code class="language-cobol">05  A                   PIC           9(2).  ... 10
+05  B                   PIC           9(2).  ... 22
+05  C                   PIC           Z(4).
+</code></pre>
+<pre><code class="language-cobol">MULTIPLY  A BY B  GIVING  C.
+  結果 C = △220
+</code></pre>
+<h3 id="5-divide-命令-除算">5. DIVIDE 命令（除算）</h3>
+<p><strong>ア. <code>DIVIDE 識別名-1 INTO 識別名-2 [ROUNDED]</code></strong></p>
+<p>INTOの右側のエリアの内容が左側のエリアで除算され、右側のエリアの値が結果と置き換わる。</p>
+<pre><code class="language-cobol">05  A                   PIC           9(2)V9(1).  ... 2.9
+05  B                   PIC           9(3)V9(2).  ... 32.28
+</code></pre>
+<pre><code class="language-cobol">DIVIDE  A  INTO  B ROUNDED.
+  結果 B = 11.13（小数第3位四捨五入）
+</code></pre>
+<p><strong>イ. <code>DIVIDE 識別名-1 INTO 識別名-2 GIVING 識別名-3 [ROUNDED] [REMAINDER 識別名-4]</code></strong></p>
+<p>REMAINDERは余りを求めるオプションである。INTOの左側のエリアの値で右側のエリアの値を除算し、結果をGIVING句のエリアへストア、REMAINDER句のエリアへ余りをストアする。</p>
+<pre><code class="language-cobol">05  A                   PIC           9(2).  ... 13
+05  B                   PIC           9(3).  ... 100
+05  C                   PIC           9(2).
+05  D                   PIC           9(2).
+</code></pre>
+<pre><code class="language-cobol">DIVIDE  A  INTO  B GIVING C REMAINDER D.
+  結果 C = 7、D = 9
+</code></pre>
+<p><strong>ウ.</strong> イの形式中のINTOをBYに変えると、除数と被除数の関係が逆転する。この時気をつけなければならないのは、除数・被除数のどちらかにリテラルを用いる場合である。</p>
+<h3 id="6-compute-命令">6. COMPUTE 命令</h3>
+<p>ADD、SUBTRACT、MULTIPLY、DIVIDEなどの機能を算術文を用いて指定できる。</p>
+<p><strong>記号:</strong> <code>=</code>（イコール）、<code>*</code>（乗算）、<code>/</code>（除算）、<code>()</code>（優先度）、<code>+</code>（加算）、<code>-</code>（減算）、<code>**</code>（べき乗）</p>
+<pre><code class="language-cobol">COMPUTE  識別名-1  [ROUNDED] = 算術演算式
+</code></pre>
+<p>例えば <code>C = (A + B) / (B - E) * D</code> と書きたい場合:</p>
+<pre><code class="language-cobol">COMPUTE  C = ((A + B) / (B - E)) * D.
+</code></pre>
+<p>ただしCOMPUTE命令には余りを求めるオプションはない。余りを必要とする時にはDIVIDE命令を使用しなければならない。</p>
+<pre><code class="language-cobol">COMPUTE  A = 20.
+</code></pre>
+<p>上記は <code>MOVE 20 TO A.</code> と同じ結果。ただしCOMPUTE命令のAのエリアは9-TYPEでなければならない。受項目（<code>=</code> の左側）は数字編集項目であってもかまわない。</p>
+<p><strong>実行順序:</strong> 括弧 → べき乗 → 乗算/除算 → 加算/減算（同レベルは左から右）</p>
+<p><strong>比較:</strong> <code>A = B × C × D⁶ + 6 - E</code> を2通りの方法で書いた場合:</p>
+<pre><code class="language-cobol">COMPUTE:
+COMPUTE   A = B * C * D ** 6 + 6 - E.
+
+個別命令:
+MULTIPLY  D BY D  GIVING  A.
+MULTIPLY  D       BY      A.           （4回繰り返す）
+MULTIPLY  B       BY      A.
+MULTIPLY  C       BY      A.
+ADD       6       TO      A.
+SUBTRACT  E       FROM    A.
+</code></pre>
+<p><strong>ON SIZE ERROR オプション（算術命令共通）:</strong></p>
+<pre><code class="language-cobol">MULTIPLY         A  BY  B
+  ON SIZE ERROR  GO TO ERR-SHORI.
+</code></pre>
+<p>AまたはBのエリアでオーバーフローが発生したらERR-SHORIというルーチンへ飛んでいく。ADD・SUBTRACT・MULTIPLY・DIVIDE・COMPUTEの各算術命令でこのオプションが使える。</p>
+<h3 id="7-if-命令">7. IF 命令</h3>
+<p>条件によって処理を変えることができる。</p>
+<pre><code class="language-cobol">IF    条件  ステートメント-1  NEXT SENTENCE
+ELSE  ステートメント-2  NEXT SENTENCE
+</code></pre>
+<pre><code class="language-cobol">IF               A = B
+  PERFORM        S03-EQUAL-SHORI  THRU  S03-EXIT
+ELSE
+  NEXT SENTENCE.
+</code></pre>
+<p>AとBのエリアの内容が等しければS03-EQUAL-SHORIからS03-EXITまでの処理を行う。等しくなければ何もしない。ELSE NEXT SENTENCEは省略できるが、IFとELSEは対にした方が分かりやすいので書いておく方が望ましい。</p>
+<p><strong>ネスティング（入れ子方式）:</strong></p>
+<pre><code class="language-cobol">IF        A = B
+  IF      B NOT = C  → ネスティング
+    IF    C = D
+      命令
+    ELSE
+</code></pre>
+<h3 id="8-read-命令">8. READ 命令</h3>
+<p>ファイルを実際にプログラム内に読み込んでくる命令。READ命令を実行する前にOPEN命令が実行されていなければならない。実行されていないと、ABEND=U3706などでプログラムは異常終了する。</p>
+<pre><code class="language-cobol">READ   ファイル名  [INTO データ名]
+  AT END  命令ステートメント.
+</code></pre>
+<pre><code class="language-cobol">READ       INFL1  INTO  IN-DATA
+  AT END
+    MOVE   '1'    TO    SW-EOF
+    GO TO  READ-END.
+</code></pre>
+<p>INTOを使わないとFILE SECTIONで定義した01レベルのエリア内にデータは読み込まれる。INTOオプションは READ + MOVE に相当する。</p>
+<h3 id="9-move-命令">9. MOVE 命令</h3>
+<pre><code class="language-cobol">MOVE  識別名-1  TO  識別名-2...(n)
+</code></pre>
+<pre><code class="language-cobol">MOVE  ZERO  TO  A B C.  ← A, B, Cがゼロクリアされる
+MOVE  A     TO  B.      ← Aの内容がBに移される
+</code></pre>
+<p>MOVEステートメントはインデックスには使えない。インデックスにはSET命令を使う。</p>
+<h3 id="10-set-命令">10. SET 命令</h3>
+<p>インデックスに値をセットしたり、加算・減算をするものである。</p>
+<pre><code class="language-cobol">SET インデックス名 TO       識別名
+SET  〃              UP BY  識別名
+SET  〃                     DOWN BY 識別名
+</code></pre>
+<pre><code class="language-cobol">SET  IDX1  TO       1.  ← IDX1に1がセットされる
+SET  IDX1  UP BY    1.  ← IDX1が+1される
+SET  IDX1  DOWN BY  3.  ← IDX1が-3される
+</code></pre>
+<p>右側のものが左側へセットされる（MOVEとは逆）。</p>
+<h3 id="11-perform-命令">11. PERFORM 命令</h3>
+<p>プログラムを処理別にセグメント化すると見やすくなるだけでなく、修正・デバッグも容易になる。このセグメント化した処理を連結する時に、このPERFORM命令を使用する。</p>
+<pre><code class="language-cobol">PERFORM  処理手順名-1  [THRU 処理手順名-2]
+                       [識別名-1 TIMES]
+</code></pre>
+<p>これは、処理手順名-1から処理手順名-2までを識別名-1回繰り返すという意味である。処理手順名-2を指定していないと、次の処理手順名が出てくるまでの処理を行う。</p>
+<pre><code class="language-cobol">  PERFORM  S03-READ  THRU  S03-EXIT.
+
+S03-READ.                             ← このブロックの処理を実行
+  ...
+S03-EXIT.
+  EXIT.
+</code></pre>
+<p><strong>UNTILオプション:</strong></p>
+<pre><code class="language-cobol">  PERFORM      S04-SHORI  THRU  S04-EXIT
+    UNTIL      SW-END = 'E'.
+
+S04-SHORI.
+    READ       INFL
+      AT END
+        MOVE   'E'        TO    SW-END
+        GO TO  S04-EXIT.
+S04-EXIT.
+  EXIT.
+</code></pre>
+<p>ファイルエンドになるまでS04-SHORIからS04-EXITまでを繰り返す。</p>
+<p><strong>VARYINGオプション（複雑なループ処理）:</strong></p>
+<p>条件付PERFORM命令でもっと複雑な処理もできる。ある値をアップしながら条件を1〜3個調べ、全ての条件を満たすまでPERFORM命令が繰り返されるというものである。処理を件数でブレイクしたり、年令でブレイクしたり、テーブルで持っているデータのブレイクをしたりする時に非常に便利である。</p>
+<pre><code class="language-cobol">PERFORM    処理手順名-1  THRU  処理手順名-2
+  VARYING  指標名-1 FROM 識別名-2 UNTIL 条件-1
+  BY       識別名-3
+  [AFTER   指標名-4 FROM 識別名-5
+  BY       識別名-6 UNTIL 条件-2
+  [AFTER   指標名-7 FROM 識別名-8
+  BY       識別名-9 UNTIL 条件-3 ]]]
+</code></pre>
+<pre><code class="language-cobol">PERFORM  S05-SHORI  THRU  S05-EXIT
+  VARYINGIDX1 FROM 1
+    BY   10 UNTIL A &gt; B
+  AFTER  IDX2 FROM 1
+    BY   10 UNTIL B &gt; C.
+</code></pre>
+<p>2次元テーブル処理に向いている。</p>
+<p><strong>動作の順序:</strong></p>
+<ol>
+<li>IDX1とIDX2が1にSETされる</li>
+<li>条件 <code>A &gt; B</code> が調べられ、<strong>真（条件成立）ならばループを抜け</strong>、この命令の次のステートメントへ移る</li>
+<li><strong>偽（条件未成立）ならば</strong>、条件 <code>B &gt; C</code> が調べられ、IDX2は1にSETされ、IDX1が1増やす</li>
+<li>IDX1が10を超えたら、次のステートメントへ移る</li>
+<li>超えていなければ、2〜4が繰り返される</li>
+<li>条件 <code>B &gt; C</code> が偽（未成立）ならば、<code>S05-SHORI</code> から <code>S05-EXIT</code> が1回実行される</li>
+<li>IDX2の値が1増やし、また条件 <code>B &gt; C</code> が調べられる</li>
+<li>以上の処理が繰り返される</li>
+</ol>
+<p>条件付PERFORM命令を使うと、ある値をアップしながら条件を調べ、全ての条件を満たすまでPERFORMが繰り返される。テーブルのデータのブレイクや集計などに非常に便利であり、このような意味でテーブル処理に向いているといえる。</p>
+<p><strong>注意:</strong> 一般にメイン処理はPERFORM命令とIF文で組み立てられる事が多い。PERFORMした先から別のセグメントへブランチすることは望ましくない（後からの解析がやりにくくなる）。</p>
+<pre><code class="language-cobol">S04-SHORI.   左のようなプログラムの組み立ては
+    GO TO  S05-SUB.   望ましくない。GO TO文はそのセグメント
+                    内にとどまる方が望ましい。
+S04-EXIT.
+  EXIT.
+S05-SUB.
+S05-EXIT.
+  EXIT.
+</code></pre>
+<h3 id="12-go-to-命令">12. GO TO 命令</h3>
+<pre><code class="language-cobol">GO TO  処理手順名
+</code></pre>
+<pre><code class="language-cobol">S04-SHORI.
+    GO TO  S04-02.
+S04-01.
+    GO TO  S04-03.
+S04-02.
+    GO TO  S04-01.
+S04-03.
+S04-EXIT.
+  EXIT.
+</code></pre>
+<p>GO TO文は1つの処理内で使うのが望ましい。他の処理へブランチさせてもプログラム的には問題ないが、デバッグ・修正が困難になる。</p>
+<p><strong>DEPENDING ONオプション:</strong></p>
+<pre><code class="language-cobol">GO TO     処理手順名-1
+          処理手順名-2
+          処理手順名-n  DEPENDING ON  識別名
+</code></pre>
+<pre><code class="language-cobol">MOVE   A  TO  WK-DEP.
+GO TO  S03-01
+     S03-02
+     S03-03 DEPENDING ON WK-DEP.
+</code></pre>
+<p>WK-DEPに <code>1</code>〜<code>3</code> の値が入っていれば、それぞれS03-01、S03-02、S03-03へブランチする。該当が無ければGO TO文は実行されず次のステートメントへ移る。</p>
+<p>なおWK-DEPは、WORKING-STORAGE SECTIONで定義済みの9-TYPEのエリアである。</p>
+<h3 id="13-open-命令">13. OPEN 命令</h3>
+<p>ファイルをREAD/WRITEできるようにあらかじめ開いておく命令。READ/WRITEの前に実行しておかなければならない。</p>
+<pre><code class="language-cobol">OPEN  INPUT  ファイル名-1...(n)  ← READだけ
+OPEN  OUTPUT ファイル名-2...(n)  ← WRITEだけ
+OPEN  I-O    ファイル名-3...(n)  ← 両方
+</code></pre>
+<p>一度OPENするとCLOSE命令を実行するまではOPEN命令は実行できない。通常、INITIAL処理で行う事が多い。I-OでREAD/WRITEをする時はインプットとして読まれたデータに書いていくので、インプットデータは残らない点に注意。</p>
+<h3 id="14-close-命令">14. CLOSE 命令</h3>
+<p>この命令は、既に開かれているファイルを閉じる命令である。この命令を実行する前には、必ずOPEN命令が実行されていなければならない。</p>
+<pre><code class="language-cobol">CLOSE  ファイル名-1...(n)
+</code></pre>
+<pre><code class="language-cobol">CLOSE  INFL OUTFL.
+</code></pre>
+<p>INPUT/OUTPUTの指定はいらない。CLOSEした後、ファイルのREAD/WRITEを行う時は再度OPENを実行しなければならない。</p>
+<p>なお、CLOSE命令には、リワインドさせる／させないなどのオプションがいくつかあるが、ここでは省略する。</p>
+<h3 id="15-write-命令">15. WRITE 命令</h3>
+<p>この命令は、OUTPUTもしくはI-Oで開かれたファイルへ書き出しを行う命令である。（形式はリスト以外のファイル）</p>
+<pre><code class="language-cobol">WRITE  レコード名  [FROM 識別名]
+</code></pre>
+<p>FROMを使うと識別名の内容がレコード名へMOVEされてからWRITEされる（READ～INTOと同じ考え方: MOVE + WRITE）。</p>
+<pre><code class="language-cobol">FILE SECTION.
+FD  OUTFL.
+01  OUT-REC             PIC           X(100).
+
+WORKING-STORAGE SECTION.
+01  OUT-DATA.
+  05  OUT-KEY.
+
+PROCEDURE DIVISION.
+WRITE  OUT-REC  FROM  OUT-DATA.
+</code></pre>
+<p>これは以下と同じ:</p>
+<pre><code class="language-cobol">MOVE   OUT-DATA  TO  OUT-REC.
+WRITE  OUT-REC.
+</code></pre>
+<p><strong>リスト出力のWRITE:</strong></p>
+<p>リストにWRITEする方法は、大きく分けて2種類ある。1つは1ラインプリントした後で改行を行う（BEFORE）方法、もう1つは改行を行った後プリントする（AFTER）方法である。</p>
+<pre><code class="language-cobol">WRITE  レコード名  [FROM 識別名]
+                   [BEFORE  ADVANCING 識別名 LINES]
+                   [AFTER   ADVANCING 識別名 LINES]
+</code></pre>
+<p>識別名の中に入っている数の分だけラインを飛ばす。ここにSPECIAL-NAMESで指定した <code>C01 IS 〜</code> の名前を使うと、改頁されてプリントできる行の最初の行を指す。通常、ADVANCINGとLINESという語は省略して使う。</p>
+<p>BEFOREとAFTERの違い:</p>
+<pre><code>ポイントPの位置:   P ← ──
+                   A行
+                   B行
+                   C行
+
+BEFORE 2 の場合:
+  &quot;*** テスト プログラム ケッカ ***&quot;  がA行に書き出される
+  ポインタはCを指す（書き出した行を含む2+1行先）
+
+AFTER 2 の場合:
+  ポインタはまず2行先に移る（B行）
+  &quot;*** テスト プログラム ケッカ ***&quot;  がB行に書き出される
+  ポインタはCを指す
+</code></pre>
+<p>効率としてはBEFOREの方が良い。プリントしてプリンタが改行している間にプログラムでは次にプリントする内容をセットできるからである。1つのプログラム中ではどちらかに統一した方が間違いが少なくて良い。</p>
+<h3 id="16-display-命令">16. DISPLAY 命令</h3>
+<pre><code class="language-cobol">DISPLAY  識別名-1...(n)  [UPON { CONSOLE  }
+                               { SYSOUT   }
+                               { SYSPUNCH }
+                               { SYSPCH   }]
+</code></pre>
+<p>UPON句が省略されるとSYSOUTとみなされる。</p>
+<table>
+<thead>
+<tr>
+<th>出力先</th>
+<th>長さ制限</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SYSOUT</td>
+<td>120桁</td>
+</tr>
+<tr>
+<td>CONSOLE</td>
+<td>100桁</td>
+</tr>
+<tr>
+<td>SYSPUNCH</td>
+<td>72桁</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="language-cobol">DISPLAY  &quot;*** PROGRAM ERR ***&quot;  UPON  CONSOLE.
+</code></pre>
+<pre><code>DISPLAY &quot;ERROR△△&quot; &quot;CODE=&quot; WK-CODE.
+</code></pre>
+<p>WK-CODEに <code>'001'</code> が入っていると仮定すると、SYSOUT上に <code>"ERROR△△CODE=001"</code> とプリントされる。</p>
+<p>CONSOLE以外は、JCL上でDDカードを指定しておかなければならない。入出力件数の出力に良く使われる。</p>
+<h3 id="17-search-命令">17. SEARCH 命令</h3>
+<p>テーブルで取られたエリア内から、あるKEYに基づいて必要なデータを探し出す命令。</p>
+<pre><code class="language-cobol">SEARCH  テーブル名  [AT END 命令ステートメント-1]
+  WHEN  条件 命令ステートメント-2
+</code></pre>
+<p>テーブル名は、エリアの上でOCCURS句が付いている項目である。SEARCHを使わずにIFでLOOPさせるやり方もある。</p>
+<pre><code class="language-cobol">05  A-OCCUR             OCCURS        100 TIMES
+                        INDEXED BY    A-X1.
+  10  A-KEY             PIC           X(3).
+  10  A-NAIYO           PIC           X(25).
+05  WK-KEY              PIC           X(3).
+05  WK-DATA             PIC           X(25).
+</code></pre>
+<pre><code class="language-cobol">SET       A-X1            TO  1.
+SEARCH    A-OCCUR
+  AT END  GO TO SEARCH-END
+WHEN      WK-KEY = A-KEY (A-X1)
+  MOVE    A-NAIYO (A-X1)  TO  WK-DATA.
+</code></pre>
+<p>SEARCH命令を実行する前に必ずインデックスに値をセットしなければならない。このサーチ命令は、A-OCCURというエリアのA-KEYのn番目がWK-KEYと等しいものを探し出して、そのn番目のA-NAIYOをWK-DATAへ移す。テーブル上に条件に合うものが無ければ、SEARCH-ENDという処理手順名の所へブランチする。</p>
+<p><strong>IF文のLOOPでも同等の処理:</strong></p>
+<pre><code class="language-cobol">  SET        A-X1            TO     1.
+S03-SEARCH.
+  IF         A-X1 &gt; 100
+    GO TO    S03-SEARCH-END
+  ELSE
+    IF       A-KEY (A-X1) = WK-KEY
+      MOVE   A-NAIYO (A-X1)  TO     WK-DATA
+    ELSE
+      SET    A-X1            UP BY  1
+      GO TO  S03-SEARCH.
+</code></pre>
+<p>SEARCHの方がステートメント数が少なく、S03-SEARCHという処理手順名をとる必要が無い。どちらを使うかはケースバイケースで使い分けて欲しい。</p>
+<h3 id="18-stop-run-goback">18. STOP RUN、GOBACK</h3>
+<ul>
+<li><strong>STOP RUN</strong> — プログラムの停止。リンクを必要としない単体のモジュールで使用する</li>
+<li><strong>GOBACK</strong> — 制御を上位モジュールへ返す。リンクを必要とし、かつメインモジュールでない时使用（メインはSTOP RUN）</li>
+</ul>
+<p>基本的には、今まで述べてきた命令詳を使用してプロシジャーを作成する。まだまだ命令はあるが、とりあえず基本としてここに述べた命令は覚えておいてもらいたい。</p>
+<blockquote>
+<p><strong>CALL命令:</strong> <code>CALL モジュール名 USING エリア名</code> という形で使用する。CALL命令は別のプログラム（モジュール）をInvokeする命令で、USING句でパラメータを渡す。CALL命令を使うと、そのプログラムは他のプログラムを必要とするため、リンクという手続きを行ってロードモジュールを作成しなければならない。本教材の範囲を超えるので詳細は別の参照書を参照されたい。</p>
+</blockquote>
+<hr />
+<h2 id="第六章-フロー例とコーディング例_1">第六章 フロー例とコーディング例</h2>
+<p>ここでは、処理の基本であるマッチング処理とコントロールブレイク処理を実際のフローとコーディング例で紹介する。</p>
+<p>なお、これらのフローは書物より引用した物ではない為、もっとよいフローがあるかもしれない。</p>
+<h3 id="マッチング処理とは">マッチング処理とは</h3>
+<p>2つ以上のファイルをつきあわせ、あるKEYによってファイルに更新をかけるような処理である。ファイルの個数・KEYの個数によって1:1、1:N、1:1:1、1:1:Nなどの処理がある。</p>
+<h3 id="コントロールブレイク処理とは">コントロールブレイク処理とは</h3>
+<p>ファイル中のあるKEYが変化した時点で、それまでとは違った処理を行う事をコントロールブレイクと呼ぶ。明細を出しながら支社・営業部・支部のトータルを出力するのような処理である。</p>
+<hr />
+<h3 id="1-マッチング処理のフロー例-1-1—スイッチを使用する場合">1. マッチング処理のフロー例（1:1）— スイッチを使用する場合</h3>
+<pre><code class="language-mermaid">flowchart TD
+  START([START]) --&gt; INITIAL[INITIAL&lt;br/&gt;ファイルのOPEN]
+  INITIAL --&gt; SET_SW1[SW1 = '1']
+  SET_SW1 --&gt; SET_SW2[SW2 = '1']
+  SET_SW2 --&gt; READ1[INFL1 READ&lt;br/&gt;AT END: KEY1→HIGH-VALUE]
+  READ1 --&gt; READ2[INFL2 READ&lt;br/&gt;AT END: KEY2→HIGH-VALUE]
+  READ2 --&gt; CHECK_KEY{KEY1 = KEY2&lt;br/&gt;AND&lt;br/&gt;KEY1 = HIGH-VALUE}
+  CHECK_KEY --&gt;|YES| CLOSE[CLOSE]
+  CLOSE --&gt; END_([END])
+  CHECK_KEY --&gt;|NO| CMP{KEY1 : KEY2}
+  CMP --&gt;|KEY1 &lt; KEY2| INFL1_ONLY[INFL1 ONLY処理]
+  CMP --&gt;|KEY1 &gt; KEY2| INFL2_ONLY[INFL2 ONLY処理]
+  CMP --&gt;|KEY1 = KEY2| MATCH[マッチング処理]
+  INFL1_ONLY --&gt; SET_A[SW1←'1'&lt;br/&gt;SW2←'0']
+  INFL2_ONLY --&gt; SET_B[SW1←'0'&lt;br/&gt;SW2←'1']
+  MATCH --&gt; SET_C[SW1←'1'&lt;br/&gt;SW2←'1']
+  SET_A --&gt; READ1
+  SET_B --&gt; READ1
+  SET_C --&gt; READ1
+</code></pre>
+<p><strong>前提条件:</strong>
+- INFL1、INFL2の各KEYは昇順にSORTされている
+- 同一のKEYは同一ファイル上には存在しない
+- KEY1はINFL1のKEY、KEY2はINFL2のKEY</p>
+<hr />
+<h3 id="2-マッチング処理のフロー例-1-1—スイッチを使用しない場合">2. マッチング処理のフロー例（1:1）— スイッチを使用しない場合</h3>
+<pre><code class="language-mermaid">flowchart TD
+  START([START]) --&gt; INITIAL[INITIAL&lt;br/&gt;ファイルのOPEN]
+  INITIAL --&gt; READ1[INFL1 READ]
+  READ1 --&gt; READ2[INFL2 READ]
+  READ2 --&gt; CHECK_KEY{KEY1 = KEY2&lt;br/&gt;AND&lt;br/&gt;KEY1 = HIGH-VALUE}
+  CHECK_KEY --&gt;|YES| CLOSE[CLOSE]
+  CLOSE --&gt; END_([END])
+  CHECK_KEY --&gt;|NO| CMP{KEY1 : KEY2}
+  CMP --&gt;|KEY1 &lt; KEY2| INFL1_ONLY[INFL1 ONLY処理]
+  CMP --&gt;|KEY1 &gt; KEY2| INFL2_ONLY[INFL2 ONLY処理]
+  CMP --&gt;|KEY1 = KEY2| MATCH[マッチング処理]
+  INFL1_ONLY --&gt; R1[INFL1 READ]
+  INFL2_ONLY --&gt; R2[INFL2 READ]
+  MATCH --&gt; R3[INFL1 READ]
+  R3 --&gt; R4[INFL2 READ]
+  R1 --&gt; CHECK_KEY
+  R2 --&gt; CHECK_KEY
+  R4 --&gt; CHECK_KEY
+</code></pre>
+<p><strong>《説明》</strong></p>
+<p>スイッチを使用する場合も使用しない場合も基本的には同一である。この「マッチング処理」という所で、ファイル（INFL2）を更新しPUTする。このINFL1はマスターファイル、INFL2はトランザクションファイルを意味している。</p>
+<p>マッチング処理で注意しなければならないのは、前提条件（ソート順、KEYの存在など）と、ファイルREADするタイミングとPUTするタイミングである。これはKEYが1:1、1:N、N:Nともに共通している。</p>
+<hr />
+<h3 id="3-スイッチを使用しない場合-1-n">3. スイッチを使用しない場合（1:N）</h3>
+<blockquote>
+<p>INFL1…1（マスター）、INFL2…N（トランザクション）</p>
+</blockquote>
+<pre><code class="language-mermaid">flowchart TD
+  START([START]) --&gt; INITIAL[INITIAL&lt;br/&gt;ファイルのOPEN]
+  INITIAL --&gt; READ1[INFL1 READ]
+  READ1 --&gt; READ2[INFL2 READ]
+  READ2 --&gt; CHECK_KEY{KEY1 = KEY2&lt;br/&gt;AND&lt;br/&gt;KEY1 = HIGH-VALUE}
+  CHECK_KEY --&gt;|YES| CLOSE[CLOSE]
+  CLOSE --&gt; END_([END])
+  CHECK_KEY --&gt;|NO| CMP{KEY1 : KEY2}
+  CMP --&gt;|KEY1 &lt; KEY2| SW_CHECK{SW1 = '1'？}
+  SW_CHECK --&gt;|YES| OUT[OUT処理]
+  SW_CHECK --&gt;|NO| INFL1_ONLY[INFL1 ONLY処理]
+  OUT --&gt; READ1B[INFL1 READ]
+  INFL1_ONLY --&gt; READ1B
+  CMP --&gt;|KEY1 &gt; KEY2| INFL2_ONLY[INFL2 ONLY処理]
+  INFL2_ONLY --&gt; READ2B[INFL2 READ]
+  CMP --&gt;|KEY1 = KEY2| MATCH[マッチング処理]
+  MATCH --&gt; READ2C[INFL2 READ]
+  READ1B --&gt; CHECK_KEY
+  READ2B --&gt; CHECK_KEY
+  READ2C --&gt; CHECK_KEY
+</code></pre>
+<p><strong>説明:</strong> マッチング処理ではファイルのPUTは行わず、SW1に<code>'1'</code>を立てる。このスイッチは更新処理を行ったことを示す。OUT処理でファイルのPUT処理を行う。ただし、このフローはINFL1がマスターで、マスターに更新をかけて新マスターを作成するフローである。マスターがINFL2の場合、OUT処理は不要となる。しかし、通常マスターには同一KEYが複数存在することは少ないので、このフロー処理で良い。SW1のクリアはOUT処理で行う。</p>
+<hr />
+<h3 id="4-スイッチを使用しない場合-n-n—同一keyのmaxが全く予想できない場合">4. スイッチを使用しない場合（N:N）— 同一KEYのMAXが全く予想できない場合</h3>
+<pre><code class="language-mermaid">flowchart TD
+  START([START]) --&gt; INITIAL[INITIAL]
+  INITIAL --&gt; READ1[INFL1 READ]
+  READ1 --&gt; READ2[INFL2 READ]
+  READ2 --&gt; CHECK1{KEY1 = KEY2&lt;br/&gt;AND&lt;br/&gt;KEY1 = HIGH-VALUE}
+  CHECK1 --&gt;|YES| CLOSE[CLOSE]
+  CLOSE --&gt; END_([END])
+  CHECK1 --&gt;|NO| CMP1{KEY1 : KEY2}
+  CMP1 --&gt;|KEY1 &lt; KEY2| INFL1_ONLY[INFL1 ONLY処理]
+  CMP1 --&gt;|KEY1 &gt; KEY2| INFL2_ONLY[INFL2 ONLY処理]
+  CMP1 --&gt;|KEY1 = KEY2| STORE[STR1←KEY1&lt;br/&gt;STR2←KEY2]
+  INFL1_ONLY --&gt; READ1A[INFL1 READ] --&gt; CHECK1
+  INFL2_ONLY --&gt; READ2A[INFL2 READ] --&gt; CHECK1
+  STORE --&gt; LOOP2{&quot;(2) KEY1 : KEY2&quot;}
+  LOOP2 --&gt;|KEY1 ≠ KEY2| OUT[OUT処理]
+  LOOP2 --&gt;|KEY1 = KEY2| MATCH[マッチング処理]
+  OUT --&gt; READ1B[INFL1 READ]
+  MATCH --&gt; READ2B[INFL2 READ]
+  READ1B --&gt; HV_CHECK{KEY1 OR KEY2&lt;br/&gt;= HIGH-VALUE？}
+  READ2B --&gt; HV_CHECK
+  HV_CHECK --&gt;|YES| LOOP2
+  HV_CHECK --&gt;|NO| CHECK3{KEY1 : STR1}
+  CHECK3 --&gt;|NO| CHECK1
+  CHECK3 --&gt;|YES| REOPEN[INFL2 CLOSE&lt;br/&gt;再オープン]
+  REOPEN --&gt; READ2C[INFL2 READ]
+  READ2C --&gt; KEY2_CMP{KEY2 : STR2}
+  KEY2_CMP --&gt;|≠| READ2C
+  KEY2_CMP --&gt;|=| CHECK1
+</code></pre>
+<hr />
+<h3 id="5-マッチング処理の説明">5. マッチング処理の説明</h3>
+<blockquote>
+<p>マッチングとは、複数のファイルをあるKEYによって照合させ、同一KEY同士の処理を行い、ファイルを更新することをいう。一般には、旧（更新前）マスターとトランザクションファイル（取引ファイル）を照合させ、トランザクションファイルの内容によってマスターの内容を更新して新マスターを作成する。その際、エラーのデータはエラーファイルに出力し、同時にリスト件数表を出力する。</p>
+</blockquote>
+<p><strong>例（B表）:</strong></p>
+<p>例えば、マスターファイルのKEYとトランザクションのKEYをB表の様に仮定すると、マスターファイルの1件目に更新をかけようとすると、トランザクションの1件目と2件目をREADしなければならない。又、3件目のトランザクションの'05'というKEYはマスター方にはない為、新しくマスターの'04'と'06'の間にインサートする事になる。こうして新マスターを作成する。</p>
+<table>
+<thead>
+<tr>
+<th>件数</th>
+<th>マスター</th>
+<th>トランザクション</th>
+<th>説明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>01</td>
+<td>01</td>
+<td>→ 01 更新をかける</td>
+</tr>
+<tr>
+<td>2</td>
+<td>02</td>
+<td>01</td>
+<td></td>
+</tr>
+<tr>
+<td>3</td>
+<td>03</td>
+<td>05</td>
+<td>→ 02 該当なし</td>
+</tr>
+<tr>
+<td>4</td>
+<td>04</td>
+<td>06</td>
+<td>→ 03</td>
+</tr>
+<tr>
+<td>5</td>
+<td>06</td>
+<td>06</td>
+<td>→ 04</td>
+</tr>
+<tr>
+<td>6</td>
+<td>07</td>
+<td>07</td>
+<td>→ (05) ← マスターにないからインサート</td>
+</tr>
+<tr>
+<td>7</td>
+<td>09</td>
+<td>08</td>
+<td>→ 06</td>
+</tr>
+<tr>
+<td>8</td>
+<td>10</td>
+<td>09</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>したがって、通常のマスター更新処理の新マスターは件数は増えることはあっても減ることはない（DELETE処理が入っている場合は例外）。</p>
+<p><strong>N:Nマッチングについて:</strong></p>
+<ul>
+<li>N:Nのマッチング処理で、マスター及びトランザクションのKEYの両方とも同一KEYの個数のMAXがまるで分からない時、このフローのようにオープン・クローズを繰り返し、あたかも1:Nのマッチング処理を行うかのように処理を行う。</li>
+<li>このSTR1、STR2というのは、KEYが変わる直前のKEYの値をストアしておくエリアである。</li>
+<li>マスターもしくはトランザクションのKEYのどちらかのKEYのMAXがわかっていて、且つRECORD-LENGTHとMAX件数を乗じた値のレングスがワーク上でとりうる値であれば、まずKEYが変わるまでワーク上へストアし続け、KEYが変わった時点でそのワークとファイルのマッチングを行う。これは1:Nのマッチング処理と同様の処理を行うことができる。</li>
+<li>このフローは各自で作成してみるとよい。</li>
+<li>N:Nのマッチング処理というのはあまりないので、1:Nのフローを完全にマスターした方が良い。N:Nは1:Nの応用である。また、1:1:1、1:1:Nのような多数ファイルのマッチング処理も、基本は1:Nである。</li>
+</ul>
+<hr />
+<h3 id="6-コントロールブレイクのフロー例">6. コントロールブレイクのフロー例</h3>
+<p><strong>プリントルーチン（53ラインを超えたら見出しを打つ）:</strong></p>
+<pre><code class="language-mermaid">flowchart TD
+  A{ライン数&lt;br/&gt;53オーバー？} --&gt;|YES| HEADER[見出し処理]
+  A --&gt;|NO| B[データセット処理]
+  HEADER --&gt; B
+  B --&gt; PRINT[PRINT処理]
+  PRINT --&gt; EXIT([EXIT])
+</code></pre>
+<p>ライン数をカウントして53ラインを超えたら改頁して見出しを打ち、ラインカウンターを初期値化する。データセット処理でプリントするエリアへデータを移送する。PRINT処理でWRITEし、ラインカウンターへ1を加える。その後、プリントエリアをクリアする。</p>
+<p>この形がコントロールブレイクの基本である。非常に簡単だが、様々な処理が入ってくると改頁のタイミングというものは難しくなってくる。次項から複雑なコントロールブレイクの例を示す。</p>
+<p><strong>複雑なコントロールブレイク:</strong></p>
+<p>ブレークキーの定義:</p>
+<pre><code class="language-cobol">05  KEY.
+  10  KEY1              PIC           X(3).  READ時のKEY
+  10  KEY2              PIC           X(3).
+  10  KEY3              PIC           X(3).
+05  STR.
+  10  STR1              PIC           X(3).  1件前のKEY
+  10  STR2              PIC           X(3).
+  10  STR3              PIC           X(3).
+</code></pre>
+<p>KEY1・KEY2・KEY3はそれぞれ大項目・中項目・小項目のKEYを表わす（支社・営業部・支部の関係と同じ）。STRの方は、違うKEYが入った時と1件目のREADの時に入れる（READ時点の1件前のデータの値）。</p>
+<pre><code class="language-mermaid">flowchart TD
+  START([START]) --&gt; READ[1件READ]
+  READ --&gt; FILE_END{FILE END？}
+  FILE_END --&gt;|YES| PRINT_ALL[小計プリント&lt;br/&gt;中計プリント&lt;br/&gt;合計プリント&lt;br/&gt;件数表プリント]
+  PRINT_ALL --&gt; END_([END])
+  FILE_END --&gt;|NO| CMP_KEY{KEY = STR？}
+  CMP_KEY --&gt;|YES| PRINT_DETAIL[明細プリント&lt;br/&gt;集計処理] --&gt; READ
+  CMP_KEY --&gt;|NO| CMP1{KEY1 = STR1？}
+  CMP1 --&gt;|NO| PRINT_GO[小計・中計・&lt;br/&gt;合計プリント] --&gt; PRINT_DETAIL
+  CMP1 --&gt;|YES| CMP2{KEY2 = STR2？}
+  CMP2 --&gt;|NO| PRINT_CHU[小計・中計プリント] --&gt; PRINT_DETAIL
+  CMP2 --&gt;|YES| PRINT_SHO[小計プリント] --&gt; PRINT_DETAIL
+</code></pre>
+<p><strong>処理の流れ:</strong></p>
+<p>このコントロールブレイクは、小計・中計・合計をコントロールする処理である。</p>
+<p>① <strong>1件目のREAD時</strong> にデータ中のKEYをワークエリアで取ったKEYとSTRにMOVEする。1件目以外はKEYへ入れる。</p>
+<p>② <strong>FILE ENDか</strong> を確認する。ENDならば、小計・中計・合計をプリントし、件数表をプリントしてEND処理を行い、プログラムはストップする。ENDでなければ③へ。</p>
+<p>③ <strong>KEYとSTRを比較</strong> して、同じならば明細をプリントして集計処理を行い①へ戻る。</p>
+<p>④ <strong>大項目KEY（KEY1、STR1）が同じでなければ</strong> 小計・中計・合計をプリントし、KEYの内容をSTRにMOVEする。</p>
+<p>⑤ <strong>中項目KEY（KEY2、STR2）が同じでなければ</strong> 小計・中計をプリントし、KEY2の内容をSTR2へ、KEY3をSTR3へMOVEする。</p>
+<p>⑥ <strong>小項目KEY（KEY3、STR3）が同じでなければ</strong>（実際には比較する必要はない）、小計をプリントしKEY3をSTR3へMOVEする。</p>
+<p>⑦ ④⑤⑥の処理が終ったら、明細をプリントし集計処理をして①へ戻る。</p>
+<blockquote>
+<p>明細はREADしたデータ。小計・中計・合計は、READしたデータの1件前までの集計した値である。だから、ラストの時に明細をプリントする必要はない。</p>
+</blockquote>
+<hr />
+<h3 id="コーディング例-main">コーディング例（MAIN）</h3>
+<pre><code class="language-cobol">10     S01-START.
+20         PERFORM            S02-INITIAL THRU S02-EXIT.
+30     S01-01.
+40         PERFORM            S03-READ THRU S03-EXIT.
+50         IF                 SW-END = '1'
+60           GO TO            S01-02
+70         ELSE
+80           IF               KEY = STR
+90             NEXT SENTENCE
+100        ELSE
+110          IF               KEY1 = STR1
+120            IF             KEY2 = STR2
+130              PERFORM      S06-SHOKEI THRU S06-EXIT
+140
+150            ELSE
+160              PERFORM      S06-SHOKEI THRU S06-EXIT
+170              PERFORM      S07-CHUKEI THRU S07-EXIT
+180
+190          ELSE
+200            PERFORM        S06-SHOKEI THRU S06-EXIT
+210            PERFORM        S07-CHUKEI THRU S07-EXIT
+220            PERFORM        S08-GOKEI THRU S08-EXIT.
+270        PERFORM            S04-MEISAI THRU S04-EXIT.
+280        PERFORM            S05-SHUKEI THRU S05-EXIT.
+290        GO TO              S01-01.
+300    S01-02.
+310        PERFORM            S06-SHOKEI THRU S06-EXIT.
+320        PERFORM            S07-CHUKEI THRU S07-EXIT.
+330        PERFORM            S08-GOKEI THRU S08-EXIT.
+340        PERFORM            S09-KENSUHYO THRU S09-EXIT.
+350        PERFORM            S10-CLOSE THRU S10-EXIT.
+360        STOP RUN.
+</code></pre>
+<p>マッチング処理中にコントロールブレイク処理が入るというような処理は非常に多い。マッチング処理とコントロールブレイク処理は、単純なTAPE TO PRINTのような処理以外は入っているとみて良いだろう。それだけに、この2つの処理はしっかりと身につけておいて欲しい。</p>
+<hr />
+<h2 id="第七章-tso_1">第七章 TSO</h2>
+<p>ここではTSOのまわりのファイルと、TSOでテストする場合とJCLとの違い、コマンドプロシジャーの基本的なものの作成方法を簡単に述べる。詳細はプログラマーズハンドブックを参照して頂きたい。</p>
+<h3 id="tsoのlogon">TSOのLOGON</h3>
+<p>LOGONとは、ユーザーがワークを確保して作業が行える様にする第1番目のコマンドである。</p>
+<pre><code>LOGON USER-ID/PASSWORD ↵
+</code></pre>
+<p>例:</p>
+<pre><code>LOGON @QAKOBA/1111 ↵
+</code></pre>
+<p>このコマンドを入れるとTSOの画面はREADYになり使用可能となる。</p>
+<h3 id="1-tso周辺のファイル関係図">1. TSO周辺のファイル関係図</h3>
+<pre><code class="language-mermaid">flowchart TD
+  TSO[TSO]
+  MASTRLIB[(MASTER&lt;br/&gt;MASTRLIB)]
+  SOURCLIB[(SOURCE&lt;br/&gt;SOURCLIB)]
+  PDSLIB[(PDSLIB)]
+  TESTCPY[(TEST.CPYLIB)]
+  DASDCPY[(DASD.CPYLIB)]
+  TESTLIB1[(TESTLIB1)]
+  TESTLIB2[(TESTLIB2)]
+  DASDLIB[(DASDLIB1&lt;br/&gt;DASDLIB2&lt;br/&gt;D1LIB1 etc)]
+  TSOWK[(TSOWKx&lt;br/&gt;ユーザー用 WORK)]
+  TSTPROC[(TSTPROC)]
+  DCMD[(DCMD)]
+
+  MASTRLIB --&gt;|LIBCM| SOURCLIB
+  SOURCLIB --&gt;|LIBA / LIBC| TSO
+  TSO --&gt;|LS| SOURCLIB
+  PDSLIB --&gt;|LIBGP| TSO
+  TSO --&gt;|LS| PDSLIB
+  TSO --&gt;|SUBCOPY| TESTCPY
+  TESTCPY --&gt; DASDCPY
+  TSO --&gt;|COMPILE&lt;br/&gt;SUBASHW / SUBCB2W| TESTLIB1
+  TESTLIB1 --&gt;|LINK&lt;br/&gt;SUBLKED| TESTLIB2
+  TESTLIB2 --&gt;|LOAD MODULE| DASDLIB
+  TESTLIB2 -.-&gt;|TEST| TSO
+  TSO --- TSOWK
+  TSTPROC -.-&gt;|コマンド| TSO
+  DCMD -.-&gt;|コマンド| TSO
+</code></pre>
+<p>TSTPROC・DCMDはコマンドプロシジャーを登録しておくライブラリで、ここからTSOへコマンドが提供される。TSOワークはTSOWKxとして確保される。</p>
+<h3 id="2-ファイル説明">2. ファイル説明</h3>
+<table>
+<thead>
+<tr>
+<th>ファイル</th>
+<th>説明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>MASTRLIB</strong></td>
+<td>最終的なソースプログラムがSOURCEからコピーされて登録されている</td>
+</tr>
+<tr>
+<td><strong>SOURCLIB</strong></td>
+<td>パンチされたプログラムが入り、修正などが行われて更新されていくプログラム。定期的にスクラッチされる</td>
+</tr>
+<tr>
+<td><strong>PDSLIB</strong></td>
+<td>DCOPY文のソースが入っている</td>
+</tr>
+<tr>
+<td><strong>TEST.CPYLIB</strong></td>
+<td>TSOよりSUBCOPYされたDCOPYが一時的に入れられる所。毎週月曜日にスクラッチされる</td>
+</tr>
+<tr>
+<td><strong>DASD.CPYLIB</strong></td>
+<td>完成されたDCOPYがTEST.CPYLIBよりコピーされて入る所</td>
+</tr>
+<tr>
+<td><strong>TESTLIB1</strong></td>
+<td>TSOよりCOMPILEされたものが入る（通常）</td>
+</tr>
+<tr>
+<td><strong>TESTLIB2</strong></td>
+<td>TESTLIB1へカタログしたモジュールを、単体ならそのまま、そうでなければ他のモジュールをリンクしロードモジュールを一時的にカタログしておく所</td>
+</tr>
+<tr>
+<td><strong>DASDLIB1/2、D1LIB1</strong></td>
+<td>最終的なロードモジュールがカタログされる</td>
+</tr>
+</tbody>
+</table>
+<h3 id="3-ソースからロードモジュールまで">3. ソースからロードモジュールまで</h3>
+<ol>
+<li>コーディングを終えてパンチに出すとまずソースリブに登録される</li>
+<li>TSOから <code>LIBC</code>、<code>LIBA</code> のコマンドによってソースリブからTSOワーク上（TSOWKx）に持ってくる。ここで修正を加えて <code>SUBCB2W</code>、<code>SUBASHW</code> などのコマンドによりコンパイル、またはアセンブルを行う。TESTLIB1へカタログされる</li>
+<li>TESTLIB1にカタログされたモジュールと他のモジュールを連結する（リンク）。TESTLIB1のモジュールが他のモジュールを必要としていなければ（CALL命令がなければ）リンクする必要は無い。このリンク処理を行うコマンドとして <code>SUBLKED</code> などがある</li>
+<li>リンクされたモジュールは一時的にTESTLIB2へカタログされる（ロードモジュール）</li>
+<li>このロードモジュールをTEST命令などでテストを繰り返す。エラーが無くなるまで手順2〜4を繰り返す</li>
+<li>完全に出来上がったロードモジュールは業務によって <code>DASDLIB1</code>、<code>DASDLIB2</code> などに <code>TESTLIB2</code> から登録される</li>
+<li>これで動かせるモジュールができた</li>
+</ol>
+<h3 id="4-jclとtsoのテストの違い">4. JCLとTSOのテストの違い</h3>
+<p><strong>JCLの場合:</strong></p>
+<pre><code>// SAMPLE      JOB NSD,MSGLEVEL=1
+// JOBLIB      DD  DSN=TESTLIB2,DISP=SHR
+// STEP1       EXEC PGM=SAMPLE,PARM='8106'
+// INFL        DD  DSN=TEST.DATA,
+//                DCB=(BLKSIZE=1000,LRECL=100,RECFM=FB),
+//                VOL=SER=DTF005,UNIT=3350,
+//                DISP=SHR
+// PRINT       DD  SYSOUT=A
+// SYSOUT      DD  SYSOUT=A
+// SYSUDUMP    DD  SYSOUT=A
+</code></pre>
+<p><strong>TSOの場合:</strong></p>
+<pre><code>FREE F(INFL,PRINT,SYSOUT)
+ALLOC F(INFL) DA('TEST.DATA') VOL(DTF005) -
+  UNIT(3350) SHR
+ALLOC F(PRINT) -DA(*)
+ALLOC F(SYSOUT) -DA(*)
+TEST 'TESTLIB2(SAMPLE)' '8106'
+</code></pre>
+<p>これだけKEYINするとTSO画面上にTESTという文字が出てくる。ここでGOというコマンドを入れるとプログラムは作動する。テストがうまく行くと結果が画面に現れる。</p>
+<h3 id="5-tsoモード関係図">5. TSOモード関係図</h3>
+<pre><code class="language-mermaid">flowchart TD
+  READY[[READY]]
+  READY --&gt; L1A[&quot;ASM | COB | LINK&quot;]
+  READY --&gt; L1B[&quot;CALL | ALLOC | FREE&quot;]
+  L1A --&gt; L2A[&quot;LIST | DEL | EDIT&quot;]
+  L1B --&gt; L2B[&quot;TEST | TESTCOB | HELP&quot;]
+  L2A --&gt; L3[&quot;SAVE | INPUT | DEL | CHANGE | END | LIST | SET&quot;]
+  L2B --&gt; L3
+</code></pre>
+<p>左側はコンパイル・リンク系のモード、右側はファイル制御・テスト系のモードで、どちらも最下層のモード群を支える上下関係になっている。</p>
+<h3 id="6-clistの作り方">6. CLISTの作り方</h3>
+<p>TSO画面上に <code>READY</code> と出たら何もやっていないという状態である。まずコマンドプロシジャーを作る。</p>
+<pre><code>EDIT MIHON.CLIST NEW ↵ E ↵
+</code></pre>
+<p>（名前は何でもよい。8桁以内）KEYINすると画面に <code>INPUT</code> と出る。ここで、前頁でテストする為に入れたコマンドをそのまま1ラインずつKEYINする。</p>
+<pre><code>INPUT
+000010 FREE F(INFL,PRINT,SYSOUT)    E
+000020 ALLOC F(INFL) DA('TEST.DATA') -    E
+...
+000060 TEST 'TESTLIB2(SAMPLE)' '8106'    E
+000070                    E
+</code></pre>
+<p>ENTER-KEYを押すとINPUTモードからEDITモードになり、<code>EDIT</code> と画面に出る。ここで <code>END SAVE ↵</code> とKEYINするとモードはREADYになる。</p>
+<p>これで、初めに <code>MIHON.CLIST</code> とKEYINしたものの中身ができた事になる。後はこれを作動させてTESTモードにすればいいのである。</p>
+<p>実行には、次の様にKEYINする:</p>
+<pre><code>EX MIHON ↵
+</code></pre>
+<p>TESTモードになり画面にTESTと出る。何回もKEYINすることを解消したわけである。なお、このコマンドプロシジャーをTSTPROCに登録すれば <code>EX</code> を付けずに <code>MIHON</code> と打ち込むだけで作動する。</p>
+<p>これが最も基本的なコマンドプロシジャーである。このコマンドプロシジャー内で様々な処理を行わせる事もできるが（IF＆SET etcを使って）それは省略しておく。ここではJCLとコマンドプロシジャーの違いを知っておいてもらいたい。</p>
+<h3 id="7-tsoの主なコマンド">7. TSOの主なコマンド</h3>
+<p><strong>LIBC / LIBA / LIBGP</strong></p>
+<pre><code>LIBC   ********
+LIBA   ********
+LIBGP  ********
+       管理コード8桁
+</code></pre>
+<p>このコマンドの基本は下記のLGコマンドである。</p>
+<p><strong>LG</strong></p>
+<pre><code>LG ******** { COBOL } DSSOURCE( { MASTRLIB } )
+            { ASM   }           { SOURCLIB }
+            { DATA  }           { PDSLIB   }
+
+   PASSWORD(****)
+</code></pre>
+<p>上記のコマンドは、ソースリブなどからソースモジュールをTSOワーク上へ持ってくるコマンドである。</p>
+<p><strong>SUBCB2W / SUBASHW / KCOBJ / KC</strong></p>
+<pre><code>SUBCB2W  ********   RM(**)
+SUBASHW  ********   RM(**)
+KCOBJ    ********   RM(**)
+KC       ********   RM(**)
+   管理コード8桁    **=RM1,RM2,C
+</code></pre>
+<p>上記のコマンドは、モジュールをコンパイルもしくはアセンブルしてTESTLIB1（基本的に）へカタログする。このコマンドにはオプションが幾つかあるが、それは省略する。</p>
+<p><strong>SUBLKED / SUBLKED2 / KLKED</strong></p>
+<pre><code>SUBLKED   ******
+SUBLKED2  ******   通常6桁指定
+KLKED     ******
+</code></pre>
+<p>上記のコマンドはリンクする為のコマンドである。TESTLIB2（基本的に）へカタログされる。</p>
+<p><strong>LS、LS =ALL</strong></p>
+<p>TSOワークへ持ってきたモジュールをソースリブなどへ戻してやるコマンドである。</p>
+<hr />
+<h2 id="第八章-pad図_1">第八章 PAD図</h2>
+<h3 id="1-pad図-1-1マッチング-スイッチ使用">1. PAD図（1:1マッチング、スイッチ使用）</h3>
+<p><em>原見出し: 1、36ページのPAD図（1:1マッチング、スウィッチ使用）</em></p>
+<pre><code class="language-mermaid">flowchart TD
+  START([START]) --&gt; INITIAL[INITIAL]
+  INITIAL --&gt; SW1{SW1=1}
+  SW1 --&gt;|YES| READ1[INFL1 READ]
+  READ1 --&gt; SW2{SW2=1}
+  SW2 --&gt;|YES| READ2[INFL2 READ]
+  READ2 --&gt; CHECK{KEY1 = KEY2&lt;br/&gt;AND&lt;br/&gt;KEY1 = HIGH-VALUE}
+  CHECK --&gt;|等しい| CLOSE[CLOSE]
+  CLOSE --&gt; END_([STOP RUN])
+  CHECK --&gt;|等しくない| COMP{KEY1 : KEY2}
+  COMP --&gt;|KEY1 &lt; KEY2| INFL1_ONLY[INFL1 ONLY処理]
+  COMP --&gt;|KEY1 &gt; KEY2| INFL2_ONLY[INFL2 ONLY処理]
+  COMP --&gt;|KEY1 = KEY2| MATCH_PROC[マッチング処理]
+  INFL1_ONLY --&gt; SET_A[&quot;'1'→SW1&lt;br/&gt;'0'→SW2&quot;]
+  INFL2_ONLY --&gt; SET_B[&quot;'0'→SW1&lt;br/&gt;'1'→SW2&quot;]
+  MATCH_PROC --&gt; SET_C[&quot;'1'→SW1&lt;br/&gt;'1'→SW2&quot;]
+  SET_A --&gt; SW1
+  SET_B --&gt; SW1
+  SET_C --&gt; SW1
+</code></pre>
+<h3 id="2-pad図-1-1マッチング-スイッチ不使用">2. PAD図（1:1マッチング、スイッチ不使用）</h3>
+<p><em>原見出し: 2、38ページのPAD図（1:1マッチング、スウィッチ不使用）</em></p>
+<pre><code class="language-mermaid">flowchart TD
+  START([START]) --&gt; INITIAL[INITIAL]
+  INITIAL --&gt; READ1[INFL1 READ]
+  READ1 --&gt; READ2[INFL2 READ]
+  READ2 --&gt; CHECK{KEY1 = KEY2&lt;br/&gt;AND&lt;br/&gt;KEY1 = HIGH-VALUE}
+  CHECK --&gt;|等しくない| COMP{KEY1 : KEY2}
+  COMP --&gt;|KEY1 &lt; KEY2| INFL1_ONLY[INFL1 ONLY処理]
+  COMP --&gt;|KEY1 &gt; KEY2| INFL2_ONLY[INFL2 ONLY処理]
+  COMP --&gt;|KEY1 = KEY2| MATCH[マッチング処理]
+  INFL1_ONLY --&gt; R1[INFL1 READ]
+  INFL2_ONLY --&gt; R2[INFL2 READ]
+  MATCH --&gt; R3[INFL1 READ]
+  R3 --&gt; R4[INFL2 READ]
+  R1 --&gt; CHECK
+  R2 --&gt; CHECK
+  R4 --&gt; CHECK
+  CHECK --&gt;|等しい| CLOSE[CLOSE]
+  CLOSE --&gt; END_([STOP RUN])
+</code></pre>
+<h3 id="3-pad図-1-nマッチング-スイッチ不使用">3. PAD図（1:Nマッチング、スイッチ不使用）</h3>
+<p><em>原見出し: 3、39ページのPAD図（1:Nマッチング、スウィッチ不使用）</em></p>
+<pre><code class="language-mermaid">flowchart TD
+  START([START]) --&gt; INITIAL[INITIAL]
+  INITIAL --&gt; READ1[INFL1 READ]
+  READ1 --&gt; READ2[INFL2 READ]
+  READ2 --&gt; CHECK{KEY1 = KEY2&lt;br/&gt;AND&lt;br/&gt;KEY1 = HIGH-VALUE}
+  CHECK --&gt;|等しくない| COMP{KEY1 : KEY2}
+  COMP --&gt;|KEY1 &lt; KEY2| SW_CHECK{SW1 = '1'？}
+  SW_CHECK --&gt;|YES| OUT_PROC[OUT処理]
+  SW_CHECK --&gt;|NO| INFL1_ONLY[INFL1 ONLY処理]
+  OUT_PROC --&gt; R1[INFL1 READ]
+  INFL1_ONLY --&gt; R1
+  COMP --&gt;|KEY1 &gt; KEY2| INFL2_ONLY[INFL2 ONLY処理]
+  INFL2_ONLY --&gt; R2[INFL2 READ]
+  COMP --&gt;|KEY1 = KEY2| MATCH[マッチング処理]
+  MATCH --&gt; R3[INFL2 READ]
+  R1 --&gt; CHECK
+  R2 --&gt; CHECK
+  R3 --&gt; CHECK
+  CHECK --&gt;|等しい| CLOSE[CLOSE]
+  CLOSE --&gt; END_([STOP RUN])
+</code></pre>
+<h3 id="4-pad図-n-nマッチング">4. PAD図（N:Nマッチング）</h3>
+<p><em>原見出し: 4、40ページのPAD図（N:Nマッチング）</em></p>
+<pre><code class="language-mermaid">flowchart TD
+  START([START]) --&gt; INITIAL[INITIAL]
+  INITIAL --&gt; READ1[INFL1 READ]
+  READ1 --&gt; READ2[INFL2 READ]
+  READ2 --&gt; CHECK1{KEY1 = KEY2&lt;br/&gt;AND&lt;br/&gt;KEY1 = HIGH-VALUE}
+  CHECK1 --&gt;|等しい| CLOSE[CLOSE]
+  CLOSE --&gt; END_([STOP RUN])
+  CHECK1 --&gt;|等しくない| COMP1{KEY1 : KEY2}
+  COMP1 --&gt;|KEY1 &lt; KEY2| INFL1_ONLY[INFL1 ONLY処理]
+  COMP1 --&gt;|KEY1 &gt; KEY2| INFL2_ONLY[INFL2 ONLY処理]
+  COMP1 --&gt;|KEY1 = KEY2| STORE[KEY1→STR1&lt;br/&gt;KEY2→STR2]
+  INFL1_ONLY --&gt; R1[INFL1 READ] --&gt; CHECK1
+  INFL2_ONLY --&gt; R2[INFL2 READ] --&gt; CHECK1
+  STORE --&gt; LOOP2{&quot;(2) KEY1 : KEY2&quot;}
+  LOOP2 --&gt;|等しくない| OUT[OUT処理]
+  LOOP2 --&gt;|等しい| MATCH[マッチング処理]
+  OUT --&gt; R3[INFL1 READ]
+  MATCH --&gt; R4[INFL2 READ]
+  R3 --&gt; HV{KEY1 OR KEY2&lt;br/&gt;= HIGH-VALUE？}
+  R4 --&gt; HV
+  HV --&gt;|YES| LOOP2
+  HV --&gt;|NO| CMP_STR{KEY1 : STR1}
+  CMP_STR --&gt;|等しくない| CHECK1
+  CMP_STR --&gt;|等しい| REOPEN[INFL2 CLOSE&lt;br/&gt;AND 再OPEN]
+  REOPEN --&gt; R5{&quot;(3) INFL2 READ&quot;}
+  R5 --&gt; CMP_KEY2{KEY2 : STR2}
+  CMP_KEY2 --&gt;|等しくない| R5
+  CMP_KEY2 --&gt;|等しい| CHECK1
+</code></pre>
+<h3 id="5-pad図-コントロールブレイク">5. PAD図（コントロールブレイク）</h3>
+<p><em>原見出し: 5、43ページのPAD図（コントロールブレイク）</em></p>
+<pre><code class="language-mermaid">flowchart TD
+  START([START]) --&gt; INITIAL[INITIAL]
+  INITIAL --&gt; READ[INFL1 READ]
+  READ --&gt; EOF{EOF？}
+  EOF --&gt;|YES| PRINT_SHO[小計プリント]
+  PRINT_SHO --&gt; PRINT_CHU[中計プリント]
+  PRINT_CHU --&gt; PRINT_GOU[合計プリント]
+  PRINT_GOU --&gt; KENSU[件数表]
+  KENSU --&gt; CLOSE[CLOSE]
+  CLOSE --&gt; END_([STOP RUN])
+  EOF --&gt;|NO| CMP{KEY : STR}
+  CMP --&gt;|等しい| DETAIL[明細] --&gt; SHUKEI[集計] --&gt; READ
+  CMP --&gt;|違う| CMP1{KEY1 = STR1？}
+  CMP1 --&gt;|違う&lt;br/&gt;大項目変化| PRINT_SHO2[小計プリント] --&gt; PRINT_CHU2[中計プリント] --&gt; PRINT_GOU2[合計プリント] --&gt; STEP7
+  CMP1 --&gt;|同じ| CMP2{KEY2 = STR2？}
+  CMP2 --&gt;|違う&lt;br/&gt;中項目変化| PRINT_SHO3[小計プリント] --&gt; PRINT_CHU3[中計プリント] --&gt; STEP7
+  CMP2 --&gt;|同じ| PRINT_SHO4[小計プリント&lt;br/&gt;小項目変化] --&gt; STEP7
+  STEP7[④⑤⑥終了後] --&gt; DETAIL
+</code></pre>
+<h2 id="_1">---</h2>
+<h2 id="付記-デジタル化に際して">付記（デジタル化に際して）</h2>
+<ul>
+<li><strong>ページ対応</strong>: 原PDFのページ番号と本文の印刷ページ番号は「印刷ページ ＝ PDFページ − 3」の関係にある（PDF 5ページ目 = 本文 − 2 −）。第八章のPAD図のページ（印刷 − 58 −〜 − 62 −）は横向きにスキャンされている。</li>
+<li><strong>原文の表記どおり</strong>に写した箇所: 第三章 (5) FILE-CONTROL の形式一覧の「ATCUAL KEY 文節」（ACTUAL KEY の誤記）、第八章 PAD図中の「HIGT VALUE」「GLOSE」など。旧式のタイプライター打ちのため、この種の誤記が原文に存在する。</li>
+<li><strong>PICTURE句の通貨記号</strong>は原文どおり <code>¥</code> とした（原文のタイプライターは <code>¥</code> キー）。</li>
+<li><strong>2進数の指定</strong>「COMP-8」は原文表記のまま。IBM COBOLでは2進（バイナリ）は <code>COMP</code>（<code>COMP-2</code>）である。</li>
+</ul>
+<h3 id="cobolコードの整桁規約">COBOLコードの整桁規約</h3>
+<p>本書のCOBOLコードは、下記の規約で整桁している（語句そのものは原文のまま。追加したのは空白のみ）。</p>
+<p><strong>データ部</strong></p>
+<table>
+<thead>
+<tr>
+<th>欄</th>
+<th>開始位置</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>レベル欄</td>
+<td>入れ子1段につき+2桁</td>
+<td>2桁のレベル番号 + 2空白</td>
+</tr>
+<tr>
+<td>項目名欄</td>
+<td>レベル欄+4桁目</td>
+<td>項目名・FD名</td>
+</tr>
+<tr>
+<td><strong>句欄</strong></td>
+<td><strong>25桁目に固定</strong></td>
+<td><code>PIC</code> <code>OCCURS</code> <code>INDEXED BY</code> <code>VALUE</code> <code>REDEFINES</code> <code>RECORDING MODE</code> などの句</td>
+</tr>
+<tr>
+<td><strong>値欄</strong></td>
+<td><strong>句欄+14桁（39桁目）</strong></td>
+<td>句の直後の値・項目名・リテラル</td>
+</tr>
+<tr>
+<td>3列目以降</td>
+<td>固定なし（2空白）</td>
+<td><code>TIMES</code> <code>MODE IS F</code> など</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="language-cobol">FD  INFL                RECORDING MODE   IS F
+                        RECORD CONTAINS  20 CHARACTERS
+01  IN-REC              PIC              X(20).
+  05  IN-KBN            PIC              X(5).
+</code></pre>
+<p><strong>手続き部</strong>（<code>GO TO</code> <code>MOVE TO</code> などの命令文）</p>
+<table>
+<thead>
+<tr>
+<th>欄</th>
+<th>開始位置</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>命令欄</td>
+<td>段落名より2桁インデント（入れ子1段ごとに+2桁）</td>
+<td>命令語。<code>GO TO</code> <code>AT END</code> <code>ON SIZE ERROR</code> <code>STOP RUN</code> は1句として扱う</td>
+</tr>
+<tr>
+<td>値欄1</td>
+<td>命令欄 +（最長命令語）+ 2桁</td>
+<td>第1オペランド</td>
+</tr>
+<tr>
+<td>前置詞欄</td>
+<td>値欄1 +（最長オペランド）+ 2桁</td>
+<td><code>TO</code> <code>FROM</code> <code>BY</code> <code>INTO</code> <code>GIVING</code> <code>THRU</code> <code>UP BY</code> <code>DOWN BY</code> <code>UPON</code></td>
+</tr>
+<tr>
+<td>値欄2</td>
+<td>前置詞欄 +（最長前置詞）+ 2桁</td>
+<td>第2オペランド</td>
+</tr>
+<tr>
+<td>以降</td>
+<td>固定なし（2空白）</td>
+<td><code>[ROUNDED]</code> <code>SW-END = 'E'.</code> など</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="language-cobol">MOVE  ZERO  TO     A B C.
+MOVE  A     TO     B.
+SET   IDX1  TO     1.
+SET   IDX1  UP BY  1.
+ADD   A B   TO     (B) ROUNDED.
+</code></pre>
+<p><strong>共通</strong></p>
+<ul>
+<li>項目名が25桁目に達するブロックでは、句欄を（名前の末尾+3桁）まで押し下げ、句欄・値欄はブロック内で同一位置に揃える</li>
+<li>句欄幅は標準14桁。<code>RECORDING MODE</code>（15桁）などを超えるブロックは（最長句+2桁）に拡張</li>
+<li>注釈（<code>←</code> <code>→</code>）は本文の最大幅+3桁に揃え、72桁を超える場合は直後3空白に置く</li>
+<li>構文の「形式」ブロックも同じ列に揃える。ただし <code>{ }</code> <code>[ ]</code> の選択肢-group は構造を保ち、継続行は直前行の同じ括弧の桁に揃える。桁計算は全角=2桁の表示幅で行う（半角のみで数えると全角ぶんだけずれる）。選択肢-group の開き括弧の前も 2空白あける</li>
+<li>フィールド間は必ず半角2つ以上。タブは使用しない。コードブロック内の行は表示幅72桁以内（実測 最大64桁）</li>
+<li>手続き部は段落名のあるブロックで命令欄を+2桁とし、入れ子関係は相対インデントで保つ（整形の再実行でインデントが増えない）</li>
+<li>
+<p><strong>対象外</strong>: JCL・TSOコマンド・CLIST・端末出力例・図解（矢印・枠線を含むブロック）、および「…文節」の列挙のみからなる一覧ブロック</p>
+</li>
+<li>
+<p>第五章の命令一覧、第七章 TSOのファイル関係図・モード関係図、第八章のPAD図は、原文の図をMermaidのフローチャートで再現したものである。PAD図そのものはN-S図（ボックス図）の表記であり、条件分岐を示す三角記号は「条件が真の時に右側（後続）の処理を実行する」と読み替えている。</p>
+</li>
+</ul>
+</main>
+<script>
+// 本文内「目次」の見出し直下リンクはサイドバーへ（重複ナビ防止ではなくそのまま表示維持）
+document.querySelectorAll('main a[href^="#"]').forEach(a=>{
+  a.addEventListener('click',e=>{
+    const t=document.getElementById(decodeURIComponent(a.hash.slice(1)));
+    if(t){e.preventDefault(); t.scrollIntoView({behavior:'smooth'}); history.replaceState(null,'',a.hash);}
+  });
+});
+</script>
+</body>
+</html>
