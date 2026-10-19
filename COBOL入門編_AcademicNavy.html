@@ -23,31 +23,9 @@ body{
 a{color:var(--navy-soft); text-decoration:none}
 a:hover{color:var(--navy-deep); text-decoration:underline}
 
-/* ===== サイドバー（目次） ===== */
-nav.sidebar{
-  position:fixed; top:0; left:0; bottom:0; width:300px; overflow-y:auto;
-  background:var(--navy-deep); color:#EFEAD9;
-  padding:28px 0 40px; border-right:4px solid var(--accent);
-}
-nav.sidebar .brand{
-  padding:0 24px 18px; border-bottom:1px solid rgba(255,255,255,.18); margin-bottom:14px;
-}
-nav.sidebar .brand .t{
-  font-size:19px; font-weight:700; letter-spacing:.06em; color:#F5F0DF;
-}
-nav.sidebar .brand .s{
-  font-size:11px; letter-spacing:.22em; color:#A8B8CC; margin-top:4px; text-transform:uppercase;
-}
-nav.sidebar ul{list-style:none; margin:0; padding:0}
-nav.sidebar .toc>ul{padding:0 10px}
-nav.sidebar li a{display:block; padding:6px 16px; color:#D8D2BF; border-left:3px solid transparent; line-height:1.5}
-nav.sidebar li a:hover{background:rgba(255,255,255,.07); color:#fff; text-decoration:none}
-nav.sidebar li ul li a{font-size:13px; padding-left:34px; color:#AEB9C6}
-nav.sidebar .toc ul ul{}
-
 /* ===== 本文（幅制限なし） ===== */
 main{
-  margin-left:300px; padding:56px 64px 120px; min-width:0;
+  padding:56px 64px 120px; min-width:0;
 }
 main>h1:first-of-type{
   margin:0 0 8px; font-size:42px; letter-spacing:.08em; color:var(--navy-deep); font-weight:700;
@@ -125,100 +103,13 @@ li{margin:.25em 0}
 /* 目次セクション（本文内の "## 目次" の直下リスト） */
 /* ===== フッター ===== */
 footer{
-  margin-left:300px; padding:24px 64px; border-top:1px solid var(--line);
+  padding:24px 64px; border-top:1px solid var(--line);
   color:var(--ink-soft); font-size:12px; letter-spacing:.08em;
 }
-@media print{ nav.sidebar{display:none} main,footer{margin-left:0} pre{box-shadow:none} }
+@media print{ pre{box-shadow:none} }
 </style>
 </head>
 <body>
-<nav class="sidebar">
-  <div class="brand">
-    <div class="t">COBOL入門編</div>
-    <div class="s">Academic Edition</div>
-  </div>
-<div class="toc">
-<ul>
-<li><a href="#第一章-cobolの概説_1">第一章 COBOLの概説</a><ul>
-<li><a href="#1-cobolの単位">1. COBOLの単位</a></li>
-<li><a href="#2-4つのdivision">2. 4つのDIVISION</a></li>
-<li><a href="#3-文字セット">3. 文字セット</a></li>
-</ul>
-</li>
-<li><a href="#第二章-identification-division-見出し部_1">第二章 IDENTIFICATION DIVISION（見出し部）</a><ul>
-<li><a href="#1-形式">1. 形式</a></li>
-</ul>
-</li>
-<li><a href="#第三章-environment-division-環境部_1">第三章 ENVIRONMENT DIVISION（環境部）</a><ul>
-<li><a href="#1-形式_1">1. 形式</a></li>
-</ul>
-</li>
-<li><a href="#第四章-data-division-データ部_1">第四章 DATA DIVISION（データ部）</a><ul>
-<li><a href="#1-形式_2">1. 形式</a></li>
-<li><a href="#息抜き">☆ 息抜き ☆</a></li>
-</ul>
-</li>
-<li><a href="#第五章-procedure-division-手続き部_1">第五章 PROCEDURE DIVISION（手続き部）</a><ul>
-<li><a href="#1-accept-命令">1. ACCEPT 命令</a></li>
-<li><a href="#2-add-命令-加算">2. ADD 命令（加算）</a></li>
-<li><a href="#3-subtract-命令-減算">3. SUBTRACT 命令（減算）</a></li>
-<li><a href="#4-multiply-命令-乗算">4. MULTIPLY 命令（乗算）</a></li>
-<li><a href="#5-divide-命令-除算">5. DIVIDE 命令（除算）</a></li>
-<li><a href="#6-compute-命令">6. COMPUTE 命令</a></li>
-<li><a href="#7-if-命令">7. IF 命令</a></li>
-<li><a href="#8-read-命令">8. READ 命令</a></li>
-<li><a href="#9-move-命令">9. MOVE 命令</a></li>
-<li><a href="#10-set-命令">10. SET 命令</a></li>
-<li><a href="#11-perform-命令">11. PERFORM 命令</a></li>
-<li><a href="#12-go-to-命令">12. GO TO 命令</a></li>
-<li><a href="#13-open-命令">13. OPEN 命令</a></li>
-<li><a href="#14-close-命令">14. CLOSE 命令</a></li>
-<li><a href="#15-write-命令">15. WRITE 命令</a></li>
-<li><a href="#16-display-命令">16. DISPLAY 命令</a></li>
-<li><a href="#17-search-命令">17. SEARCH 命令</a></li>
-<li><a href="#18-stop-run-goback">18. STOP RUN、GOBACK</a></li>
-</ul>
-</li>
-<li><a href="#第六章-フロー例とコーディング例_1">第六章 フロー例とコーディング例</a><ul>
-<li><a href="#マッチング処理とは">マッチング処理とは</a></li>
-<li><a href="#コントロールブレイク処理とは">コントロールブレイク処理とは</a></li>
-<li><a href="#1-マッチング処理のフロー例-1-1—スイッチを使用する場合">1. マッチング処理のフロー例（1:1）— スイッチを使用する場合</a></li>
-<li><a href="#2-マッチング処理のフロー例-1-1—スイッチを使用しない場合">2. マッチング処理のフロー例（1:1）— スイッチを使用しない場合</a></li>
-<li><a href="#3-スイッチを使用しない場合-1-n">3. スイッチを使用しない場合（1:N）</a></li>
-<li><a href="#4-スイッチを使用しない場合-n-n—同一keyのmaxが全く予想できない場合">4. スイッチを使用しない場合（N:N）— 同一KEYのMAXが全く予想できない場合</a></li>
-<li><a href="#5-マッチング処理の説明">5. マッチング処理の説明</a></li>
-<li><a href="#6-コントロールブレイクのフロー例">6. コントロールブレイクのフロー例</a></li>
-<li><a href="#コーディング例-main">コーディング例（MAIN）</a></li>
-</ul>
-</li>
-<li><a href="#第七章-tso_1">第七章 TSO</a><ul>
-<li><a href="#tsoのlogon">TSOのLOGON</a></li>
-<li><a href="#1-tso周辺のファイル関係図">1. TSO周辺のファイル関係図</a></li>
-<li><a href="#2-ファイル説明">2. ファイル説明</a></li>
-<li><a href="#3-ソースからロードモジュールまで">3. ソースからロードモジュールまで</a></li>
-<li><a href="#4-jclとtsoのテストの違い">4. JCLとTSOのテストの違い</a></li>
-<li><a href="#5-tsoモード関係図">5. TSOモード関係図</a></li>
-<li><a href="#6-clistの作り方">6. CLISTの作り方</a></li>
-<li><a href="#7-tsoの主なコマンド">7. TSOの主なコマンド</a></li>
-</ul>
-</li>
-<li><a href="#第八章-pad図_1">第八章 PAD図</a><ul>
-<li><a href="#1-pad図-1-1マッチング-スイッチ使用">1. PAD図（1:1マッチング、スイッチ使用）</a></li>
-<li><a href="#2-pad図-1-1マッチング-スイッチ不使用">2. PAD図（1:1マッチング、スイッチ不使用）</a></li>
-<li><a href="#3-pad図-1-nマッチング-スイッチ不使用">3. PAD図（1:Nマッチング、スイッチ不使用）</a></li>
-<li><a href="#4-pad図-n-nマッチング">4. PAD図（N:Nマッチング）</a></li>
-<li><a href="#5-pad図-コントロールブレイク">5. PAD図（コントロールブレイク）</a></li>
-</ul>
-</li>
-<li><a href="#_1">---</a></li>
-<li><a href="#付記-デジタル化に際して">付記（デジタル化に際して）</a><ul>
-<li><a href="#cobolコードの整桁規約">COBOLコードの整桁規約</a></li>
-</ul>
-</li>
-</ul>
-</div>
-
-</nav>
 <main>
 <h1 id="cobol入門編">COBOL入門編</h1>
 <p><strong>東京システム営業5部1課</strong>
